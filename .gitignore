@@ -10,3 +10,9 @@ node_modules/
 .env
 .env.*
 .venv
+
+# Build
+dist/
+
+# Caches
+.eslintcache
