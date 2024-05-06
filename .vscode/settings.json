@@ -1,0 +1,32 @@
+{
+  "files.autoSave": "onFocusChange",
+  "editor.formatOnSave": true,
+  "git.autoStash": true,
+  "editor.suggestSelection": "first",
+  "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": false
+  },
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.tabCompletion": "on",
+  "[dotenv]": {
+      "editor.formatOnSave": false
+  },
+  "yaml.schemas": {
+      "https://json.schemastore.org/github-workflow.json": ".github/workflows/**/*.yml"
+  },
+  "files.associations": {
+      ".env.sample": "properties",
+  },
+  "search.exclude": {
+  },
+  "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+  },
+}
