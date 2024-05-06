@@ -24,5 +24,18 @@ module.exports = {
     'sort-imports': 0, // we use eslint-plugin-import instead
     'simple-import-sort/imports': 1,
     'simple-import-sort/exports': 1,
+
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        args: 'all',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      },
+    ],
   },
 }
