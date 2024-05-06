@@ -44,5 +44,7 @@
     "test": "npm run test:ts-jest",
     "test:ts-jest": "npx jest --config ../../configs/ts-jest.config.json"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "zod": "^3.23.6"
+  }
 }
