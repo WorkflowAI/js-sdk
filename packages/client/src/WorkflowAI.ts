@@ -1,4 +1,4 @@
-import '@workflowai/api/polyfill'
+import '@workflowai/api/fetch-polyfill'
 
 import {
   initWorkflowAIApi,

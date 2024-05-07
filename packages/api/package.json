@@ -14,13 +14,14 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "exports": {
-    "import": {
+    ".": {
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.js"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     },
-    "require": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/cjs/index.js"
+    "./fetch-polyfill": {
+      "import": "./dist/esm/fetch-polyfill.js",
+      "require": "./dist/cjs/fetch-polyfill.js"
     }
   },
   "files": [
@@ -28,7 +29,7 @@
   ],
   "scripts": {
     "-------- OPENAPI": "",
-    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.d.ts",
+    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts",
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
