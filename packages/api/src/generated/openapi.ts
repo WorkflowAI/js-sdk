@@ -3,97 +3,96 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
-  "/tasks/generate": {
+  '/tasks/generate': {
     /**
      * Generate Io
      * @description Generate a new task based on natural language
      */
-    post: operations["generate_io_tasks_generate_post"];
-  };
-  "/tasks": {
+    post: operations['generate_io_tasks_generate_post']
+  }
+  '/tasks': {
     /** List Tasks */
-    get: operations["list_tasks_tasks_get"];
+    get: operations['list_tasks_tasks_get']
     /**
      * Create Task
      * @description Create a new task
      */
-    post: operations["create_task_tasks_post"];
-  };
-  "/runs/{run_id}": {
+    post: operations['create_task_tasks_post']
+  }
+  '/runs/{run_id}': {
     /** Get Run */
-    get: operations["get_run_runs__run_id__get"];
-  };
-  "/runs/{run_id}/annotate": {
+    get: operations['get_run_runs__run_id__get']
+  }
+  '/runs/{run_id}/annotate': {
     /**
      * Annotate
      * @description Annotate (user evaluate) a task run.
      */
-    post: operations["annotate_runs__run_id__annotate_post"];
-  };
-  "/runs/{run_id}/examples": {
+    post: operations['annotate_runs__run_id__annotate_post']
+  }
+  '/runs/{run_id}/examples': {
     /**
      * Create Example
      * @deprecated
      * @description Use /annotate instead
      */
-    post: operations["create_example_runs__run_id__examples_post"];
-  };
-  "/models": {
+    post: operations['create_example_runs__run_id__examples_post']
+  }
+  '/models': {
     /** List Models */
-    get: operations["list_models_models_get"];
-  };
-  "/examples/{example_id}": {
+    get: operations['list_models_models_get']
+  }
+  '/examples/{example_id}': {
     /** Get Task Example */
-    get: operations["get_task_example_examples__example_id__get"];
+    get: operations['get_task_example_examples__example_id__get']
     /** Delete Task Example */
-    delete: operations["delete_task_example_examples__example_id__delete"];
-  };
-  "/tasks/{task_id}/schemas/{task_schema_id}": {
+    delete: operations['delete_task_example_examples__example_id__delete']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}': {
     /** Get Task Schema */
-    get: operations["get_task_schema_tasks__task_id__schemas__task_schema_id__get"];
-  };
-  "/tasks/{task_id}/schemas/{task_schema_id}/runs": {
+    get: operations['get_task_schema_tasks__task_id__schemas__task_schema_id__get']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/runs': {
     /** List Task Runs */
-    get: operations["list_task_runs_tasks__task_id__schemas__task_schema_id__runs_get"];
+    get: operations['list_task_runs_tasks__task_id__schemas__task_schema_id__runs_get']
     /**
      * Create Task Run
      * @description Import a task run
      */
-    post: operations["create_task_run_tasks__task_id__schemas__task_schema_id__runs_post"];
-  };
-  "/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate": {
+    post: operations['create_task_run_tasks__task_id__schemas__task_schema_id__runs_post']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate': {
     /**
      * Aggregate Task Runs
      * @description Compute statistics for task runs for a task schema
      */
-    get: operations["aggregate_task_runs_tasks__task_id__schemas__task_schema_id__runs_aggregate_get"];
-  };
-  "/tasks/{task_id}/schemas/{task_schema_id}/run": {
+    get: operations['aggregate_task_runs_tasks__task_id__schemas__task_schema_id__runs_aggregate_get']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/run': {
     /**
      * Run Schema
      * @description Run a task with a group id
      */
-    post: operations["run_schema_tasks__task_id__schemas__task_schema_id__run_post"];
-  };
-  "/tasks/{task_id}/schemas/{task_schema_id}/examples": {
+    post: operations['run_schema_tasks__task_id__schemas__task_schema_id__run_post']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/examples': {
     /** List Examples */
-    get: operations["list_examples_tasks__task_id__schemas__task_schema_id__examples_get"];
+    get: operations['list_examples_tasks__task_id__schemas__task_schema_id__examples_get']
     /** Add Example */
-    post: operations["add_example_tasks__task_id__schemas__task_schema_id__examples_post"];
-  };
-  "/tasks/{task_id}/schemas/{task_schema_id}/scores": {
+    post: operations['add_example_tasks__task_id__schemas__task_schema_id__examples_post']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/scores': {
     /** List Scores */
-    get: operations["list_scores_tasks__task_id__schemas__task_schema_id__scores_get"];
-  };
-  "/tasks/{task_id}/groups/{group_id}": {
+    get: operations['list_scores_tasks__task_id__schemas__task_schema_id__scores_get']
+  }
+  '/tasks/{task_id}/groups/{group_id}': {
     /** Get Task Group */
-    get: operations["get_task_group_tasks__task_id__groups__group_id__get"];
-  };
+    get: operations['get_task_group_tasks__task_id__groups__group_id__get']
+  }
 }
 
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
@@ -103,330 +102,332 @@ export interface components {
        * Score
        * @description The score of the evaluation
        */
-      score: number;
+      score: number
       /**
        * Corrections
        * @description Corrections to the task output as a json object keypath: value.
        * If the score is 0 and there are no corrections, the example will not be created.
        * Otherwise, the example will be created with the corrected output. If there is an evaluator associated with the task, the task run will be evaluated asynchronously against the example.
        */
-      corrections?: Record<string, never> | null;
+      corrections?: Record<string, never> | null
       /**
        * Comment
        * @description An optional comment from the evaluation
        */
-      comment?: string | null;
-    };
+      comment?: string | null
+    }
     /**
      * ApiTaskIO
      * @description Mixin for task io objects that are used in the API
      * It makes sure that the class methods are not called directly
      */
     ApiTaskIO: {
-      [key: string]: unknown;
-    };
+      [key: string]: unknown
+    }
     /** CreateTaskRequest */
     CreateTaskRequest: {
       /**
        * Name
        * @description the task display name
        */
-      name: string;
+      name: string
       /** Input Schema */
-      input_schema: Record<string, never>;
+      input_schema: Record<string, never>
       /** Output Schema */
-      output_schema: Record<string, never>;
-      properties?: components["schemas"]["TaskRunGroupProperties"];
-      evaluator_options?: components["schemas"]["SerializableEvaluatorOptions"] | null;
+      output_schema: Record<string, never>
+      properties?: components['schemas']['TaskRunGroupProperties']
+      evaluator_options?:
+        | components['schemas']['SerializableEvaluatorOptions']
+        | null
       /**
        * Evaluator For
        * @description A task id, if any, that this task can evaluate
        */
-      evaluator_for?: string | null;
+      evaluator_for?: string | null
       /**
        * Task Id
        * @description the task id, stable accross all variants. If not provided, an id based on the name is generated.
        */
-      task_id?: string | null;
-    };
+      task_id?: string | null
+    }
     /** CreateTaskRunRequest */
     CreateTaskRunRequest: {
       /**
        * Task Input
        * @description the input of the task. Must match the input schema
        */
-      task_input: Record<string, never>;
+      task_input: Record<string, never>
       /**
        * Task Output
        * @description the output of the task. Must match the output schema
        */
-      task_output: Record<string, never>;
-      group: components["schemas"]["api__schemas__create_task_run_request__CreateTaskRunRequest__Group"];
+      task_output: Record<string, never>
+      group: components['schemas']['api__schemas__create_task_run_request__CreateTaskRunRequest__Group']
       /**
        * Id
        * @description The id to use for a task run. If not provided a uuid will be generated
        */
-      id?: string | null;
+      id?: string | null
       /**
        * Start Time
        * @description the time the run was started.
        */
-      start_time?: string | null;
+      start_time?: string | null
       /**
        * End Time
        * @description the time the run ended.
        */
-      end_time?: string | null;
+      end_time?: string | null
       /**
        * Labels
        * @description A list of labels for the task run.
        */
-      labels?: string[] | null;
-    };
+      labels?: string[] | null
+    }
     /** Evaluator */
     Evaluator: {
       /**
        * Id
        * @description The id of the evaluator that computed the score. Only one score per id can be attached to a task run.
        */
-      id: string;
+      id: string
       /**
        * Name
        * @description The name of the evaluator that computed the score e-g 'equality' or 'user'
        */
-      name: string;
+      name: string
       /** Properties */
-      properties: Record<string, never>;
-    };
+      properties: Record<string, never>
+    }
     /** Group */
-    "Group-Output": {
+    'Group-Output': {
       /**
        * Id
        * @description The group id either client provided or generated, stable for given set of properties
        */
-      id: string;
+      id: string
       /**
        * Iteration
        * @description The iteration of the group, incremented for each new group
        */
-      iteration: number;
+      iteration: number
       /** @description The properties used for executing the run. */
-      properties: components["schemas"]["TaskRunGroupProperties"];
+      properties: components['schemas']['TaskRunGroupProperties']
       /**
        * Tags
        * @description A list of tags associated with the group, computed from the properties
        */
-      tags: string[];
-    };
+      tags: string[]
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
+      detail?: components['schemas']['ValidationError'][]
+    }
     /** Model */
     Model: {
       /** Id */
-      id: string;
+      id: string
       /** Name */
-      name: string;
+      name: string
       /** Providers */
-      providers: components["schemas"]["Provider"][];
+      providers: components['schemas']['Provider'][]
       /**
        * Modes
        * @description The modes supported by the model
        */
-      modes: ("images" | "text")[];
-    };
+      modes: ('images' | 'text')[]
+    }
     /** ModelResponse */
     ModelResponse: {
       /** Models */
-      models: components["schemas"]["Model"][];
-    };
+      models: components['schemas']['Model'][]
+    }
     /** Page[SerializableTaskExample] */
     Page_SerializableTaskExample_: {
       /** Items */
-      items: components["schemas"]["SerializableTaskExample"][];
+      items: components['schemas']['SerializableTaskExample'][]
       /** Count */
-      count?: number | null;
-    };
+      count?: number | null
+    }
     /** Page[SerializableTaskRunAggregate] */
     Page_SerializableTaskRunAggregate_: {
       /** Items */
-      items: components["schemas"]["SerializableTaskRunAggregate"][];
+      items: components['schemas']['SerializableTaskRunAggregate'][]
       /** Count */
-      count?: number | null;
-    };
+      count?: number | null
+    }
     /** Page[SerializableTaskRun] */
     Page_SerializableTaskRun_: {
       /** Items */
-      items: components["schemas"]["SerializableTaskRun"][];
+      items: components['schemas']['SerializableTaskRun'][]
       /** Count */
-      count?: number | null;
-    };
+      count?: number | null
+    }
     /** Page[SerializableTaskScoreAggregate] */
     Page_SerializableTaskScoreAggregate_: {
       /** Items */
-      items: components["schemas"]["SerializableTaskScoreAggregate"][];
+      items: components['schemas']['SerializableTaskScoreAggregate'][]
       /** Count */
-      count?: number | null;
-    };
+      count?: number | null
+    }
     /** Page[SerializableTask] */
     Page_SerializableTask_: {
       /** Items */
-      items: components["schemas"]["SerializableTask"][];
+      items: components['schemas']['SerializableTask'][]
       /** Count */
-      count?: number | null;
-    };
+      count?: number | null
+    }
     /** PartialTaskVersion */
     PartialTaskVersion: {
       /** Schema Id */
-      schema_id: number;
+      schema_id: number
       /** Variant Id */
-      variant_id: string;
+      variant_id: string
       /** Input Schema Version */
-      input_schema_version: string;
+      input_schema_version: string
       /** Output Schema Version */
-      output_schema_version: string;
+      output_schema_version: string
       /**
        * Created At
        * Format: date-time
        * @default 1970-01-01T00:00:00Z
        */
-      created_at?: string;
-    };
+      created_at?: string
+    }
     /** Provider */
     Provider: {
       /** Name */
-      name: string;
+      name: string
       /** Id */
-      id: string;
-    };
+      id: string
+    }
     /** RunRequest */
     RunRequest: {
       /** @description The input of the task. Must match the input schema */
-      task_input: components["schemas"]["ApiTaskIO"];
-      group: components["schemas"]["api__routers__task_schemas__RunRequest__Group"];
+      task_input: components['schemas']['ApiTaskIO']
+      group: components['schemas']['api__routers__task_schemas__RunRequest__Group']
       /**
        * Id
        * @description An optional id. If not provided a uuid will be generated
        */
-      id?: string;
+      id?: string
       /**
        * Stream
        * @default false
        */
-      stream?: boolean;
-    };
+      stream?: boolean
+    }
     /**
      * SerializableEvaluatorOptions
      * @description Specify how a task will be evaluated
      */
     SerializableEvaluatorOptions: {
-      [key: string]: unknown;
-    };
+      [key: string]: unknown
+    }
     /** SerializableTask */
     SerializableTask: {
       /** Id */
-      id: string;
+      id: string
       /** Name */
-      name: string;
+      name: string
       /** Versions */
-      versions: components["schemas"]["PartialTaskVersion"][];
-    };
+      versions: components['schemas']['PartialTaskVersion'][]
+    }
     /** SerializableTaskEvaluation */
     SerializableTaskEvaluation: {
       /**
        * Score
        * @description The score of the evaluation
        */
-      score: number;
+      score: number
       /**
        * Tags
        * @description Metadata added by the evaluator
        */
-      tags?: string[] | null;
+      tags?: string[] | null
       /**
        * Comment
        * @description An optional comment from the evaluation
        */
-      comment?: string | null;
+      comment?: string | null
       /** @description Information about the evaluator that computed the score */
-      evaluator: components["schemas"]["Evaluator"];
+      evaluator: components['schemas']['Evaluator']
       /**
        * Created At
        * Format: date-time
        * @description The time at which the score was created
        */
-      created_at?: string;
-    };
+      created_at?: string
+    }
     /** SerializableTaskExample */
     SerializableTaskExample: {
       /**
        * Id
        * @description the id of the example. Read only
        */
-      id: string;
+      id: string
       /**
        * Task Id
        * @description the id of the associated task. Read only
        */
-      task_id: string;
+      task_id: string
       /**
        * Task Schema Id
        * @description the task schema index
        */
-      task_schema_id: number;
+      task_schema_id: number
       /** Task Input */
-      task_input: Record<string, never>;
+      task_input: Record<string, never>
       /**
        * Task Input Hash
        * @description a hash describing the input
        */
-      task_input_hash: string;
+      task_input_hash: string
       /** Task Output */
-      task_output: Record<string, never>;
+      task_output: Record<string, never>
       /**
        * Task Output Hash
        * @description a hash describing the output
        */
-      task_output_hash: string;
+      task_output_hash: string
       /**
        * Created At
        * @description the creation date of the example. Read only
        */
-      created_at?: string | null;
+      created_at?: string | null
       /** From Task Run Id */
-      from_task_run_id?: string | null;
+      from_task_run_id?: string | null
       /**
        * In Training Set
        * @description whether the example belongs to the training set
        * @default false
        */
-      in_training_set?: boolean;
+      in_training_set?: boolean
       /**
        * Task Input Vector
        * @description an optional embedding of the input of the example
        */
-      task_input_vector?: number[] | null;
+      task_input_vector?: number[] | null
       /**
        * From Correction
        * @description whether the example comes from a correction, i-e whether the LLM made a mistake in the original task run
        */
-      from_correction?: boolean | null;
-    };
+      from_correction?: boolean | null
+    }
     /** SerializableTaskIO */
     SerializableTaskIO: {
       /**
        * Version
        * @description the version of the schema definition. Titles and descriptions are ignored.
        */
-      version: string;
+      version: string
       /**
        * Json Schema
        * @description A json schema
        */
-      json_schema: Record<string, never>;
-    };
+      json_schema: Record<string, never>
+    }
     /**
      * SerializableTaskRun
      * @description A task run represents an instance of a task being executed
@@ -436,128 +437,128 @@ export interface components {
        * Id
        * @description the id of the task run. If not provided a uuid will be generated
        */
-      id: string;
+      id: string
       /**
        * Task Id
        * @description the id of the associated task, read only
        */
-      task_id: string;
+      task_id: string
       /**
        * Task Schema Id
        * @description the schema idx of the associated task, read only
        */
-      task_schema_id: number;
+      task_schema_id: number
       /** Task Input */
-      task_input: Record<string, never>;
+      task_input: Record<string, never>
       /**
        * Task Input Hash
        * @description a hash describing the input
        */
-      task_input_hash: string;
+      task_input_hash: string
       /** Task Output */
-      task_output: Record<string, never>;
+      task_output: Record<string, never>
       /**
        * Task Output Hash
        * @description a hash describing the output
        */
-      task_output_hash: string;
-      group: components["schemas"]["Group-Output"];
+      task_output_hash: string
+      group: components['schemas']['Group-Output']
       /** Start Time */
-      start_time?: string | null;
+      start_time?: string | null
       /** End Time */
-      end_time?: string | null;
+      end_time?: string | null
       /** Duration Seconds */
-      duration_seconds?: number | null;
+      duration_seconds?: number | null
       /**
        * Created At
        * Format: date-time
        * @description The time the task run was created
        */
-      created_at?: string;
+      created_at?: string
       /**
        * Example Id
        * @description The id of the example that share the same input as the task run
        */
-      example_id?: string | null;
+      example_id?: string | null
       /**
        * Corrections
        * @description The corrections that were applied to the task output if used as a base for an evaluation
        */
-      corrections?: Record<string, never> | null;
+      corrections?: Record<string, never> | null
       /** Parent Task Ids */
-      parent_task_ids?: string[] | null;
+      parent_task_ids?: string[] | null
       /**
        * Scores
        * @description A list of scores computed for the task run. A run can be evaluated in multiple ways.
        */
-      scores?: components["schemas"]["SerializableTaskEvaluation"][] | null;
+      scores?: components['schemas']['SerializableTaskEvaluation'][] | null
       /**
        * Labels
        * @description A set of labels that are attached to the task runs. They are indexed.
        */
-      labels?: string[] | null;
-    };
+      labels?: string[] | null
+    }
     /**
      * SerializableTaskRunAggregate
      * @description Score that is aggregated by runner version and tags
      */
     SerializableTaskRunAggregate: {
-      group: components["schemas"]["Group-Output"];
+      group: components['schemas']['Group-Output']
       /**
        * First Appeared
        * Format: date-time
        */
-      first_appeared: string;
+      first_appeared: string
       /**
        * Average Duration Seconds
        * @description The average duration in seconds
        */
-      average_duration_seconds?: number | null;
+      average_duration_seconds?: number | null
       /**
        * Scored Count
        * @description The number of scores
        * @default 0
        */
-      scored_count?: number;
+      scored_count?: number
       /**
        * Total Count
        * @description The number of task runs
        * @default 0
        */
-      total_count?: number;
-    };
+      total_count?: number
+    }
     /**
      * SerializableTaskScoreAggregate
      * @description Score that is aggregated by runner version and tags
      */
     SerializableTaskScoreAggregate: {
       /** Average Score */
-      average_score: number;
+      average_score: number
       /** Average Duration Seconds */
-      average_duration_seconds: number;
+      average_duration_seconds: number
       /** Count */
-      count: number;
-      evaluator: components["schemas"]["Evaluator"];
+      count: number
+      evaluator: components['schemas']['Evaluator']
       /**
        * First Appeared
        * Format: date-time
        */
-      first_appeared: string;
-      group: components["schemas"]["Group-Output"];
-    };
+      first_appeared: string
+      group: components['schemas']['Group-Output']
+    }
     /** SerializableTaskVariant */
     SerializableTaskVariant: {
       /**
        * Id
        * @description the task version id, computed based on the other parameters. Read only.
        */
-      id: string;
+      id: string
       /**
        * Task Id
        * @description the task id, stable accross all versions
        * @default
        */
-      task_id?: string;
+      task_id?: string
       /**
        * Task Schema Id
        * @description The task schema idx. The schema index only changes when the types
@@ -565,41 +566,43 @@ export interface components {
        *         have compatible input / output objects. Read only
        * @default 0
        */
-      task_schema_id?: number;
+      task_schema_id?: number
       /**
        * Name
        * @description the task display name
        */
-      name: string;
-      input_schema: components["schemas"]["SerializableTaskIO"];
-      output_schema: components["schemas"]["SerializableTaskIO"];
-      properties: components["schemas"]["TaskRunGroupProperties"];
-      evaluator_options?: components["schemas"]["SerializableEvaluatorOptions"] | null;
+      name: string
+      input_schema: components['schemas']['SerializableTaskIO']
+      output_schema: components['schemas']['SerializableTaskIO']
+      properties: components['schemas']['TaskRunGroupProperties']
+      evaluator_options?:
+        | components['schemas']['SerializableEvaluatorOptions']
+        | null
       /**
        * Created At
        * Format: date-time
        */
-      created_at?: string;
+      created_at?: string
       /**
        * Evaluator For
        * @description A task id, if any, that this task can evaluate
        */
-      evaluator_for?: string | null;
-    };
+      evaluator_for?: string | null
+    }
     /** TaskGenerateRequest */
     TaskGenerateRequest: {
       /** Description */
-      description: string;
-    };
+      description: string
+    }
     /** TaskGenerateResponse */
     TaskGenerateResponse: {
       /** Name */
-      name: string;
+      name: string
       /** Input Schema */
-      input_schema: Record<string, never>;
+      input_schema: Record<string, never>
       /** Output Schema */
-      output_schema: Record<string, never>;
-    };
+      output_schema: Record<string, never>
+    }
     /**
      * TaskRunGroupProperties
      * @description Properties that described a way a task run was executed.
@@ -610,126 +613,125 @@ export interface components {
        * Model
        * @description The LLM model used for the run
        */
-      model?: string | null;
+      model?: string | null
       /**
        * Provider
        * @description The LLM provider used for the run
        */
-      provider?: string | null;
+      provider?: string | null
       /**
        * Temperature
        * @description The temperature for generation
        */
-      temperature?: number | null;
+      temperature?: number | null
       /**
        * Instructions
        * @description The instructions passed to the runner in order to generate the prompt.
        */
-      instructions?: string | null;
+      instructions?: string | null
       /**
        * Max Tokens
        * @description The maximum tokens to generate in the prompt
        */
-      max_tokens?: number | null;
+      max_tokens?: number | null
       /**
        * Few Shot Count
        * @description Number of few-shot examples to use for the task
        */
-      few_shot_count?: number | null;
+      few_shot_count?: number | null
       /**
        * Training Set Version
        * @description The version of the training set used
        */
-      training_set_version?: string | null;
-      [key: string]: unknown;
-    };
+      training_set_version?: string | null
+      [key: string]: unknown
+    }
     /** TaskSchemaResponse */
     TaskSchemaResponse: {
       /** Task Id */
-      task_id: string;
+      task_id: string
       /** Schema Id */
-      schema_id: number;
-      input_schema: components["schemas"]["SerializableTaskIO"];
-      output_schema: components["schemas"]["SerializableTaskIO"];
-    };
+      schema_id: number
+      input_schema: components['schemas']['SerializableTaskIO']
+      output_schema: components['schemas']['SerializableTaskIO']
+    }
     /** ValidationError */
     ValidationError: {
       /** Location */
-      loc: (string | number)[];
+      loc: (string | number)[]
       /** Message */
-      msg: string;
+      msg: string
       /** Error Type */
-      type: string;
-    };
+      type: string
+    }
     /** CreateExampleRequest */
     api__routers__runs__CreateExampleRequest: {
       /**
        * Corrections
        * @description Corrections to the task output as a json object keypath: value
        */
-      corrections: Record<string, never>;
-    };
+      corrections: Record<string, never>
+    }
     /** Group */
     api__routers__task_schemas__RunRequest__Group: {
       /**
        * Id
        * @description The group id to use as a base for the run.The group id must already exist and have been generated using a WorkflowAI runner.
        */
-      id: string;
+      id: string
       /** @description An optional set of properties that will override the group properties. */
-      properties?: components["schemas"]["TaskRunGroupProperties"] | null;
-    };
+      properties?: components['schemas']['TaskRunGroupProperties'] | null
+    }
     /** CreateExampleRequest */
     api__schemas__create_example_request__CreateExampleRequest: {
       /**
        * Task Input
        * @description the input of the task. Must match the input schema
        */
-      task_input: Record<string, never>;
+      task_input: Record<string, never>
       /**
        * Task Output
        * @description the output of the task. Must match the output schema
        */
-      task_output: Record<string, never>;
+      task_output: Record<string, never>
       /** From Task Run Id */
-      from_task_run_id?: string | null;
+      from_task_run_id?: string | null
       /** In Training Set */
-      in_training_set?: boolean | null;
+      in_training_set?: boolean | null
       /**
        * From Correction
        * @description whether the example comes from a correction, i-e whether the LLM made a mistake in the original task run
        */
-      from_correction?: boolean | null;
-    };
+      from_correction?: boolean | null
+    }
     /** Group */
     api__schemas__create_task_run_request__CreateTaskRunRequest__Group: {
       /**
        * Id
        * @description An optional client provided id for the group. Must be unique. If not provided, properties is required and a uuid will be generated. If provided and properties is unset, a corresponding group must exist.
        */
-      id?: string | null;
+      id?: string | null
       /** @description The properties used for executing the run. Must be provided if the id is not provided. */
-      properties?: components["schemas"]["TaskRunGroupProperties"] | null;
+      properties?: components['schemas']['TaskRunGroupProperties'] | null
       /**
        * Tags
        * @description A list of tags to associate with the group.Tags will be indexed.
        */
-      tags?: string[] | null;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+      tags?: string[] | null
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
 
-export type $defs = Record<string, never>;
+export type $defs = Record<string, never>
 
-export type external = Record<string, never>;
+export type external = Record<string, never>
 
 export interface operations {
-
   /**
    * Generate Io
    * @description Generate a new task based on natural language
@@ -737,35 +739,35 @@ export interface operations {
   generate_io_tasks_generate_post: {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["TaskGenerateRequest"];
-      };
-    };
+        'application/json': components['schemas']['TaskGenerateRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["TaskGenerateResponse"];
-        };
-      };
+          'application/json': components['schemas']['TaskGenerateResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** List Tasks */
   list_tasks_tasks_get: {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_SerializableTask_"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['Page_SerializableTask_']
+        }
+      }
+    }
+  }
   /**
    * Create Task
    * @description Create a new task
@@ -773,46 +775,46 @@ export interface operations {
   create_task_tasks_post: {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateTaskRequest"];
-      };
-    };
+        'application/json': components['schemas']['CreateTaskRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskVariant"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskVariant']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** Get Run */
   get_run_runs__run_id__get: {
     parameters: {
       path: {
-        run_id: string;
-      };
-    };
+        run_id: string
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskRun"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /**
    * Annotate
    * @description Annotate (user evaluate) a task run.
@@ -820,29 +822,29 @@ export interface operations {
   annotate_runs__run_id__annotate_post: {
     parameters: {
       path: {
-        run_id: string;
-      };
-    };
+        run_id: string
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["AnnotateRequest"];
-      };
-    };
+        'application/json': components['schemas']['AnnotateRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskRun"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /**
    * Create Example
    * @deprecated
@@ -851,174 +853,174 @@ export interface operations {
   create_example_runs__run_id__examples_post: {
     parameters: {
       path: {
-        run_id: string;
-      };
-    };
+        run_id: string
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["api__routers__runs__CreateExampleRequest"];
-      };
-    };
+        'application/json': components['schemas']['api__routers__runs__CreateExampleRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskExample"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** List Models */
   list_models_models_get: {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["ModelResponse"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['ModelResponse']
+        }
+      }
+    }
+  }
   /** Get Task Example */
   get_task_example_examples__example_id__get: {
     parameters: {
       path: {
-        example_id: string;
-      };
-    };
+        example_id: string
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskExample"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** Delete Task Example */
   delete_task_example_examples__example_id__delete: {
     parameters: {
       path: {
-        example_id: string;
-      };
-    };
+        example_id: string
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-        };
-      };
+          'application/json': unknown
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** Get Task Schema */
   get_task_schema_tasks__task_id__schemas__task_schema_id__get: {
     parameters: {
       path: {
-        task_id: string;
-        task_schema_id: number;
-      };
-    };
+        task_id: string
+        task_schema_id: number
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["TaskSchemaResponse"];
-        };
-      };
+          'application/json': components['schemas']['TaskSchemaResponse']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** List Task Runs */
   list_task_runs_tasks__task_id__schemas__task_schema_id__runs_get: {
     parameters: {
       query?: {
         /** @description The hash of the task input */
-        task_input_hash?: string | null;
+        task_input_hash?: string | null
         /** @description The hash of the task output */
-        task_output_hash?: string | null;
+        task_output_hash?: string | null
         /** @description Whether the task has been scored */
-        has_scores?: boolean | null;
+        has_scores?: boolean | null
         /** @description A list of evaluator names that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by?: string[] | null;
+        evaluated_by?: string[] | null
         /** @description A list of evaluator names that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by?: string[] | null;
+        not_evaluated_by?: string[] | null
         /** @description A list of evaluator ids that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by_ids?: string[] | null;
+        evaluated_by_ids?: string[] | null
         /** @description A list of evaluator ids that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by_ids?: string[] | null;
+        not_evaluated_by_ids?: string[] | null
         /** @description Whether the task has an associated example */
-        has_example?: boolean | null;
+        has_example?: boolean | null
         /** @description The id of the example associated with the task run */
-        example_id?: string | null;
+        example_id?: string | null
         /** @description An id of a task run group */
-        group_id?: string | null;
+        group_id?: string | null
         /** @description The hash of a task run group */
-        group_hash?: string | null;
+        group_hash?: string | null
         /** @description A list of group tags */
-        group_tags?: string[] | null;
-        task_output_filters?: string[] | null;
-        task_input_filters?: string[] | null;
+        group_tags?: string[] | null
+        task_output_filters?: string[] | null
+        task_input_filters?: string[] | null
         /** @description The field to sort by */
-        sort_by?: "created_at" | "recent";
+        sort_by?: 'created_at' | 'recent'
         /** @description A list of labels to filter by */
-        labels?: string[] | null;
+        labels?: string[] | null
         /** @description Make sure only one task run is returned per unique value of the requested field */
-        unique_by?: "task_input_hash" | "task_output_hash" | "";
+        unique_by?: 'task_input_hash' | 'task_output_hash' | ''
         /** @description The number of items to return */
-        limit?: number;
+        limit?: number
         /** @description The number of items to skip */
-        offset?: number | null;
+        offset?: number | null
         /** @description The version of the task input class */
-        task_input_schema_version?: string | null;
+        task_input_schema_version?: string | null
         /** @description The version of the task output class */
-        task_output_schema_version?: string | null;
-      };
+        task_output_schema_version?: string | null
+      }
       path: {
         /** @description The id of the task */
-        task_id: string;
+        task_id: string
         /** @description The schema id */
-        task_schema_id: number;
-      };
-    };
+        task_schema_id: number
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_SerializableTaskRun_"];
-        };
-      };
+          'application/json': components['schemas']['Page_SerializableTaskRun_']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /**
    * Create Task Run
    * @description Import a task run
@@ -1026,30 +1028,30 @@ export interface operations {
   create_task_run_tasks__task_id__schemas__task_schema_id__runs_post: {
     parameters: {
       path: {
-        task_id: string;
-        task_schema_id: number;
-      };
-    };
+        task_id: string
+        task_schema_id: number
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateTaskRunRequest"];
-      };
-    };
+        'application/json': components['schemas']['CreateTaskRunRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskRun"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /**
    * Aggregate Task Runs
    * @description Compute statistics for task runs for a task schema
@@ -1058,68 +1060,68 @@ export interface operations {
     parameters: {
       query?: {
         /** @description The hash of the task input */
-        task_input_hash?: string | null;
+        task_input_hash?: string | null
         /** @description The hash of the task output */
-        task_output_hash?: string | null;
+        task_output_hash?: string | null
         /** @description Whether the task has been scored */
-        has_scores?: boolean | null;
+        has_scores?: boolean | null
         /** @description A list of evaluator names that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by?: string[] | null;
+        evaluated_by?: string[] | null
         /** @description A list of evaluator names that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by?: string[] | null;
+        not_evaluated_by?: string[] | null
         /** @description A list of evaluator ids that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by_ids?: string[] | null;
+        evaluated_by_ids?: string[] | null
         /** @description A list of evaluator ids that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by_ids?: string[] | null;
+        not_evaluated_by_ids?: string[] | null
         /** @description Whether the task has an associated example */
-        has_example?: boolean | null;
+        has_example?: boolean | null
         /** @description The id of the example associated with the task run */
-        example_id?: string | null;
+        example_id?: string | null
         /** @description An id of a task run group */
-        group_id?: string | null;
+        group_id?: string | null
         /** @description The hash of a task run group */
-        group_hash?: string | null;
+        group_hash?: string | null
         /** @description A list of group tags */
-        group_tags?: string[] | null;
-        task_output_filters?: string[] | null;
-        task_input_filters?: string[] | null;
+        group_tags?: string[] | null
+        task_output_filters?: string[] | null
+        task_input_filters?: string[] | null
         /** @description The field to sort by */
-        sort_by?: "created_at" | "recent";
+        sort_by?: 'created_at' | 'recent'
         /** @description A list of labels to filter by */
-        labels?: string[] | null;
+        labels?: string[] | null
         /** @description Make sure only one task run is returned per unique value of the requested field */
-        unique_by?: "task_input_hash" | "task_output_hash" | "";
+        unique_by?: 'task_input_hash' | 'task_output_hash' | ''
         /** @description The number of items to return */
-        limit?: number;
+        limit?: number
         /** @description The number of items to skip */
-        offset?: number | null;
+        offset?: number | null
         /** @description The version of the task input class */
-        task_input_schema_version?: string | null;
+        task_input_schema_version?: string | null
         /** @description The version of the task output class */
-        task_output_schema_version?: string | null;
-      };
+        task_output_schema_version?: string | null
+      }
       path: {
         /** @description The id of the task */
-        task_id: string;
+        task_id: string
         /** @description The schema id */
-        task_schema_id: number;
-      };
-    };
+        task_schema_id: number
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_SerializableTaskRunAggregate_"];
-        };
-      };
+          'application/json': components['schemas']['Page_SerializableTaskRunAggregate_']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /**
    * Run Schema
    * @description Run a task with a group id
@@ -1127,84 +1129,84 @@ export interface operations {
   run_schema_tasks__task_id__schemas__task_schema_id__run_post: {
     parameters: {
       path: {
-        task_id: string;
-        task_schema_id: number;
-      };
-    };
+        task_id: string
+        task_schema_id: number
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RunRequest"];
-      };
-    };
+        'application/json': components['schemas']['RunRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": {
+          'application/json': {
             /**
              * Id
              * @description the id of the task run. If not provided a uuid will be generated
              */
-            id: string;
+            id: string
             /**
              * Task Id
              * @description the id of the associated task, read only
              */
-            task_id: string;
+            task_id: string
             /**
              * Task Schema Id
              * @description the schema idx of the associated task, read only
              */
-            task_schema_id: number;
+            task_schema_id: number
             /** Task Input */
-            task_input: Record<string, never>;
+            task_input: Record<string, never>
             /**
              * Task Input Hash
              * @description a hash describing the input
              */
-            task_input_hash: string;
+            task_input_hash: string
             /** Task Output */
-            task_output: Record<string, never>;
+            task_output: Record<string, never>
             /**
              * Task Output Hash
              * @description a hash describing the output
              */
-            task_output_hash: string;
-            group: $defs["Group"];
+            task_output_hash: string
+            group: $defs['Group']
             /** Start Time */
-            start_time?: string | null;
+            start_time?: string | null
             /** End Time */
-            end_time?: string | null;
+            end_time?: string | null
             /** Duration Seconds */
-            duration_seconds?: number | null;
+            duration_seconds?: number | null
             /**
              * Created At
              * Format: date-time
              * @description The time the task run was created
              */
-            created_at?: string;
+            created_at?: string
             /**
              * Example Id
              * @description The id of the example that share the same input as the task run
              */
-            example_id?: string | null;
+            example_id?: string | null
             /**
              * Corrections
              * @description The corrections that were applied to the task output if used as a base for an evaluation
              */
-            corrections?: Record<string, never> | null;
+            corrections?: Record<string, never> | null
             /** Parent Task Ids */
-            parent_task_ids?: string[] | null;
+            parent_task_ids?: string[] | null
             /**
              * Scores
              * @description A list of scores computed for the task run. A run can be evaluated in multiple ways.
              */
-            scores?: $defs["SerializableTaskEvaluation"][] | null;
+            scores?: $defs['SerializableTaskEvaluation'][] | null
             /**
              * Labels
              * @description A set of labels that are attached to the task runs. They are indexed.
              */
-            labels?: string[] | null;
+            labels?: string[] | null
             $defs: {
               /** Evaluator */
               Evaluator: {
@@ -1212,61 +1214,61 @@ export interface operations {
                  * Id
                  * @description The id of the evaluator that computed the score. Only one score per id can be attached to a task run.
                  */
-                id: string;
+                id: string
                 /**
                  * Name
                  * @description The name of the evaluator that computed the score e-g 'equality' or 'user'
                  */
-                name: string;
+                name: string
                 /** Properties */
-                properties: Record<string, never>;
-              };
+                properties: Record<string, never>
+              }
               /** Group */
               Group: {
                 /**
                  * Id
                  * @description The group id either client provided or generated, stable for given set of properties
                  */
-                id: string;
+                id: string
                 /**
                  * Iteration
                  * @description The iteration of the group, incremented for each new group
                  */
-                iteration: number;
+                iteration: number
                 /** @description The properties used for executing the run. */
-                properties: $defs["TaskRunGroupProperties"];
+                properties: $defs['TaskRunGroupProperties']
                 /**
                  * Tags
                  * @description A list of tags associated with the group, computed from the properties
                  */
-                tags: string[];
-              };
+                tags: string[]
+              }
               /** SerializableTaskEvaluation */
               SerializableTaskEvaluation: {
                 /**
                  * Score
                  * @description The score of the evaluation
                  */
-                score: number;
+                score: number
                 /**
                  * Tags
                  * @description Metadata added by the evaluator
                  */
-                tags?: string[] | null;
+                tags?: string[] | null
                 /**
                  * Comment
                  * @description An optional comment from the evaluation
                  */
-                comment?: string | null;
+                comment?: string | null
                 /** @description Information about the evaluator that computed the score */
-                evaluator: $defs["Evaluator"];
+                evaluator: $defs['Evaluator']
                 /**
                  * Created At
                  * Format: date-time
                  * @description The time at which the score was created
                  */
-                created_at?: string;
-              };
+                created_at?: string
+              }
               /**
                * TaskRunGroupProperties
                * @description Properties that described a way a task run was executed.
@@ -1277,217 +1279,217 @@ export interface operations {
                  * Model
                  * @description The LLM model used for the run
                  */
-                model?: string | null;
+                model?: string | null
                 /**
                  * Provider
                  * @description The LLM provider used for the run
                  */
-                provider?: string | null;
+                provider?: string | null
                 /**
                  * Temperature
                  * @description The temperature for generation
                  */
-                temperature?: number | null;
+                temperature?: number | null
                 /**
                  * Instructions
                  * @description The instructions passed to the runner in order to generate the prompt.
                  */
-                instructions?: string | null;
+                instructions?: string | null
                 /**
                  * Max Tokens
                  * @description The maximum tokens to generate in the prompt
                  */
-                max_tokens?: number | null;
+                max_tokens?: number | null
                 /**
                  * Few Shot Count
                  * @description Number of few-shot examples to use for the task
                  */
-                few_shot_count?: number | null;
+                few_shot_count?: number | null
                 /**
                  * Training Set Version
                  * @description The version of the training set used
                  */
-                training_set_version?: string | null;
-                [key: string]: unknown;
-              };
-            };
-          };
-          "text/event-stream": {
+                training_set_version?: string | null
+                [key: string]: unknown
+              }
+            }
+          }
+          'text/event-stream': {
             /** Run Id */
-            run_id: string;
+            run_id: string
             /** Task Output */
-            task_output: Record<string, never>;
-          };
-        };
-      };
+            task_output: Record<string, never>
+          }
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** List Examples */
   list_examples_tasks__task_id__schemas__task_schema_id__examples_get: {
     parameters: {
       query?: {
-        sort_by?: "created_at" | "random" | "recent";
+        sort_by?: 'created_at' | 'random' | 'recent'
         /** @description Whether to include or include the training set. Omit to ignore */
-        is_training?: boolean | null;
+        is_training?: boolean | null
         /** @description A vector for semantic search of the input. As a list of floats or a comma separated float string */
-        task_input_vector?: string | null;
+        task_input_vector?: string | null
         /** @description filter whether examples come from corrections. Omit to ignore */
-        from_correction?: boolean | null;
+        from_correction?: boolean | null
         /** @description Make sure only one task run is returned per unique value of the requested field */
-        unique_by?: "task_input_hash" | "task_output_hash" | "";
+        unique_by?: 'task_input_hash' | 'task_output_hash' | ''
         /** @description The number of items to return */
-        limit?: number;
+        limit?: number
         /** @description The number of items to skip */
-        offset?: number | null;
+        offset?: number | null
         /** @description The version of the task input class */
-        task_input_schema_version?: string | null;
+        task_input_schema_version?: string | null
         /** @description The version of the task output class */
-        task_output_schema_version?: string | null;
-      };
+        task_output_schema_version?: string | null
+      }
       path: {
         /** @description The id of the task */
-        task_id: string;
+        task_id: string
         /** @description The schema id */
-        task_schema_id: number;
-      };
-    };
+        task_schema_id: number
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_SerializableTaskExample_"];
-        };
-      };
+          'application/json': components['schemas']['Page_SerializableTaskExample_']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** Add Example */
   add_example_tasks__task_id__schemas__task_schema_id__examples_post: {
     parameters: {
       path: {
-        task_id: string;
-        task_schema_id: number;
-      };
-    };
+        task_id: string
+        task_schema_id: number
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["api__schemas__create_example_request__CreateExampleRequest"];
-      };
-    };
+        'application/json': components['schemas']['api__schemas__create_example_request__CreateExampleRequest']
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SerializableTaskExample"];
-        };
-      };
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** List Scores */
   list_scores_tasks__task_id__schemas__task_schema_id__scores_get: {
     parameters: {
       query?: {
         /** @description The hash of the task input */
-        task_input_hash?: string | null;
+        task_input_hash?: string | null
         /** @description The hash of the task output */
-        task_output_hash?: string | null;
+        task_output_hash?: string | null
         /** @description Whether the task has been scored */
-        has_scores?: boolean | null;
+        has_scores?: boolean | null
         /** @description A list of evaluator names that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by?: string[] | null;
+        evaluated_by?: string[] | null
         /** @description A list of evaluator names that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by?: string[] | null;
+        not_evaluated_by?: string[] | null
         /** @description A list of evaluator ids that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by_ids?: string[] | null;
+        evaluated_by_ids?: string[] | null
         /** @description A list of evaluator ids that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by_ids?: string[] | null;
+        not_evaluated_by_ids?: string[] | null
         /** @description Whether the task has an associated example */
-        has_example?: boolean | null;
+        has_example?: boolean | null
         /** @description The id of the example associated with the task run */
-        example_id?: string | null;
+        example_id?: string | null
         /** @description An id of a task run group */
-        group_id?: string | null;
+        group_id?: string | null
         /** @description The hash of a task run group */
-        group_hash?: string | null;
+        group_hash?: string | null
         /** @description A list of group tags */
-        group_tags?: string[] | null;
-        task_output_filters?: string[] | null;
-        task_input_filters?: string[] | null;
+        group_tags?: string[] | null
+        task_output_filters?: string[] | null
+        task_input_filters?: string[] | null
         /** @description The field to sort by */
-        sort_by?: "created_at" | "recent";
+        sort_by?: 'created_at' | 'recent'
         /** @description A list of labels to filter by */
-        labels?: string[] | null;
+        labels?: string[] | null
         /** @description Make sure only one task run is returned per unique value of the requested field */
-        unique_by?: "task_input_hash" | "task_output_hash" | "";
+        unique_by?: 'task_input_hash' | 'task_output_hash' | ''
         /** @description The number of items to return */
-        limit?: number;
+        limit?: number
         /** @description The number of items to skip */
-        offset?: number | null;
+        offset?: number | null
         /** @description The version of the task input class */
-        task_input_schema_version?: string | null;
+        task_input_schema_version?: string | null
         /** @description The version of the task output class */
-        task_output_schema_version?: string | null;
-      };
+        task_output_schema_version?: string | null
+      }
       path: {
         /** @description The id of the task */
-        task_id: string;
+        task_id: string
         /** @description The schema id */
-        task_schema_id: number;
-      };
-    };
+        task_schema_id: number
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_SerializableTaskScoreAggregate_"];
-        };
-      };
+          'application/json': components['schemas']['Page_SerializableTaskScoreAggregate_']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** Get Task Group */
   get_task_group_tasks__task_id__groups__group_id__get: {
     parameters: {
       path: {
-        task_id: string;
-        group_id: string;
-      };
-    };
+        task_id: string
+        group_id: string
+      }
+    }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Group-Output"];
-        };
-      };
+          'application/json': components['schemas']['Group-Output']
+        }
+      }
       /** @description Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
 }

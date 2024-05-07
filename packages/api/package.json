@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "-------- OPENAPI": "",
-    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts",
+    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts && npm run fix",
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
