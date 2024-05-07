@@ -1,6 +1,6 @@
 import { Fetcher, Middleware } from 'openapi-typescript-fetch'
 
-import { paths } from '../generated/openapi'
+import { paths } from './generated/openapi'
 import { getEnv } from './getEnv'
 
 export interface InitWorkflowAIApiConfig {
