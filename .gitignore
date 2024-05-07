@@ -1,0 +1,18 @@
+# NPM
+node_modules/
+.node_modules/
+.npmrc
+
+# MacOS file system
+.DS_Store
+
+# Local env
+.env
+.env.*
+.venv
+
+# Build
+dist/
+
+# Caches
+.eslintcache
