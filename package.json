@@ -6,6 +6,7 @@
   "author": "workflowAI",
   "homepage": "https://workflow.ai",
   "workspaces": [
+    "packages/api",
     "packages/client"
   ],
   "devDependencies": {

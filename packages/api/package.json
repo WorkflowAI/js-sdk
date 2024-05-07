@@ -1,0 +1,59 @@
+{
+  "name": "@workflowai/api",
+  "version": "0.1.0",
+  "description": "workflowAI typed API client",
+  "author": "workflowAI",
+  "homepage": "https://workflowai.ai",
+  "keywords": [
+    "workflowai",
+    "ai",
+    "llm",
+    "api"
+  ],
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    "import": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/esm/index.js"
+    },
+    "require": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/cjs/index.js"
+    }
+  },
+  "scripts": {
+    "-------- OPENAPI": "",
+    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.d.ts",
+    "-------- LINTING": "",
+    "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "lint:check": "eslint --config ../../configs/eslint.config.js --cache --ext .ts ./src",
+    "lint:fix": "eslint --config ../../configs/eslint.config.js --cache --fix --ext .ts ./src",
+    "check": "npm run lint:check && npm run prettier:check",
+    "fix": "npm run lint:fix && npm run prettier:fix",
+    "-------- BUILD": "",
+    "clean": "rm -rf dist/*",
+    "build:types": "tsc -p ./configs/tsconfig.types.json",
+    "build:cjs": "tsc -p ./configs/tsconfig.cjs.json && tsx ../../configs/postcjs.ts",
+    "build:esm": "tsc -p ./configs/tsconfig.esm.json && tsx ../../configs/postesm.ts",
+    "build:test": "tsc -p ./configs/tsconfig.test.json",
+    "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
+    "dry": "npm run build && npm pub --dry-run",
+    "prepublishOnly": "npm run test && npm run build",
+    "-------- TEST": "",
+    "test:watch": "npm run test:ts-jest --watch",
+    "test": "npm run test:ts-jest",
+    "test:ts-jest": "npx jest --config ../../configs/ts-jest.config.json"
+  },
+  "dependencies": {
+    "openapi-typescript-fetch": "^2.0.0"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^6.7.5"
+  },
+  "optionalDependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
