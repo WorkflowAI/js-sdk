@@ -38,7 +38,7 @@ export class WorkflowAI {
     options: RunTaskOptions,
   ): Promise<TaskOutput<OS>> {
     const { data } = await this.api.taskSchemas.run({
-      task_id: taskDef.taskId,
+      task_id: taskDef.taskId.toLowerCase(),
       task_schema_id: taskDef.schema.id,
       task_input: taskDef.schema.input.parse(input),
       group: options.group,
