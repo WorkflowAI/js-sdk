@@ -1,5 +1,5 @@
 {
-  "name": "workflowai",
+  "name": "@workflowai/workflowai",
   "version": "0.1.0",
   "description": "workflowAI client",
   "author": "workflowAI",
