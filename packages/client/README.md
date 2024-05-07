@@ -1,1 +1,1 @@
-# workflowAI API client
+# workflowAI client

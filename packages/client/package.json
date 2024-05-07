@@ -1,9 +1,9 @@
 {
-  "name": "@workflowai/client",
+  "name": "workflowai",
   "version": "0.1.0",
-  "description": "worflowAI API client",
+  "description": "workflowAI client",
   "author": "workflowAI",
-  "homepage": "https://workflow.ai",
+  "homepage": "https://workflowai.ai",
   "keywords": [
     "workflowai",
     "ai",
@@ -23,8 +23,6 @@
     }
   },
   "scripts": {
-    "-------- OPENAPI": "",
-    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/api/openapi.d.ts",
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
@@ -47,11 +45,8 @@
     "test:ts-jest": "npx jest --config ../../configs/ts-jest.config.json"
   },
   "dependencies": {
+    "@workflowai/api": "^0.1.0",
     "node-fetch": "^3.3.2",
-    "openapi-typescript-fetch": "^2.0.0",
     "zod": "^3.23.6"
-  },
-  "devDependencies": {
-    "openapi-typescript": "^6.7.5"
   }
 }

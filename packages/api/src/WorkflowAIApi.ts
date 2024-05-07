@@ -3,13 +3,13 @@ import { Fetcher, Middleware } from 'openapi-typescript-fetch'
 import { paths } from '../generated/openapi'
 import { getEnv } from './getEnv'
 
-interface InitWorkflowAIApiConfig {
+export interface InitWorkflowAIApiConfig {
   apiKey?: string | undefined
   apiUrl?: string | undefined
   use?: Middleware[]
 }
 
-export function initWorkflowAIApi(config: InitWorkflowAIApiConfig) {
+export function initWorkflowAIApi(config?: InitWorkflowAIApiConfig | undefined) {
   const { apiKey, apiUrl, use } = {
     apiKey: getEnv('WORKFLOWAI_API_KEY'),
     apiUrl: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',

@@ -9,7 +9,7 @@ export type OutputSchema = z.ZodTypeAny
 export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
   taskId: TaskId
   schema: {
-    id: number,
+    id: number
     input: IS
     output: OS
   }

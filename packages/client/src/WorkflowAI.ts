@@ -1,4 +1,12 @@
-import { Api, initApi, TaskRunGroup } from './api'
+import '@workflowai/api/polyfill'
+
+import {
+  initWorkflowAIApi,
+  InitWorkflowAIApiConfig,
+  TaskSchemaRunGroup,
+  WorkflowAIApi,
+} from '@workflowai/api'
+
 import type {
   ExecutableTask,
   InputSchema,
@@ -7,22 +15,18 @@ import type {
   TaskOutput,
 } from './Task'
 
-export interface WorkflowAIConfig {
-  apiKey?: string
-}
+export interface WorkflowAIConfig extends InitWorkflowAIApiConfig {}
 
 export interface RunTaskOptions {
-  group: TaskRunGroup
+  group: TaskSchemaRunGroup
 }
 
 export class WorkflowAI {
-  protected api: Api
+  protected api: WorkflowAIApi
 
   constructor(config?: WorkflowAIConfig) {
     // Default to env variable
-    this.api = initApi({
-      apiKey: config?.apiKey || process.env.WORKFLOWAI_API_KEY
-    })
+    this.api = initWorkflowAIApi(config)
   }
 
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
@@ -30,9 +34,7 @@ export class WorkflowAI {
     input: IS,
     options: RunTaskOptions,
   ): Promise<TaskOutput<OS>> {
-    const {
-      data
-    } = await this.api.tasks.run({
+    const { data } = await this.api.taskSchemas.run({
       task_id: taskDef.taskId,
       task_schema_id: taskDef.schema.id,
       task_input: taskDef.schema.input.parse(input),
