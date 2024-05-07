@@ -9,7 +9,9 @@ export interface InitWorkflowAIApiConfig {
   use?: Middleware[]
 }
 
-export function initWorkflowAIApi(config?: InitWorkflowAIApiConfig | undefined) {
+export function initWorkflowAIApi(
+  config?: InitWorkflowAIApiConfig | undefined,
+) {
   const { apiKey, apiUrl, use } = {
     apiKey: getEnv('WORKFLOWAI_API_KEY'),
     apiUrl: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',

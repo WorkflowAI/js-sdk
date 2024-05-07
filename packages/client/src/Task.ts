@@ -15,7 +15,7 @@ export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
   }
 }
 
-type ExecutableTask<IS extends InputSchema, OS extends OutputSchema> = (
+export type ExecutableTask<IS extends InputSchema, OS extends OutputSchema> = (
   input: TaskInput<IS>,
   options?: Partial<RunTaskOptions>,
 ) => Promise<TaskOutput<OS>>
