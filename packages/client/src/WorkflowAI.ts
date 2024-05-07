@@ -1,5 +1,3 @@
-import '@workflowai/api/fetch-polyfill'
-
 import {
   initWorkflowAIApi,
   InitWorkflowAIApiConfig,

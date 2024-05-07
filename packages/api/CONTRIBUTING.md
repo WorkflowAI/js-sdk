@@ -7,7 +7,7 @@ npm i
 ## Generate types from OpenAPI specs
 
 - Read OpenAPI specs from `https://api.workflowai.ai/openapi.json`
-- Write corresponding TypeScript definitions in `src/generated/openapi.d.ts`
+- Write corresponding TypeScript definitions in `src/generated/openapi.ts`
 - Conversion is done by [openapi-typescript](https://www.npmjs.com/package/openapi-typescript)
 
 ```

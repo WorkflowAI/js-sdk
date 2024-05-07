@@ -8,16 +8,6 @@ Wrapper for workflowAI's OpenAPI specs, for node or browser
 npm install @workflowai/api
 ```
 
-If using this library in a node project, you'll need to globally polyfill `fetch`:
-
-```
-npm install node-fetch
-```
-
-```ts
-import '@workflowai/api/fetch-polyfill'
-```
-
 ## Initialize API
 
 ```ts

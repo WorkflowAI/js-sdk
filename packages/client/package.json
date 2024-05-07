@@ -25,6 +25,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=18.20.2"
+  },
   "scripts": {
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
@@ -49,7 +52,6 @@
   },
   "dependencies": {
     "@workflowai/api": "^0.1.0",
-    "node-fetch": "^3.3.2",
     "zod": "^3.23.6"
   }
 }
