@@ -56,7 +56,10 @@
   "devDependencies": {
     "openapi-typescript": "^6.7.5"
   },
-  "optionalDependencies": {
-    "node-fetch": "^3.3.2"
+  "peerDependenciesMeta": {
+    "node-fetch": {
+      "version": "^3.3.2",
+      "optional": true
+    }
   }
 }
