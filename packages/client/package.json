@@ -23,9 +23,11 @@
     }
   },
   "scripts": {
+    "-------- OPENAPI": "",
+    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/api/openapi.d.ts",
     "-------- LINTING": "",
-    "prettier:check": "prettier --check src/**/*.ts *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
-    "prettier:fix": "prettier --write src/**/*.ts *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "lint:check": "eslint --config ../../configs/eslint.config.js --cache --ext .ts ./src",
     "lint:fix": "eslint --config ../../configs/eslint.config.js --cache --fix --ext .ts ./src",
     "check": "npm run lint:check && npm run prettier:check",
@@ -45,6 +47,11 @@
     "test:ts-jest": "npx jest --config ../../configs/ts-jest.config.json"
   },
   "dependencies": {
+    "node-fetch": "^3.3.2",
+    "openapi-typescript-fetch": "^2.0.0",
     "zod": "^3.23.6"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^6.7.5"
   }
 }

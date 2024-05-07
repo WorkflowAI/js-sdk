@@ -9,6 +9,7 @@ export type OutputSchema = z.ZodTypeAny
 export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
   taskId: TaskId
   schema: {
+    id: number,
     input: IS
     output: OS
   }
@@ -16,7 +17,7 @@ export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
 
 type ExecutableTask<IS extends InputSchema, OS extends OutputSchema> = (
   input: TaskInput<IS>,
-  options?: RunTaskOptions,
+  options?: Partial<RunTaskOptions>,
 ) => Promise<TaskOutput<OS>>
 
 export type TaskInput<T> = T extends InputSchema
