@@ -3,7 +3,7 @@ import { Fetcher, Middleware } from 'openapi-typescript-fetch'
 import { paths } from './generated/openapi'
 import { getEnv } from './getEnv'
 
-export interface InitWorkflowAIApiConfig {
+export type InitWorkflowAIApiConfig = {
   apiKey?: string | undefined
   apiUrl?: string | undefined
   use?: Middleware[]

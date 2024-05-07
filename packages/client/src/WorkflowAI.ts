@@ -13,7 +13,7 @@ import type {
   TaskOutput,
 } from './Task'
 
-export interface WorkflowAIConfig extends InitWorkflowAIApiConfig {}
+export type WorkflowAIConfig = InitWorkflowAIApiConfig | { api: WorkflowAIApi }
 
 export interface RunTaskOptions {
   group: TaskSchemaRunGroup
@@ -23,8 +23,13 @@ export class WorkflowAI {
   protected api: WorkflowAIApi
 
   constructor(config?: WorkflowAIConfig) {
-    // Default to env variable
-    this.api = initWorkflowAIApi(config)
+    if (config && 'api' in config) {
+      this.api = config.api
+    } else {
+      this.api = initWorkflowAIApi({
+        ...config,
+      })
+    }
   }
 
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
