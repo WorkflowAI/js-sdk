@@ -23,6 +23,9 @@
       "default": "./dist/cjs/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "-------- OPENAPI": "",
     "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.d.ts",
