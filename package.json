@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "description": "Collection of TS/JS libraries, private and public, for workflowAI.",
   "author": "workflowAI",
-  "homepage": "https://workflow.ai",
+  "homepage": "https://workflowai.ai",
   "workspaces": [
+    "packages/api",
     "packages/client"
   ],
   "devDependencies": {

@@ -1,3 +1,10 @@
+import {
+  initWorkflowAIApi,
+  InitWorkflowAIApiConfig,
+  TaskSchemaRunGroup,
+  WorkflowAIApi,
+} from '@workflowai/api'
+
 import type {
   ExecutableTask,
   InputSchema,
@@ -6,41 +13,51 @@ import type {
   TaskOutput,
 } from './Task'
 
-export interface WorkflowAIConfig {
-  apiKey?: string
-}
+export type WorkflowAIConfig = InitWorkflowAIApiConfig | { api: WorkflowAIApi }
 
 export interface RunTaskOptions {
-  groupId?: string
+  group: TaskSchemaRunGroup
 }
 
 export class WorkflowAI {
-  protected apiKey: string | undefined
+  protected api: WorkflowAIApi
 
   constructor(config?: WorkflowAIConfig) {
-    // Default to env variable
-    this.apiKey = config?.apiKey || process.env.WORKFLOWAI_API_KEY
+    if (config && 'api' in config) {
+      this.api = config.api
+    } else {
+      this.api = initWorkflowAIApi({
+        ...config,
+      })
+    }
   }
 
-  protected runTask<IS extends InputSchema, OS extends OutputSchema>(
-    _taskDef: TaskDefinition<IS, OS>,
-    _input: IS,
-    _options: RunTaskOptions,
-  ): Promise<TaskOutput<OS>> {
-    return Promise.reject('Not implemented')
-  }
-
-  compileTask<IS extends InputSchema, OS extends OutputSchema>(
+  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS>,
-    _defaultOptions?: RunTaskOptions,
-  ): ExecutableTask<IS, OS> {
+    input: IS,
+    options: RunTaskOptions,
+  ): Promise<TaskOutput<OS>> {
+    const { data } = await this.api.taskSchemas.run({
+      task_id: taskDef.taskId.toLowerCase(),
+      task_schema_id: taskDef.schema.id,
+      task_input: taskDef.schema.input.parse(input),
+      group: options.group,
+    })
+
+    return taskDef.schema.output.parse(data.task_output)
+  }
+
+  public async compileTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS>,
+    defaultOptions?: Partial<RunTaskOptions>,
+  ): Promise<ExecutableTask<IS, OS>> {
     // TODO: register task
 
-    return (input, options) => {
-      options = {
-        ..._defaultOptions,
-        ...options,
-      }
+    return (input, overrideOptions) => {
+      const options = {
+        ...defaultOptions,
+        ...overrideOptions,
+      } as RunTaskOptions
 
       return this.runTask<IS, OS>(taskDef, input, options)
     }

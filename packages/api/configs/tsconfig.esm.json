@@ -1,0 +1,8 @@
+{
+  "extends": "../../../configs/tsconfig.esm.json",
+  "compilerOptions": {
+    "outDir": "../dist/esm",
+    "allowJs": true
+  },
+  "include": ["../src"]
+}

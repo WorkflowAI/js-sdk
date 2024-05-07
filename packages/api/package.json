@@ -1,13 +1,14 @@
 {
-  "name": "@workflowai/workflowai",
-  "version": "0.1.0",
-  "description": "workflowAI client",
+  "name": "@workflowai/api",
+  "version": "0.1.1",
+  "description": "workflowAI typed API client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
   "keywords": [
     "workflowai",
     "ai",
-    "llm"
+    "llm",
+    "api"
   ],
   "types": "./dist/types/index.d.ts",
   "main": "./dist/cjs/index.js",
@@ -29,6 +30,8 @@
     "node": ">=18.20.2"
   },
   "scripts": {
+    "-------- OPENAPI": "",
+    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts && npm run fix",
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
@@ -44,14 +47,17 @@
     "build:test": "tsc -p ./configs/tsconfig.test.json",
     "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly--DISABLED": "npm run test && npm run build",
+    "prepublishOnly": "npm run build",
     "-------- TEST": "",
     "test:watch": "npm run test:ts-jest --watch",
     "test": "npm run test:ts-jest",
     "test:ts-jest": "npx jest --config ../../configs/ts-jest.config.json"
   },
   "dependencies": {
-    "@workflowai/api": "^0.1.1",
-    "zod": "^3.23.6"
+    "openapi-typescript-fetch": "^2.0.0"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^6.7.5"
   }
 }
