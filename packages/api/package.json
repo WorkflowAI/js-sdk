@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "workflowAI typed API client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -14,14 +14,13 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "exports": {
-    ".": {
+    "import": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "default": "./dist/esm/index.js"
     },
-    "./fetch-polyfill": {
-      "import": "./dist/esm/fetch-polyfill.js",
-      "require": "./dist/cjs/fetch-polyfill.js"
+    "require": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/cjs/index.js"
     }
   },
   "files": [
