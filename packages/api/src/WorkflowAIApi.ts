@@ -48,6 +48,9 @@ export function initWorkflowAIApi(
       list: fetcher.path('/tasks').method('get').create(),
       upsert: fetcher.path('/tasks').method('post').create(),
     },
+    taskGroups: {
+      get: fetcher.path('/tasks/{task_id}/groups/{group_id}').method('get').create(),
+    },
     taskSchemas: {
       run: fetcher
         .path('/tasks/{task_id}/schemas/{task_schema_id}/run')
