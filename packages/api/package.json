@@ -55,6 +55,7 @@
     "openapi-typescript-fetch": "^2.0.0"
   },
   "devDependencies": {
-    "openapi-typescript": "^6.7.5"
+    "openapi-typescript": "^6.7.5",
+    "zod": "^3.23.6"
   }
 }
