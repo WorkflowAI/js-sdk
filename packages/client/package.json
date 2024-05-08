@@ -30,8 +30,8 @@
   },
   "scripts": {
     "-------- LINTING": "",
-    "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
-    "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "lint:check": "eslint --config ../../configs/eslint.config.js --cache --ext .ts ./src",
     "lint:fix": "eslint --config ../../configs/eslint.config.js --cache --fix --ext .ts ./src",
     "check": "npm run lint:check && npm run prettier:check",
@@ -47,7 +47,7 @@
     "prepublishOnly": "npm run test && npm run build"
   },
   "dependencies": {
-    "@workflowai/api": "^0.1.1",
+    "@workflowai/api": "^0.1.2",
     "zod": "^3.23.6"
   }
 }
