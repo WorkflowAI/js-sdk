@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { base64ToBufferSchema, bufferToBase64Schema } from './buffer'
+import { base64ToBuffer, bufferToBase64 } from './buffer'
 
 const imageContentType = z.enum([
   'image/png',
@@ -14,13 +14,13 @@ const imageContentType = z.enum([
 const imageInput = z.object({
   name: z.string().optional().describe('An optional name'),
   content_type: imageContentType.describe('The content type of the image'),
-  data: bufferToBase64Schema.describe('The base64 encoded data of the image'),
+  data: bufferToBase64.describe('The base64 encoded data of the image'),
 })
 
 const imageOutput = z.object({
   name: z.string().optional().describe('An optional name'),
   content_type: imageContentType.describe('The content type of the image'),
-  data: base64ToBufferSchema.describe('The base64 encoded data of the image'),
+  data: base64ToBuffer.describe('The base64 encoded data of the image'),
 })
 
 export const definitions = {
