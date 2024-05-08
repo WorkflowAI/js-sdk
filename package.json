@@ -6,6 +6,7 @@
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
   "workspaces": [
+    "packages/schema",
     "packages/api",
     "packages/client"
   ],
