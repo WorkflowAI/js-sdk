@@ -33,6 +33,8 @@
     "check": "npm run check --workspaces --if-present",
     "fix": "npm run fix --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test:watch": "npm run test:ts-jest --watch",
+    "test": "npm run test:ts-jest --",
+    "test:ts-jest": "npx jest --config ./configs/jest.config.json"
   }
 }
