@@ -20,7 +20,7 @@ export function initWorkflowAIApi(
 
   const fetcher = Fetcher.for<paths>()
 
-  // global configuration
+  // Default configuration
   fetcher.configure({
     baseUrl: apiUrl,
     init: {
@@ -32,30 +32,75 @@ export function initWorkflowAIApi(
   })
 
   return {
-    models: {
-      list: fetcher.path('/models').method('get').create(),
-    },
-    examples: {
-      get: fetcher.path('/examples/{example_id}').method('get').create(),
-      delete: fetcher.path('/examples/{example_id}').method('delete').create(),
-    },
-    runs: {
-      get: fetcher.path('/runs/{run_id}').method('get').create(),
-      annotate: fetcher.path('/runs/{run_id}/annotate').method('post').create(),
-    },
     tasks: {
       generate: fetcher.path('/tasks/generate').method('post').create(),
       list: fetcher.path('/tasks').method('get').create(),
       upsert: fetcher.path('/tasks').method('post').create(),
+
+      groups: {
+        get: fetcher
+          .path('/tasks/{task_id}/groups/{group_id}')
+          .method('get')
+          .create(),
+      },
+
+      schemas: {
+        get: fetcher
+          .path('/tasks/{task_id}/schemas/{task_schema_id}')
+          .method('get')
+          .create(),
+        run: fetcher
+          .path('/tasks/{task_id}/schemas/{task_schema_id}/run')
+          .method('post')
+          .create(),
+
+        runs: {
+          list: fetcher
+            .path('/tasks/{task_id}/schemas/{task_schema_id}/runs')
+            .method('get')
+            .create(),
+          import: fetcher
+            .path('/tasks/{task_id}/schemas/{task_schema_id}/runs')
+            .method('post')
+            .create(),
+          aggregate: fetcher
+            .path('/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate')
+            .method('get')
+            .create(),
+        },
+
+        examples: {
+          list: fetcher
+            .path('/tasks/{task_id}/schemas/{task_schema_id}/examples')
+            .method('get')
+            .create(),
+          create: fetcher
+            .path('/tasks/{task_id}/schemas/{task_schema_id}/examples')
+            .method('post')
+            .create(),
+        },
+
+        scores: {
+          list: fetcher
+            .path('/tasks/{task_id}/schemas/{task_schema_id}/scores')
+            .method('get')
+            .create(),
+        },
+      },
     },
-    taskGroups: {
-      get: fetcher.path('/tasks/{task_id}/groups/{group_id}').method('get').create(),
+
+    runs: {
+      get: fetcher.path('/runs/{run_id}').method('get').create(),
+      annotate: fetcher.path('/runs/{run_id}/annotate').method('post').create(),
     },
-    taskSchemas: {
-      run: fetcher
-        .path('/tasks/{task_id}/schemas/{task_schema_id}/run')
-        .method('post')
-        .create(),
+
+    models: {
+      list: fetcher.path('/models').method('get').create(),
+    },
+
+    examples: {
+      get: fetcher.path('/examples/{example_id}').method('get').create(),
+      delete: fetcher.path('/examples/{example_id}').method('delete').create(),
     },
   }
 }
