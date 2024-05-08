@@ -29,6 +29,7 @@
     "typescript": "^5.1.3"
   },
   "scripts": {
+    "codegen": "npm run codegen --workspaces --if-present",
     "check": "npm run check --workspaces --if-present",
     "fix": "npm run fix --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
