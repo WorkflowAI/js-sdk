@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/schema",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "workflowAI schema helpers",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",

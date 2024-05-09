@@ -48,6 +48,6 @@
   },
   "dependencies": {
     "@workflowai/api": "^0.1.2",
-    "@workflowai/schema": "^0.1.0"
+    "@workflowai/schema": "^0.1.1"
   }
 }

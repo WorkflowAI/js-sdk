@@ -1,0 +1,10 @@
+{
+  "extends": "../../../configs/tsconfig.base.json",
+  "compilerOptions": {
+    "typeRoots": [
+      "../typings"
+    ],
+  },
+  "include": ["../src", "../typings"],
+  "exclude": ["../src/**/__tests__"]
+}

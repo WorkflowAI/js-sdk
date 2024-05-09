@@ -1,18 +1,21 @@
 import { resolveRefs } from 'json-refs'
-import { jsonSchemaToZod, ParserOverride } from 'json-schema-to-zod'
+import {
+  JsonSchemaObject,
+  jsonSchemaToZod,
+  ParserOverride,
+} from 'json-schema-to-zod'
 
-import { definitions } from './atoms'
-import { z } from './zod'
+import { Definition, definitions } from './definitions'
 
 const makeParserOverride =
-  (type: 'input' | 'output'): ParserOverride =>
+  (type: keyof Definition['zodSchema']): ParserOverride =>
   (schema, _refs) => {
-    if (schema.title && schema.title in definitions) {
-      const def = schema.title as keyof typeof definitions
-      const extensionName = definitions[def][type]
-
-      if (extensionName in z) {
-        return `z.${extensionName}`
+    if (schema.title) {
+      const definition = definitions.find(
+        ({ jsonSchemaTitle }) => jsonSchemaTitle === schema.title,
+      )
+      if (definition) {
+        return `z.${definition.zodSchema[type]}()`
       }
     }
     return
@@ -22,7 +25,7 @@ const inputParserOverride = makeParserOverride('input')
 const outputParserOverride = makeParserOverride('output')
 
 const schemaToZod = async (
-  jsonSchema: any[] | object, // eslint-disable-line @typescript-eslint/no-explicit-any
+  jsonSchema: JsonSchemaObject,
   parserOverride: ParserOverride,
 ): Promise<string> => {
   const { resolved: resolvedJsonSchema } = await resolveRefs(jsonSchema)
@@ -30,13 +33,13 @@ const schemaToZod = async (
 }
 
 export const inputSchemaToZod = async (
-  jsonSchema: any[] | object, // eslint-disable-line @typescript-eslint/no-explicit-any
+  jsonSchema: JsonSchemaObject,
 ): Promise<string> => {
   return schemaToZod(jsonSchema, inputParserOverride)
 }
 
 export const outputSchemaToZod = async (
-  jsonSchema: any[] | object, // eslint-disable-line @typescript-eslint/no-explicit-any
+  jsonSchema: JsonSchemaObject,
 ): Promise<string> => {
   return schemaToZod(jsonSchema, outputParserOverride)
 }

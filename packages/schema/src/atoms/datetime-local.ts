@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const datetimeLocal = z
+export const DATETIME_LOCAL = z
   .object({
     date: z.string().date().describe('The date of the local datetime.'),
     local_time: z
@@ -12,14 +12,3 @@ const datetimeLocal = z
   .describe(
     'This class represents a local datetime, with a datetime and a timezone.',
   )
-
-export const definitions = {
-  DatetimeLocal: {
-    input: 'datetimeLocal',
-    output: 'datetimeLocal',
-  },
-}
-
-export const zodExtensions = {
-  datetimeLocal,
-}
