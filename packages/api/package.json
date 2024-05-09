@@ -48,8 +48,7 @@
     "build:test": "tsc -p ./configs/tsconfig.test.json",
     "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
-    "prepublishOnly--DISABLED": "npm run test && npm run build",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "dependencies": {
     "openapi-typescript-fetch": "^2.0.0"
