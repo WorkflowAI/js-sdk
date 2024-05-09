@@ -1,5 +1,9 @@
 import { resolveRefs } from 'json-refs'
-import { jsonSchemaToZod, ParserOverride } from 'json-schema-to-zod'
+import {
+  JsonSchemaObject,
+  jsonSchemaToZod,
+  ParserOverride,
+} from 'json-schema-to-zod'
 
 import { Definition, definitions } from './definitions'
 
@@ -21,7 +25,7 @@ const inputParserOverride = makeParserOverride('input')
 const outputParserOverride = makeParserOverride('output')
 
 const schemaToZod = async (
-  jsonSchema: any[] | object, // eslint-disable-line @typescript-eslint/no-explicit-any
+  jsonSchema: JsonSchemaObject,
   parserOverride: ParserOverride,
 ): Promise<string> => {
   const { resolved: resolvedJsonSchema } = await resolveRefs(jsonSchema)
@@ -29,13 +33,13 @@ const schemaToZod = async (
 }
 
 export const inputSchemaToZod = async (
-  jsonSchema: any[] | object, // eslint-disable-line @typescript-eslint/no-explicit-any
+  jsonSchema: JsonSchemaObject,
 ): Promise<string> => {
   return schemaToZod(jsonSchema, inputParserOverride)
 }
 
 export const outputSchemaToZod = async (
-  jsonSchema: any[] | object, // eslint-disable-line @typescript-eslint/no-explicit-any
+  jsonSchema: JsonSchemaObject,
 ): Promise<string> => {
   return schemaToZod(jsonSchema, outputParserOverride)
 }
