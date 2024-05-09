@@ -1,4 +1,4 @@
-import type z from 'zod'
+import type { z } from '@workflowai/schema'
 
 import type { RunTaskOptions } from './WorkflowAI'
 
