@@ -1,18 +1,17 @@
 import { resolveRefs } from 'json-refs'
 import { jsonSchemaToZod, ParserOverride } from 'json-schema-to-zod'
 
-import { definitions } from './atoms'
-import { z } from './zod'
+import { Definition, definitions } from './definitions'
 
 const makeParserOverride =
-  (type: 'input' | 'output'): ParserOverride =>
+  (type: keyof Definition['zodSchema']): ParserOverride =>
   (schema, _refs) => {
-    if (schema.title && schema.title in definitions) {
-      const def = schema.title as keyof typeof definitions
-      const extensionName = definitions[def][type]
-
-      if (extensionName in z) {
-        return `z.${extensionName}`
+    if (schema.title) {
+      const definition = definitions.find(
+        ({ jsonSchemaTitle }) => jsonSchemaTitle === schema.title,
+      )
+      if (definition) {
+        return `z.${definition.zodSchema[type]}()`
       }
     }
     return

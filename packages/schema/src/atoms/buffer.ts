@@ -1,17 +1,17 @@
 import { z } from 'zod'
 
-export const buffer = z.union([
+export const BUFFER = z.union([
   z.instanceof(Buffer),
   z
     .instanceof(ArrayBuffer)
     .transform<Buffer>((arrBuff) => Buffer.from(arrBuff)),
 ])
 
-export const bufferToBase64 = z
-  .union([buffer, z.promise(buffer)])
+export const BUFFER_TO_BASE64 = z
+  .union([BUFFER, z.promise(BUFFER)])
   .transform<string>(async (buf) => (await buf).toString('base64'))
 
-export const base64ToBuffer = z
+export const BASE64_TO_BUFFER = z
   .string()
   .base64()
   .transform<Buffer>((b64) => Buffer.from(b64, 'base64'))

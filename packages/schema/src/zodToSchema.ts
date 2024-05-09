@@ -1,28 +1,24 @@
-import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 
-import { definitions, zodExtensions } from './atoms'
+import { definitions } from './definitions'
+import { z } from './zod'
 
 type Definitions = Record<string, z.ZodTypeAny>
 
-const inputSchemaDefinitions: Definitions = {}
-const outputSchemaDefinitions: Definitions = {}
-
-for (const _def in definitions) {
-  const def = _def as keyof typeof definitions
-
-  const inputExtensionName = definitions[def]
-    .input as keyof typeof zodExtensions
-  if (zodExtensions[inputExtensionName]) {
-    inputSchemaDefinitions[def] = zodExtensions[inputExtensionName]
-  }
-
-  const outputExtensionName = definitions[def]
-    .output as keyof typeof zodExtensions
-  if (zodExtensions[outputExtensionName]) {
-    outputSchemaDefinitions[def] = zodExtensions[outputExtensionName]
-  }
-}
+const { input: inputSchemaDefinitions, output: outputSchemaDefinitions } =
+  definitions.reduce<{ input: Definitions; output: Definitions }>(
+    (result, { jsonSchemaTitle, zodSchema }) => ({
+      input: {
+        ...result.input,
+        [jsonSchemaTitle]: z[zodSchema.input](),
+      },
+      output: {
+        ...result.output,
+        [jsonSchemaTitle]: z[zodSchema.output](),
+      },
+    }),
+    { input: {}, output: {} },
+  )
 
 const zodToSchema = (zodSchema: z.ZodTypeAny, definitions: Definitions) => {
   return zodToJsonSchema(zodSchema, {
