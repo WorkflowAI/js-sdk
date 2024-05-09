@@ -16,3 +16,6 @@ dist/
 
 # Caches
 .eslintcache
+
+# Local sandbox
+packages/sandbox/
