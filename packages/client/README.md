@@ -21,25 +21,38 @@ const workflowAI = new WorkflowAI({
 ```ts
 import { z } from '@workflowai/workflowai'
 
-const checkTextFollowInstructions = await workflowAI.compileTask({
-  taskId: 'CheckTextFollowInstructions',
-  schema: {
-    id: 5
-    input: z.object({
-      text: z.string().describe('The text to check if it follows the instructions in "instructions"'),
-      instructions: z.string().describe('The instructions to check if the text follows'),
-    }),
-    output: z.object({
-      isFollowingInstructions: z.bool().describe('Whether the "text" follows all the instructions or not'),
-      reason: z.string().describe('The reason why the text follows or not the instructions'),
-    }),
+const checkTextFollowInstructions = await workflowAI.compileTask(
+  {
+    taskId: 'CheckTextFollowInstructions',
+    schema: {
+      id: 5,
+      input: z.object({
+        text: z
+          .string()
+          .describe(
+            'The text to check if it follows the instructions in "instructions"',
+          ),
+        instructions: z
+          .string()
+          .describe('The instructions to check if the text follows'),
+      }),
+      output: z.object({
+        isFollowingInstructions: z
+          .bool()
+          .describe('Whether the "text" follows all the instructions or not'),
+        reason: z
+          .string()
+          .describe('The reason why the text follows or not the instructions'),
+      }),
+    },
   },
-}, {
-  // Default run configuration is optional if passed when runs are created
-  group: {
-    id: '...', // Find group IDs in the playground
-  }
-})
+  {
+    // Default run configuration is optional if passed when runs are created
+    group: {
+      id: '...', // Find group IDs in the playground
+    },
+  },
+)
 ```
 
 ## Prepare your task input
