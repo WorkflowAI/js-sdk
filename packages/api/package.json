@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "workflowAI typed API client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -30,11 +30,12 @@
     "node": ">=18.20.2"
   },
   "scripts": {
-    "-------- OPENAPI": "",
-    "generate-api-types": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts && npm run fix",
+    "-------- CODEGEN": "",
+    "codegen:openapi": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts",
+    "codegen": "npm run codegen:openapi && npm run fix",
     "-------- LINTING": "",
-    "prettier:check": "prettier --check src/**/*.ts src/**/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
-    "prettier:fix": "prettier --write src/**/*.ts src/**/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
+    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
     "lint:check": "eslint --config ../../configs/eslint.config.js --cache --ext .ts ./src",
     "lint:fix": "eslint --config ../../configs/eslint.config.js --cache --fix --ext .ts ./src",
     "check": "npm run lint:check && npm run prettier:check",
@@ -48,16 +49,13 @@
     "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
     "prepublishOnly--DISABLED": "npm run test && npm run build",
-    "prepublishOnly": "npm run build",
-    "-------- TEST": "",
-    "test:watch": "npm run test:ts-jest --watch",
-    "test": "npm run test:ts-jest",
-    "test:ts-jest": "npx jest --config ../../configs/ts-jest.config.json"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "openapi-typescript-fetch": "^2.0.0"
   },
   "devDependencies": {
-    "openapi-typescript": "^6.7.5"
+    "openapi-typescript": "^6.7.5",
+    "zod": "^3.23.6"
   }
 }

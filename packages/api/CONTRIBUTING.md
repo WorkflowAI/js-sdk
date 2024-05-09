@@ -11,7 +11,7 @@ npm i
 - Conversion is done by [openapi-typescript](https://www.npmjs.com/package/openapi-typescript)
 
 ```
-npm run generate-api-types
+npm run codegen
 ```
 
 ## Linter
@@ -34,4 +34,11 @@ npm run fix
 
 ```
 npm run build
+```
+
+## Publish
+
+```
+npm version [major|minor|patch]
+npm pub
 ```
