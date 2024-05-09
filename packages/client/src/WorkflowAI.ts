@@ -40,11 +40,11 @@ export class WorkflowAI {
     const { data } = await this.api.tasks.schemas.run({
       task_id: taskDef.taskId.toLowerCase(),
       task_schema_id: taskDef.schema.id,
-      task_input: taskDef.schema.input.parse(input),
+      task_input: await taskDef.schema.input.parseAsync(input),
       group: options.group,
     })
 
-    return taskDef.schema.output.parse(data.task_output)
+    return taskDef.schema.output.parseAsync(data.task_output)
   }
 
   public async compileTask<IS extends InputSchema, OS extends OutputSchema>(
