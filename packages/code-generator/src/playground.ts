@@ -27,6 +27,7 @@ type GeneratedCode = {
 
 type GetPlaygroundSnippetsConfig = {
   taskId: string
+  taskName?: string
   schema: {
     id: number
     input: JsonSchemaObject
@@ -48,9 +49,9 @@ type GetPlaygroundSnippetsResult = {
 export const getPlaygroundSnippets = async (
   config: GetPlaygroundSnippetsConfig,
 ): Promise<GetPlaygroundSnippetsResult> => {
-  const { taskId, schema, groupId, example } = config
+  const { taskId, taskName, schema, groupId, example } = config
 
-  const taskFunctionName = validVarName(taskId)
+  const taskFunctionName = validVarName(taskName || taskId)
 
   return {
     installSdk: {
