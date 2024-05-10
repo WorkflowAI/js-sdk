@@ -24,7 +24,25 @@ test('accept empty configuration', () => {
 test('export api routes as functions', () => {
   const outputSchema = z.record(
     z.string(),
-    z.union([apiMethod, z.lazy(() => outputSchema)]),
+    z.union([
+      apiMethod,
+      z.record(
+        z.string(),
+        z.union([
+          apiMethod,
+          z.record(
+            z.string(),
+            z.union([
+              apiMethod,
+              z.record(
+                z.string(),
+                z.union([apiMethod, z.record(z.string(), apiMethod)]),
+              ),
+            ]),
+          ),
+        ]),
+      ),
+    ]),
   )
   const api = initWorkflowAIApi()
   expect(outputSchema.parse(api)).toBeTruthy()

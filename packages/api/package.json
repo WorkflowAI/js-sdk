@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "workflowAI typed API client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -14,13 +14,10 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "exports": {
-    "import": {
+    ".": {
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.js"
-    },
-    "require": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "files": [
