@@ -1,9 +1,10 @@
 {
-  "extends": "../../../configs/tsconfig.cjs.json",
+  "extends": [
+    "./tsconfig.base.json",
+    "../../../configs/tsconfig.cjs.json"
+  ],
   "compilerOptions": {
     "outDir": "../dist/cjs",
     "allowJs": true
-  },
-  "include": ["../src"],
-  "exclude": ["../src/**/__tests__"]
+  }
 }

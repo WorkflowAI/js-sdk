@@ -12,13 +12,19 @@ import { beautifyTypescript } from './beautify'
  * @param text any text, like a task ID for example
  */
 const validVarName = (text: string): string => {
-  // Replace any invalid character by an underscore
-  const anyCase = text.replace(/[^a-z0-9_$]/gi, '_').replace(/_{2,}/g, '_')
-  // Force the first character to be lower case
-  return `${anyCase[0].toLowerCase()}${anyCase.substring(1)}`
-}
+  // Remove dashes and spaces by concatenating and upper casing
+  const noDashes = text
+    .trim()
+    .split(/-|\s/)
+    .map((part) => `${part.substring(0, 1).toUpperCase()}${part.substring(1)}`)
+    .join('')
 
-type Json = string | number | boolean | null | Json[] | { [key: string]: Json }
+  // Replace any invalid character by an dash
+  const anyCase = noDashes.replace(/[^a-z0-9_$]/gi, '_').replace(/_{2,}/g, '_')
+
+  // Force the first character to be lower case
+  return `${anyCase.substring(0, 1).toLowerCase()}${anyCase.substring(1)}`
+}
 
 type GeneratedCode = {
   language: 'bash' | 'typescript'
@@ -27,6 +33,7 @@ type GeneratedCode = {
 
 type GetPlaygroundSnippetsConfig = {
   taskId: string
+  taskName?: string
   schema: {
     id: number
     input: JsonSchemaObject
@@ -34,7 +41,7 @@ type GetPlaygroundSnippetsConfig = {
   }
   groupId: string
   example: {
-    input: Json
+    input: Record<string, unknown>
   }
 }
 
@@ -48,9 +55,9 @@ type GetPlaygroundSnippetsResult = {
 export const getPlaygroundSnippets = async (
   config: GetPlaygroundSnippetsConfig,
 ): Promise<GetPlaygroundSnippetsResult> => {
-  const { taskId, schema, groupId, example } = config
+  const { taskId, taskName, schema, groupId, example } = config
 
-  const taskFunctionName = validVarName(taskId)
+  const taskFunctionName = validVarName(taskName || taskId)
 
   return {
     installSdk: {

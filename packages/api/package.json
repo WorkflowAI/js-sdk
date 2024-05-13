@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/api",
-  "version": "0.1.2",
+  "version": "1.0.2",
   "description": "workflowAI typed API client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -14,13 +14,10 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "exports": {
-    "import": {
+    ".": {
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.js"
-    },
-    "require": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "files": [
@@ -48,7 +45,7 @@
     "build:test": "tsc -p ./configs/tsconfig.test.json",
     "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "openapi-typescript-fetch": "^2.0.0"

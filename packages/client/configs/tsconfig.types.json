@@ -1,7 +1,9 @@
 {
-  "extends": "../../../configs/tsconfig.types.json",
+  "extends": [
+    "./tsconfig.base.json",
+    "../../../configs/tsconfig.types.json"
+  ],
   "compilerOptions": {
     "outDir": "../dist/types"
-  },
-  "include": ["../src"]
+  }
 }
