@@ -7,9 +7,9 @@ export const BUFFER = z.union([
     .transform<Buffer>((arrBuff) => Buffer.from(arrBuff)),
 ])
 
-export const BUFFER_TO_BASE64 = z
-  .union([BUFFER, z.promise(BUFFER)])
-  .transform<string>(async (buf) => (await buf).toString('base64'))
+export const BUFFER_TO_BASE64 = BUFFER.transform<string>((buf) =>
+  buf.toString('base64'),
+)
 
 export const BASE64_TO_BUFFER = z
   .string()

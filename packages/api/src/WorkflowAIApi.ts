@@ -4,17 +4,17 @@ import { paths } from './generated/openapi'
 import { getEnv } from './getEnv'
 
 export type InitWorkflowAIApiConfig = {
-  apiKey?: string | undefined
-  apiUrl?: string | undefined
+  key?: string | undefined
+  url?: string | undefined
   use?: Middleware[]
 }
 
 export function initWorkflowAIApi(
   config?: InitWorkflowAIApiConfig | undefined,
 ) {
-  const { apiKey, apiUrl, use } = {
-    apiKey: getEnv('WORKFLOWAI_API_KEY'),
-    apiUrl: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',
+  const { key, url, use } = {
+    key: getEnv('WORKFLOWAI_API_KEY'),
+    url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',
     ...config,
   }
 
@@ -22,10 +22,10 @@ export function initWorkflowAIApi(
 
   // Default configuration
   fetcher.configure({
-    baseUrl: apiUrl,
+    baseUrl: url,
     init: {
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${key}`,
       },
     },
     use,

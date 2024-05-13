@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/workflowai",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "workflowAI client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -45,7 +45,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@workflowai/api": "^1.0.2",
-    "@workflowai/schema": "^1.0.1"
+    "@workflowai/api": "^1.0.3",
+    "@workflowai/schema": "^1.0.2"
   }
 }
