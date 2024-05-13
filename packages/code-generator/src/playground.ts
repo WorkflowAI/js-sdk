@@ -42,7 +42,11 @@ type GetPlaygroundSnippetsConfig = {
   groupId: string
   example: {
     input: Record<string, unknown>
-  }
+  },
+  api?: {
+    key?: string | null | undefined,
+    url?: string | null | undefined,
+  },
 }
 
 type GetPlaygroundSnippetsResult = {
@@ -55,7 +59,7 @@ type GetPlaygroundSnippetsResult = {
 export const getPlaygroundSnippets = async (
   config: GetPlaygroundSnippetsConfig,
 ): Promise<GetPlaygroundSnippetsResult> => {
-  const { taskId, taskName, schema, groupId, example } = config
+  const { taskId, taskName, schema, groupId, example, api } = config
 
   const taskFunctionName = validVarName(taskName || taskId)
 
@@ -74,7 +78,11 @@ yarn add @workflowai/workflowai          # yarn
 import { WorkflowAI } from "@workflowai/workflowai"
 
 const workflowAI = new WorkflowAI({
-  apiKey: "...", // optional, defaults to process.env.WORKFLOWAI_API_KEY
+  api: {${api?.url ? `
+    url: "${api.url}",`: ''}
+    // optional, defaults to process.env.WORKFLOWAI_API_KEY
+    key: "${api?.key || '...'}"
+  }
 })
       `.trim(),
     },
