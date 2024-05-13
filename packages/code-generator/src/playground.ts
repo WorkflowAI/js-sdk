@@ -185,7 +185,7 @@ ${[
   .join('\n')}
 
 const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
-const ouput: TaskOutput<typeof ${taskFunctionName}> = ${beautifyTypescript(JSON.stringify(example.output))}
+const output: TaskOutput<typeof ${taskFunctionName}> = ${beautifyTypescript(JSON.stringify(example.output))}
 
 await ${taskFunctionName}.importRun(input, output)
       `.trim(),
