@@ -26,6 +26,8 @@ const validVarName = (text: string): string => {
   return `${anyCase.substring(0, 1).toLowerCase()}${anyCase.substring(1)}`
 }
 
+export type FileDataProvider = 'fs-promise' | 'fetch' | 'axios'
+
 type GeneratedCode = {
   language: 'bash' | 'typescript'
   code: string
@@ -42,28 +44,71 @@ type GetPlaygroundSnippetsConfig = {
   groupId: string
   example: {
     input: Record<string, unknown>
+    output: Record<string, unknown>
   }
   api?: {
     key?: string | null | undefined
     url?: string | null | undefined
   }
+  fileDataProvider?: FileDataProvider
 }
 
 type GetPlaygroundSnippetsResult = {
+  isUsingFileDataProvider: boolean
   installSdk: GeneratedCode
   initializeClient: GeneratedCode
   compileTask: GeneratedCode
   runTask: GeneratedCode
+  importTaskRun: GeneratedCode
+}
+
+const base64DataToFileDataProvider = (
+  str: string,
+  fileDataProvider: FileDataProvider,
+): string => {
+  return str.replace(
+    /"[-A-Za-z0-9+/]{50,}={0,3}"/g,
+    {
+      'fs-promise': 'readFile("/path/to/file")',
+      fetch: '(await fetch("http://url.to/file")).arrayBuffer()',
+      axios:
+        '(await axios.get("http://url.to/file", { responseType: "arraybuffer" })).data',
+    }[fileDataProvider],
+  )
 }
 
 export const getPlaygroundSnippets = async (
   config: GetPlaygroundSnippetsConfig,
 ): Promise<GetPlaygroundSnippetsResult> => {
-  const { taskId, taskName, schema, groupId, example, api } = config
+  const {
+    taskId,
+    taskName,
+    schema,
+    groupId,
+    example,
+    api,
+    fileDataProvider = 'fs-promise',
+  } = {
+    ...config,
+  }
 
   const taskFunctionName = validVarName(taskName || taskId)
+  const _stringifiedInput = JSON.stringify(example.input, null, 2)
+  const beautifiedInput = base64DataToFileDataProvider(
+    _stringifiedInput,
+    fileDataProvider,
+  )
+  const isUsingFileDataProvider = beautifiedInput !== _stringifiedInput
+
+  const fileProviderImport = {
+    'fs-promise': 'import { readFile } from "fs/promises"\n',
+    fetch: '',
+    axios: 'import axios from "axios"\n',
+  }[fileDataProvider]
 
   return {
+    isUsingFileDataProvider,
+
     installSdk: {
       language: 'bash',
       code: `
@@ -114,11 +159,35 @@ ${beautifyTypescript(`const ${taskFunctionName} = await workflowAI.compileTask({
     runTask: {
       language: 'typescript',
       code: `
-import { TaskInput } from "@workflowai/workflowai"
+${[
+  'import { TaskInput } from "@workflowai/workflowai"',
+  isUsingFileDataProvider && fileProviderImport,
+]
+  .filter(Boolean)
+  .join('\n')}
 
-${`const input: TaskInput<typeof ${taskFunctionName}> = ${beautifyTypescript(JSON.stringify(example.input))}`}
+const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
 
 const output = await ${taskFunctionName}(input)
+
+console.log(output)
+      `.trim(),
+    },
+
+    importTaskRun: {
+      language: 'typescript',
+      code: `
+${[
+  'import { TaskInput, TaskOutput } from "@workflowai/workflowai"',
+  isUsingFileDataProvider && fileProviderImport,
+]
+  .filter(Boolean)
+  .join('\n')}
+
+const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
+const ouput: TaskOutput<typeof ${taskFunctionName}> = ${beautifyTypescript(JSON.stringify(example.output))}
+
+await ${taskFunctionName}.importRun(input, output)
       `.trim(),
     },
   }
