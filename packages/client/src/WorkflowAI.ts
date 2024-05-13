@@ -25,16 +25,13 @@ export class WorkflowAI {
   protected api: WorkflowAIApi
 
   constructor(config?: WorkflowAIConfig) {
-    const {
-      api: apiConfig,
-    } = {
-      ...config
+    const { api: apiConfig } = {
+      ...config,
     }
 
     if (apiConfig && 'tasks' in apiConfig) {
       this.api = apiConfig
-    }
-    else {
+    } else {
       this.api = initWorkflowAIApi({
         ...apiConfig,
       })
