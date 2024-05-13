@@ -101,9 +101,9 @@ export const getPlaygroundSnippets = async (
   const isUsingFileDataProvider = beautifiedInput !== _stringifiedInput
 
   const fileProviderImport = {
-    'fs-promise': 'import { readFile } from "fs/promises"\n',
+    'fs-promise': 'import { readFile } from "fs/promises"',
     fetch: '',
-    axios: 'import axios from "axios"\n',
+    axios: 'import axios from "axios"',
   }[fileDataProvider]
 
   return {
