@@ -3,6 +3,7 @@ import {
   InitWorkflowAIApiConfig,
   TaskSchemaRunGroup,
   WorkflowAIApi,
+  WorkflowAIApiRequestError,
 } from '@workflowai/api'
 import { inputZodToSchema, outputZodToSchema } from '@workflowai/schema'
 
@@ -24,7 +25,7 @@ export interface RunTaskOptions {
 }
 
 export type ImportTaskRunOptions = Pick<
-  Parameters<WorkflowAIApi['tasks']['schemas']['runs']['import']>[0],
+  Parameters<WorkflowAIApi['tasks']['schemas']['runs']['import']>[0]['body'],
   'id' | 'group' | 'start_time' | 'end_time' | 'labels'
 >
 
@@ -48,14 +49,20 @@ export class WorkflowAI {
   protected async upsertTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS, true>,
   ): Promise<TaskDefinition<IS, OS, false>> {
-    const { data } = await this.api.tasks.upsert({
-      task_id: taskDef.taskId,
-      name: taskDef.taskName || taskDef.taskId,
-      // @ts-expect-error The generated API types are messed up
-      input_schema: await inputZodToSchema(taskDef.schema.input),
-      // @ts-expect-error The generated API types are messed up
-      output_schema: await outputZodToSchema(taskDef.schema.output),
+    const { data, error, response } = await this.api.tasks.upsert({
+      body: {
+        task_id: taskDef.taskId,
+        name: taskDef.taskName || taskDef.taskId,
+        // @ts-expect-error The generated API types are messed up
+        input_schema: await inputZodToSchema(taskDef.schema.input),
+        // @ts-expect-error The generated API types are messed up
+        output_schema: await outputZodToSchema(taskDef.schema.output),
+      },
     })
+
+    if (!data) {
+      throw new WorkflowAIApiRequestError(response, error)
+    }
 
     return {
       ...taskDef,
@@ -73,12 +80,22 @@ export class WorkflowAI {
     input: IS,
     options: RunTaskOptions,
   ): Promise<TaskOutput<OS>> {
-    const { data } = await this.api.tasks.schemas.run({
-      task_id: taskDef.taskId.toLowerCase(),
-      task_schema_id: taskDef.schema.id,
-      task_input: await taskDef.schema.input.parseAsync(input),
-      group: options.group,
+    const { data, error, response } = await this.api.tasks.schemas.run({
+      params: {
+        path: {
+          task_id: taskDef.taskId.toLowerCase(),
+          task_schema_id: taskDef.schema.id,
+        },
+      },
+      body: {
+        task_input: await taskDef.schema.input.parseAsync(input),
+        group: options.group,
+      },
     })
+
+    if (!data) {
+      throw new WorkflowAIApiRequestError(response, error)
+    }
 
     return taskDef.schema.output.parseAsync(data.task_output)
   }
@@ -97,13 +114,23 @@ export class WorkflowAI {
       taskDef.schema.output.parseAsync(output),
     ])
 
-    const { data } = await this.api.tasks.schemas.runs.import({
-      ...options,
-      task_id: taskDef.taskId.toLowerCase(),
-      task_schema_id: taskDef.schema.id,
-      task_input,
-      task_output,
+    const { data, response, error } = await this.api.tasks.schemas.runs.import({
+      params: {
+        path: {
+          task_id: taskDef.taskId.toLowerCase(),
+          task_schema_id: taskDef.schema.id,
+        },
+      },
+      body: {
+        ...options,
+        task_input,
+        task_output,
+      },
     })
+
+    if (!data) {
+      throw new WorkflowAIApiRequestError(response, error)
+    }
 
     return data
   }
