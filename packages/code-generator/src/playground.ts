@@ -26,7 +26,11 @@ const validVarName = (text: string): string => {
   return `${anyCase.substring(0, 1).toLowerCase()}${anyCase.substring(1)}`
 }
 
-export type FileDataProvider = 'fs-promise' | 'fetch' | 'axios'
+export enum FileDataProvider {
+  FILE_SYSTEM = 'fs-promise',
+  FETCH = 'fetch',
+  AXIOS = 'axios',
+}
 
 type GeneratedCode = {
   language: 'bash' | 'typescript'
@@ -69,9 +73,10 @@ const base64DataToFileDataProvider = (
   return str.replace(
     /"[-A-Za-z0-9+/]{50,}={0,3}"/g,
     {
-      'fs-promise': 'readFile("/path/to/file")',
-      fetch: '(await fetch("http://url.to/file")).arrayBuffer()',
-      axios:
+      [FileDataProvider.FILE_SYSTEM]: 'readFile("/path/to/file")',
+      [FileDataProvider.FETCH]:
+        '(await fetch("http://url.to/file")).arrayBuffer()',
+      [FileDataProvider.AXIOS]:
         '(await axios.get("http://url.to/file", { responseType: "arraybuffer" })).data',
     }[fileDataProvider],
   )
@@ -87,7 +92,7 @@ export const getPlaygroundSnippets = async (
     groupId,
     example,
     api,
-    fileDataProvider = 'fs-promise',
+    fileDataProvider = FileDataProvider.FILE_SYSTEM,
   } = {
     ...config,
   }
