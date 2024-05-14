@@ -7,14 +7,14 @@ type Definitions = Record<string, z.ZodTypeAny>
 
 const { input: inputSchemaDefinitions, output: outputSchemaDefinitions } =
   definitions.reduce<{ input: Definitions; output: Definitions }>(
-    (result, { jsonSchemaTitle, zodSchema }) => ({
+    (result, { jsonSchemaDefinitionKey, zodSchema }) => ({
       input: {
         ...result.input,
-        [jsonSchemaTitle]: z[zodSchema.input](),
+        [jsonSchemaDefinitionKey]: z[zodSchema.input](),
       },
       output: {
         ...result.output,
-        [jsonSchemaTitle]: z[zodSchema.output](),
+        [jsonSchemaDefinitionKey]: z[zodSchema.output](),
       },
     }),
     { input: {}, output: {} },
