@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/code-generator",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "workflowAI code-generator",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -45,7 +45,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@workflowai/schema": "^1.0.2",
+    "@workflowai/schema": "^1.0.3",
     "simply-beautiful": "^0.2.14"
   }
 }

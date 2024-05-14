@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/workflowai",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "workflowAI client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -46,6 +46,6 @@
   },
   "dependencies": {
     "@workflowai/api": "^1.0.3",
-    "@workflowai/schema": "^1.0.2"
+    "@workflowai/schema": "^1.0.3"
   }
 }
