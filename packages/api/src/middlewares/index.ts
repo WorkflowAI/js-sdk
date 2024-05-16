@@ -1,5 +1,2 @@
-import type { Middleware } from 'openapi-fetch'
-
-export { Middleware }
-
 export * from './throwError'
+export type { Middleware } from 'openapi-fetch'
