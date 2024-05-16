@@ -26,17 +26,19 @@ const validVarName = (text: string): string => {
   return `${anyCase.substring(0, 1).toLowerCase()}${anyCase.substring(1)}`
 }
 
-const cleanZodDescribe = (code: string): string => {
+const cleanZodDescribe = (code: string, asComments: boolean): string => {
   const lines = code.split('\n')
   const cleanLines = lines.map((line) => {
-    return line.replace(/^(\s*)(("[^"]+": z\.)?.*)\.describe\("([^"]+)"\)/, (_match, indents, pre, prop, description, ) => {
-      if (prop) {
-        return `${indents}/**\n${indents} * ${description}\n${indents} */\n${indents}${pre}`
-      }
-      else {
-        return `${indents}${pre}`
-      }
-    })
+    return line.replace(
+      /^(\s*)(("[^"]+": z\.)?.*)\.describe\("([^"]+)"\)/,
+      (_match, indents, pre, prop, description) => {
+        if (prop && asComments) {
+          return `${indents}/**\n${indents} * ${description}\n${indents} */\n${indents}${pre}`
+        } else {
+          return `${indents}${pre}`
+        }
+      },
+    )
   })
 
   return cleanLines.join('\n')
@@ -71,6 +73,7 @@ type GetPlaygroundSnippetsConfig = {
     url?: string | null | undefined
   }
   fileDataProvider?: FileDataProvider
+  descriptionAsComments?: boolean
 }
 
 type GetPlaygroundSnippetsResult = {
@@ -109,6 +112,7 @@ export const getPlaygroundSnippets = async (
     example,
     api,
     fileDataProvider = FileDataProvider.FILE_SYSTEM,
+    descriptionAsComments,
   } = {
     ...config,
   }
@@ -162,7 +166,8 @@ const workflowAI = new WorkflowAI({
       code: `
 import { z } from "@workflowai/workflowai"
 
-${cleanZodDescribe(beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
+${cleanZodDescribe(
+  beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
   taskId: "${taskId}",
   schema: {
     id: ${schema.id},
@@ -173,7 +178,9 @@ ${cleanZodDescribe(beautifyTypescript(`const { run: ${taskFunctionName} } = awai
   group: {
     id: "${groupId}",
   },
-})`))}
+})`),
+  !!descriptionAsComments,
+)}
       `.trim(),
     },
 
