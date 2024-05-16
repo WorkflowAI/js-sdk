@@ -1,6 +1,7 @@
 import type { WorkflowAIApi } from '@workflowai/api'
 import type { z } from '@workflowai/schema'
 
+import type { AsyncIteratorValue, DeepPartial } from './utils'
 import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI'
 
 type TaskId = string
@@ -34,10 +35,36 @@ export function hasSchemaId<IS extends InputSchema, OS extends OutputSchema>(
   return taskDef.schema.id != null
 }
 
-export type ExecutableTask<IS extends InputSchema, OS extends OutputSchema> = ((
+export type TaskRunResult<OS extends OutputSchema> = Pick<
+  Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['run']>>,
+  'data' | 'response'
+> & {
+  output: TaskOutput<OS>
+}
+
+// Raw async iterator that the API client returns for streaming a task run
+type TaskRunStreamIterator = Awaited<
+  ReturnType<
+    Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['run']>['stream']>
+  >
+>
+
+export type TaskRunStreamEvent<OS extends OutputSchema> =
+  AsyncIteratorValue<TaskRunStreamIterator> & {
+    output: TaskOutput<OS> | undefined
+    partialOutput: DeepPartial<TaskOutput<OS>> | undefined
+  }
+
+export type ExecutableTask<
+  IS extends InputSchema,
+  OS extends OutputSchema,
+  S extends true | false = false,
+> = ((
   input: TaskInput<IS>,
-  options?: Partial<RunTaskOptions>,
-) => Promise<TaskOutput<OS>>) & {
+  options?: Partial<RunTaskOptions<S>>,
+) => PromiseLike<TaskRunResult<OS>> & {
+  stream: () => Promise<AsyncIterableIterator<TaskRunStreamEvent<OS>>>
+}) & {
   importRun: (
     input: TaskInput<IS>,
     output: TaskOutput<OS>,

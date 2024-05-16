@@ -4,8 +4,9 @@ import {
   TaskSchemaRunGroup,
   WorkflowAIApi,
   WorkflowAIApiRequestError,
+  wrapAsyncIterator,
 } from '@workflowai/api'
-import { inputZodToSchema, outputZodToSchema } from '@workflowai/schema'
+import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
 import {
   type ExecutableTask,
@@ -13,15 +14,17 @@ import {
   type InputSchema,
   type OutputSchema,
   type TaskDefinition,
-  type TaskOutput,
+  TaskRunResult,
+  TaskRunStreamEvent,
 } from './Task'
 
 export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig
 }
 
-export interface RunTaskOptions {
+export type RunTaskOptions<S extends true | false = false> = {
   group: TaskSchemaRunGroup
+  stream?: S
 }
 
 export type ImportTaskRunOptions = Pick<
@@ -78,9 +81,23 @@ export class WorkflowAI {
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS, false>,
     input: IS,
-    options: RunTaskOptions,
-  ): Promise<TaskOutput<OS>> {
-    const { data, error, response } = await this.api.tasks.schemas.run({
+    options: RunTaskOptions<false>,
+  ): Promise<TaskRunResult<OS>>
+  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS, false>,
+    input: IS,
+    options: RunTaskOptions<true>,
+  ): Promise<AsyncIterableIterator<TaskRunStreamEvent<OS>>>
+  protected async runTask<
+    IS extends InputSchema,
+    OS extends OutputSchema,
+    S extends true | false = false,
+  >(
+    taskDef: TaskDefinition<IS, OS, false>,
+    input: IS,
+    { group, stream }: RunTaskOptions<S>,
+  ) {
+    const init = {
       params: {
         path: {
           task_id: taskDef.taskId.toLowerCase(),
@@ -89,15 +106,56 @@ export class WorkflowAI {
       },
       body: {
         task_input: await taskDef.schema.input.parseAsync(input),
-        group: options.group,
+        group,
+        stream,
       },
-    })
-
-    if (!data) {
-      throw new WorkflowAIApiRequestError(response, error)
     }
 
-    return taskDef.schema.output.parseAsync(data.task_output)
+    // Prepare a run call, but nothing is executed yet
+    const run = this.api.tasks.schemas.run(init)
+
+    if (stream) {
+      // Streaming response, we receive partial results
+      // Return an async iterator for easy consumption
+      return wrapAsyncIterator(
+        await run.stream(),
+        // Transform the server-sent events data to the expected outputs
+        // conforming to the schema (as best as possible)
+        async ({ response, data }): Promise<TaskRunStreamEvent<OS>> => {
+          // Allows us to make a deep partial version of the schema, whatever the schema looks like
+          const partialWrap = z.object({ partial: taskDef.schema.output })
+          const [parsed, partialParsed] = await Promise.all([
+            // We do a `safeParse` to avoid throwing, since it's expected that during
+            // streaming of partial results we'll have data that does not conform to schema
+            data && taskDef.schema.output.safeParseAsync(data.task_output),
+            data &&
+              (partialWrap.deepPartial() as typeof partialWrap).safeParseAsync({
+                partial: data.task_output,
+              }),
+          ])
+
+          return {
+            response,
+            data,
+            output: parsed?.data,
+            partialOutput: partialParsed?.data?.partial,
+          }
+        },
+      )
+    }
+    else {
+      // Non-streaming version, await the run to actually send the request
+      const { data, error, response } = await run
+      if (!data) {
+        throw new WorkflowAIApiRequestError(response, error)
+      }
+  
+      return {
+        data,
+        response,
+        output: await taskDef.schema.output.parseAsync(data.task_output),
+      } as TaskRunResult<OS>
+    }
   }
 
   protected async importTaskRun<
@@ -158,7 +216,20 @@ export class WorkflowAI {
         ...overrideOptions,
       } as RunTaskOptions
 
-      return this.runTask<IS, OS>(taskDef, input, options)
+      return {
+        then: (resolve, reject) => {
+          return this.runTask<IS, OS>(taskDef, input, {
+            ...options,
+            stream: false,
+          }).then(resolve, reject)
+        },
+        stream: () => {
+          return this.runTask<IS, OS>(taskDef, input, {
+            ...options,
+            stream: true,
+          })
+        },
+      }
     }
 
     runTask.importRun = async (input, output, overrideOptions) => {
