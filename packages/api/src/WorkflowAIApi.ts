@@ -1,24 +1,7 @@
-import createClient, { MaybeOptionalInit, Middleware } from 'openapi-fetch'
-import type { PathsWithMethod } from 'openapi-typescript-helpers'
-
-import { WorkflowAIApiRequestError } from './Error'
-import type { paths } from './generated/openapi'
-import { getEnv } from './getEnv'
-
-const THROW_ERROR_MIDDLEWARE: Middleware = {
-  async onResponse(res) {
-    if (!res.ok) {
-      let detail: unknown
-      try {
-        detail = (await res.json())?.detail
-      } finally {
-        // eslint-disable-next-line no-unsafe-finally
-        throw new WorkflowAIApiRequestError(res, detail)
-      }
-    }
-    return res
-  },
-}
+import { createJsonClient, createStreamClient } from './http-clients'
+import { Middleware, throwError } from './middlewares'
+import { getEnv } from './utils/getEnv'
+import { withStream } from './utils/withStream'
 
 export type InitWorkflowAIApiConfig = {
   key?: string | undefined
@@ -32,88 +15,69 @@ export function initWorkflowAIApi(
   const {
     key,
     url,
-    use: middlewares,
+    use: middlewares = [],
   } = {
     key: getEnv('WORKFLOWAI_API_KEY'),
     url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',
     ...config,
   }
 
-  const fetcher = createClient<paths>({
-    baseUrl: url,
-    headers: {
-      Authorization: `Bearer ${key}`,
-    },
-  })
+  // Add error handing middleware AT THE END of the chain
+  middlewares.push(throwError)
 
-  // Register middlewares
-  if (middlewares?.length) {
-    fetcher.use(...middlewares)
-  }
-
-  // Register error AFTER other middlewares
-  fetcher.use(THROW_ERROR_MIDDLEWARE)
-
-  const GET =
-    <P extends PathsWithMethod<paths, 'get'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'get'>) =>
-      fetcher.GET(path, init)
-
-  const POST =
-    <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'post'>) =>
-      fetcher.POST(path, init)
-
-  const DELETE =
-    <P extends PathsWithMethod<paths, 'delete'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'delete'>) =>
-      fetcher.DELETE(path, init)
+  const json = createJsonClient({ url, key, use: middlewares })
+  const stream = createStreamClient({ url, key, use: middlewares })
 
   return {
     tasks: {
-      generate: POST('/tasks/generate'),
-      list: GET('/tasks'),
-      upsert: POST('/tasks'),
+      generate: json.POST('/tasks/generate'),
+      list: json.GET('/tasks'),
+      upsert: json.POST('/tasks'),
 
       groups: {
-        get: GET('/tasks/{task_id}/groups/{group_id}'),
+        get: json.GET('/tasks/{task_id}/groups/{group_id}'),
       },
 
       schemas: {
-        get: GET('/tasks/{task_id}/schemas/{task_schema_id}'),
-        run: POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
+        get: json.GET('/tasks/{task_id}/schemas/{task_schema_id}'),
+        run: withStream(
+          json.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
+          stream.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
+        ),
 
         runs: {
-          list: GET('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
-          import: POST('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
-          aggregate: GET(
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
+          import: json.POST('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
+          aggregate: json.GET(
             '/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate',
           ),
         },
 
         examples: {
-          list: GET('/tasks/{task_id}/schemas/{task_schema_id}/examples'),
-          create: POST('/tasks/{task_id}/schemas/{task_schema_id}/examples'),
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/examples'),
+          create: json.POST(
+            '/tasks/{task_id}/schemas/{task_schema_id}/examples',
+          ),
         },
 
         scores: {
-          list: GET('/tasks/{task_id}/schemas/{task_schema_id}/scores'),
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/scores'),
         },
       },
     },
 
     runs: {
-      get: GET('/runs/{run_id}'),
-      annotate: POST('/runs/{run_id}/annotate'),
+      get: json.GET('/runs/{run_id}'),
+      annotate: json.POST('/runs/{run_id}/annotate'),
     },
 
     models: {
-      list: GET('/models'),
+      list: json.GET('/models'),
     },
 
     examples: {
-      get: GET('/examples/{example_id}'),
-      delete: DELETE('/examples/{example_id}'),
+      get: json.GET('/examples/{example_id}'),
+      delete: json.DELETE('/examples/{example_id}'),
     },
   }
 }
