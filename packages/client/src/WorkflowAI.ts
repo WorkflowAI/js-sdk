@@ -16,6 +16,7 @@ import {
   type TaskDefinition,
   TaskRunResult,
   TaskRunStreamEvent,
+  TaskRunStreamResult,
 } from './Task'
 
 export type WorkflowAIConfig = {
@@ -87,7 +88,7 @@ export class WorkflowAI {
     taskDef: TaskDefinition<IS, OS, false>,
     input: IS,
     options: RunTaskOptions<true>,
-  ): Promise<AsyncIterableIterator<TaskRunStreamEvent<OS>>>
+  ): Promise<TaskRunStreamResult<OS>>
   protected async runTask<
     IS extends InputSchema,
     OS extends OutputSchema,
@@ -116,40 +117,46 @@ export class WorkflowAI {
 
     if (stream) {
       // Streaming response, we receive partial results
-      // Return an async iterator for easy consumption
-      return wrapAsyncIterator(
-        await run.stream(),
-        // Transform the server-sent events data to the expected outputs
-        // conforming to the schema (as best as possible)
-        async ({ response, data }): Promise<TaskRunStreamEvent<OS>> => {
-          // Allows us to make a deep partial version of the schema, whatever the schema looks like
-          const partialWrap = z.object({ partial: taskDef.schema.output })
-          const [parsed, partialParsed] = await Promise.all([
-            // We do a `safeParse` to avoid throwing, since it's expected that during
-            // streaming of partial results we'll have data that does not conform to schema
-            data && taskDef.schema.output.safeParseAsync(data.task_output),
-            data &&
-              (partialWrap.deepPartial() as typeof partialWrap).safeParseAsync({
-                partial: data.task_output,
-              }),
-          ])
 
-          return {
-            response,
-            data,
-            output: parsed?.data,
-            partialOutput: partialParsed?.data?.partial,
-          }
-        },
-      )
-    }
-    else {
+      const { response, stream: rawStream } = await run.stream()
+
+      return {
+        response,
+        // Return an async iterator for easy consumption
+        stream: wrapAsyncIterator(
+          rawStream,
+          // Transform the server-sent events data to the expected outputs
+          // conforming to the schema (as best as possible)
+          async ({ data }): Promise<TaskRunStreamEvent<OS>> => {
+            // Allows us to make a deep partial version of the schema, whatever the schema looks like
+            const partialWrap = z.object({ partial: taskDef.schema.output })
+            const [parsed, partialParsed] = await Promise.all([
+              // We do a `safeParse` to avoid throwing, since it's expected that during
+              // streaming of partial results we'll have data that does not conform to schema
+              data && taskDef.schema.output.safeParseAsync(data.task_output),
+              data &&
+                (
+                  partialWrap.deepPartial() as typeof partialWrap
+                ).safeParseAsync({
+                  partial: data.task_output,
+                }),
+            ])
+
+            return {
+              data,
+              output: parsed?.data,
+              partialOutput: partialParsed?.data?.partial,
+            }
+          },
+        ),
+      }
+    } else {
       // Non-streaming version, await the run to actually send the request
       const { data, error, response } = await run
       if (!data) {
         throw new WorkflowAIApiRequestError(response, error)
       }
-  
+
       return {
         data,
         response,

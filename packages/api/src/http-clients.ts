@@ -90,26 +90,27 @@ export function createStreamClient(config: CreateHttpClientConfig) {
         parseAs: 'stream',
       })
 
-      // Wrap response stream in an easy-to-use async iterator
-      // with event data JSON parsed
-      return wrapAsyncIterator(
-        asServerSentEvents(response),
-        (
-          value,
-        ): {
-          data:
-            | GetValueWithDefault<
-                paths[P]['post']['responses'][200]['content'],
-                'text/event-stream',
-                Record<string, unknown>
-              >
-            | undefined
-          response: Response
-        } => ({
-          response,
-          data: value?.data ? JSON.parse(value.data) : undefined,
-        }),
-      )
+      return {
+        response,
+        // Wrap response stream in an easy-to-use async iterator
+        // with event data JSON parsed
+        stream: wrapAsyncIterator(
+          asServerSentEvents(response),
+          (
+            value,
+          ): {
+            data:
+              | GetValueWithDefault<
+                  paths[P]['post']['responses'][200]['content'],
+                  'text/event-stream',
+                  Record<string, unknown>
+                >
+              | undefined
+          } => ({
+            data: value?.data ? JSON.parse(value.data) : undefined,
+          }),
+        ),
+      }
     }
 
   return {
