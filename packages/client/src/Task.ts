@@ -63,16 +63,18 @@ export type TaskRunStreamResult<OS extends OutputSchema> = Pick<
   stream: AsyncIterableIterator<TaskRunStreamEvent<OS>>
 }
 
-export type ExecutableTask<
+export type UseTaskResult<
   IS extends InputSchema,
   OS extends OutputSchema,
   S extends true | false = false,
-> = ((
-  input: TaskInput<IS>,
-  options?: Partial<RunTaskOptions<S>>,
-) => PromiseLike<TaskRunResult<OS>> & {
-  stream: () => Promise<TaskRunStreamResult<OS>>
-}) & {
+> = {
+  run: (
+    input: TaskInput<IS>,
+    options?: Partial<RunTaskOptions<S>>,
+  ) => Promise<TaskRunResult<OS>> & {
+    stream: () => Promise<TaskRunStreamResult<OS>>
+  }
+
   importRun: (
     input: TaskInput<IS>,
     output: TaskOutput<OS>,
@@ -88,14 +90,22 @@ export type TaskInput<T> = T extends InputSchema
   ? z.input<T>
   : T extends TaskDefinition<infer IS, infer _OS>
     ? TaskInput<IS>
-    : T extends ExecutableTask<infer IS, infer _OS>
+    : T extends UseTaskResult<infer IS, infer _OS>
       ? TaskInput<IS>
-      : never
+      : T extends UseTaskResult<infer IS, infer _OS>['run']
+        ? TaskInput<IS>
+        : T extends UseTaskResult<infer IS, infer _OS>['importRun']
+          ? TaskInput<IS>
+          : never
 
 export type TaskOutput<T> = T extends OutputSchema
   ? z.output<T>
   : T extends TaskDefinition<infer _IS, infer OS>
     ? TaskOutput<OS>
-    : T extends ExecutableTask<infer _IS, infer OS>
+    : T extends UseTaskResult<infer _IS, infer OS>
       ? TaskOutput<OS>
-      : never
+      : T extends UseTaskResult<infer _IS, infer OS>['run']
+        ? TaskOutput<OS>
+        : T extends UseTaskResult<infer _IS, infer OS>['importRun']
+          ? TaskOutput<OS>
+          : never

@@ -1,22 +1,22 @@
 import {
   initWorkflowAIApi,
   InitWorkflowAIApiConfig,
-  TaskSchemaRunGroup,
-  WorkflowAIApi,
+  type TaskSchemaRunGroup,
+  type WorkflowAIApi,
   WorkflowAIApiRequestError,
   wrapAsyncIterator,
 } from '@workflowai/api'
 import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
 import {
-  type ExecutableTask,
   hasSchemaId,
   type InputSchema,
   type OutputSchema,
   type TaskDefinition,
-  TaskRunResult,
-  TaskRunStreamEvent,
-  TaskRunStreamResult,
+  type TaskRunResult,
+  type TaskRunStreamEvent,
+  type TaskRunStreamResult,
+  type UseTaskResult,
 } from './Task'
 
 export type WorkflowAIConfig = {
@@ -200,10 +200,10 @@ export class WorkflowAI {
     return data
   }
 
-  public async compileTask<IS extends InputSchema, OS extends OutputSchema>(
+  public async useTask<IS extends InputSchema, OS extends OutputSchema>(
     _taskDef: TaskDefinition<IS, OS, true>,
     defaultOptions?: Partial<RunTaskOptions>,
-  ): Promise<ExecutableTask<IS, OS>> {
+  ): Promise<UseTaskResult<IS, OS>> {
     let taskDef: TaskDefinition<IS, OS>
 
     // Make sure we have a schema ID, either passed or by upserting the task
@@ -217,29 +217,44 @@ export class WorkflowAI {
       )
     }
 
-    const runTask: ExecutableTask<IS, OS> = (input, overrideOptions) => {
+    const run: UseTaskResult<IS, OS>['run'] = (input, overrideOptions) => {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
       } as RunTaskOptions
 
-      return {
-        then: (resolve, reject) => {
-          return this.runTask<IS, OS>(taskDef, input, {
+      let runPromise: Promise<TaskRunResult<OS>>
+
+      const getRunPromise = () => {
+        if (!runPromise) {
+          runPromise = this.runTask<IS, OS>(taskDef, input, {
             ...options,
             stream: false,
-          }).then(resolve, reject)
+          })
+        }
+        return runPromise
+      }
+
+      return {
+        get [Symbol.toStringTag]() {
+          return Promise.resolve()[Symbol.toStringTag]
         },
-        stream: () => {
-          return this.runTask<IS, OS>(taskDef, input, {
+        then: (...r) => getRunPromise().then(...r),
+        catch: (...r) => getRunPromise().catch(...r),
+        finally: (...r) => getRunPromise().finally(...r),
+        stream: () =>
+          this.runTask<IS, OS>(taskDef, input, {
             ...options,
             stream: true,
-          })
-        },
+          }),
       }
     }
 
-    runTask.importRun = async (input, output, overrideOptions) => {
+    const importRun: UseTaskResult<IS, OS>['importRun'] = async (
+      input,
+      output,
+      overrideOptions,
+    ) => {
       return this.importTaskRun(taskDef, input, output, {
         ...defaultOptions,
         ...overrideOptions,
@@ -254,6 +269,9 @@ export class WorkflowAI {
       })
     }
 
-    return runTask
+    return {
+      run,
+      importRun,
+    }
   }
 }

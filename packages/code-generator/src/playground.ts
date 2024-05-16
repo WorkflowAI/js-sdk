@@ -55,16 +55,15 @@ type GetPlaygroundSnippetsConfig = {
     url?: string | null | undefined
   }
   fileDataProvider?: FileDataProvider
-  streamRunTask?: boolean
 }
 
 type GetPlaygroundSnippetsResult = {
   isUsingFileDataProvider: boolean
   installSdk: GeneratedCode
   initializeClient: GeneratedCode
-  compileTask: GeneratedCode
+  initializeTask: GeneratedCode
   runTask: GeneratedCode
-  importTaskRun: GeneratedCode
+  streamRunTask: GeneratedCode
 }
 
 const base64DataToFileDataProvider = (
@@ -94,7 +93,6 @@ export const getPlaygroundSnippets = async (
     example,
     api,
     fileDataProvider = FileDataProvider.FILE_SYSTEM,
-    streamRunTask = false,
   } = {
     ...config,
   }
@@ -143,12 +141,12 @@ const workflowAI = new WorkflowAI({
       `.trim(),
     },
 
-    compileTask: {
+    initializeTask: {
       language: 'typescript',
       code: `
 import { z } from "@workflowai/workflowai"
 
-${beautifyTypescript(`const ${taskFunctionName} = await workflowAI.compileTask({
+${beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
   taskId: "${taskId}",
   schema: {
     id: ${schema.id},
@@ -174,39 +172,32 @@ ${[
   .join('\n')}
 
 const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
-${
-  streamRunTask
-    ? `
-const { stream } = await ${taskFunctionName}(input).stream()
 
-for await (const { output, partialOutput } of stream) {
-  console.log(output) // Conforms to output schema
-  console.log(partialOutput) // All properties of output schema are optional
-}
-`
-    : `
 const { output } = await ${taskFunctionName}(input)
 
 console.log(output)
-`
 }`.trim(),
     },
 
-    importTaskRun: {
+    streamRunTask: {
       language: 'typescript',
       code: `
 ${[
-  'import { TaskInput, TaskOutput } from "@workflowai/workflowai"',
+  'import { TaskInput } from "@workflowai/workflowai"',
   isUsingFileDataProvider && fileProviderImport,
 ]
   .filter(Boolean)
   .join('\n')}
 
 const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
-const output: TaskOutput<typeof ${taskFunctionName}> = ${beautifyTypescript(JSON.stringify(example.output))}
 
-await ${taskFunctionName}.importRun(input, output)
-      `.trim(),
+const { stream } = await ${taskFunctionName}(input).stream()
+
+for await (const { output, partialOutput } of stream) {
+  console.log(output) // Conforms to output schema
+  console.log(partialOutput) // All properties of output schema are optional
+}
+`.trim(),
     },
   }
 }
