@@ -197,7 +197,7 @@ export class WorkflowAI {
       throw new WorkflowAIApiRequestError(response, error)
     }
 
-    return data
+    return { data, response }
   }
 
   public async useTask<IS extends InputSchema, OS extends OutputSchema>(

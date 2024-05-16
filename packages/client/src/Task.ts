@@ -80,9 +80,9 @@ export type UseTaskResult<
     output: TaskOutput<OS>,
     options?: Partial<ImportTaskRunOptions>,
   ) => Promise<
-    Awaited<
+    Pick<Awaited<
       ReturnType<WorkflowAIApi['tasks']['schemas']['runs']['import']>
-    >['data']
+    >, 'data' | 'response'>
   >
 }
 
