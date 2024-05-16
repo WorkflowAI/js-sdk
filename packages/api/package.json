@@ -52,6 +52,7 @@
     "zod": "^3.23.6"
   },
   "dependencies": {
+    "fetch-event-stream": "^0.1.5",
     "openapi-fetch": "^0.9.5"
   }
 }
