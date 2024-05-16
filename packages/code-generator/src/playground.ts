@@ -26,6 +26,22 @@ const validVarName = (text: string): string => {
   return `${anyCase.substring(0, 1).toLowerCase()}${anyCase.substring(1)}`
 }
 
+const cleanZodDescribe = (code: string): string => {
+  const lines = code.split('\n')
+  const cleanLines = lines.map((line) => {
+    return line.replace(/^(\s*)(("[^"]+": z\.)?.*)\.describe\("([^"]+)"\)/, (_match, indents, pre, prop, description, ) => {
+      if (prop) {
+        return `${indents}/**\n${indents} * ${description}\n${indents} */\n${indents}${pre}`
+      }
+      else {
+        return `${indents}${pre}`
+      }
+    })
+  })
+
+  return cleanLines.join('\n')
+}
+
 export enum FileDataProvider {
   FILE_SYSTEM = 'fs-promise',
   FETCH = 'fetch',
@@ -146,7 +162,7 @@ const workflowAI = new WorkflowAI({
       code: `
 import { z } from "@workflowai/workflowai"
 
-${beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
+${cleanZodDescribe(beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
   taskId: "${taskId}",
   schema: {
     id: ${schema.id},
@@ -157,7 +173,7 @@ ${beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useT
   group: {
     id: "${groupId}",
   },
-})`)}
+})`))}
       `.trim(),
     },
 
@@ -176,7 +192,7 @@ const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
 const { output } = await ${taskFunctionName}(input)
 
 console.log(output)
-}`.trim(),
+`.trim(),
     },
 
     streamRunTask: {
