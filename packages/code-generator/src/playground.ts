@@ -55,6 +55,7 @@ type GetPlaygroundSnippetsConfig = {
     url?: string | null | undefined
   }
   fileDataProvider?: FileDataProvider
+  streamRunTask?: boolean
 }
 
 type GetPlaygroundSnippetsResult = {
@@ -93,6 +94,7 @@ export const getPlaygroundSnippets = async (
     example,
     api,
     fileDataProvider = FileDataProvider.FILE_SYSTEM,
+    streamRunTask = false,
   } = {
     ...config,
   }
@@ -172,11 +174,22 @@ ${[
   .join('\n')}
 
 const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
+${
+  streamRunTask
+    ? `
+const { stream } = await ${taskFunctionName}(input).stream()
 
-const output = await ${taskFunctionName}(input)
+for await (const { output, partialOutput } of stream) {
+  console.log(output) // Conforms to output schema
+  console.log(partialOutput) // All properties of output schema are optional
+}
+`
+    : `
+const { output } = await ${taskFunctionName}(input)
 
 console.log(output)
-      `.trim(),
+`
+}`.trim(),
     },
 
     importTaskRun: {
