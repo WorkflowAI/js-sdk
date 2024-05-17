@@ -1,30 +1,35 @@
 import {
   initWorkflowAIApi,
   InitWorkflowAIApiConfig,
-  TaskSchemaRunGroup,
-  WorkflowAIApi,
+  type TaskSchemaRunGroup,
+  type WorkflowAIApi,
+  WorkflowAIApiRequestError,
+  wrapAsyncIterator,
 } from '@workflowai/api'
-import { inputZodToSchema, outputZodToSchema } from '@workflowai/schema'
+import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
 import {
-  type ExecutableTask,
   hasSchemaId,
   type InputSchema,
   type OutputSchema,
   type TaskDefinition,
-  type TaskOutput,
+  type TaskRunResult,
+  type TaskRunStreamEvent,
+  type TaskRunStreamResult,
+  type UseTaskResult,
 } from './Task'
 
 export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig
 }
 
-export interface RunTaskOptions {
+export type RunTaskOptions<S extends true | false = false> = {
   group: TaskSchemaRunGroup
+  stream?: S
 }
 
 export type ImportTaskRunOptions = Pick<
-  Parameters<WorkflowAIApi['tasks']['schemas']['runs']['import']>[0],
+  Parameters<WorkflowAIApi['tasks']['schemas']['runs']['import']>[0]['body'],
   'id' | 'group' | 'start_time' | 'end_time' | 'labels'
 >
 
@@ -48,14 +53,20 @@ export class WorkflowAI {
   protected async upsertTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS, true>,
   ): Promise<TaskDefinition<IS, OS, false>> {
-    const { data } = await this.api.tasks.upsert({
-      task_id: taskDef.taskId,
-      name: taskDef.taskName || taskDef.taskId,
-      // @ts-expect-error The generated API types are messed up
-      input_schema: await inputZodToSchema(taskDef.schema.input),
-      // @ts-expect-error The generated API types are messed up
-      output_schema: await outputZodToSchema(taskDef.schema.output),
+    const { data, error, response } = await this.api.tasks.upsert({
+      body: {
+        task_id: taskDef.taskId,
+        name: taskDef.taskName || taskDef.taskId,
+        // @ts-expect-error The generated API types are messed up
+        input_schema: await inputZodToSchema(taskDef.schema.input),
+        // @ts-expect-error The generated API types are messed up
+        output_schema: await outputZodToSchema(taskDef.schema.output),
+      },
     })
+
+    if (!data) {
+      throw new WorkflowAIApiRequestError(response, error)
+    }
 
     return {
       ...taskDef,
@@ -71,16 +82,87 @@ export class WorkflowAI {
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS, false>,
     input: IS,
-    options: RunTaskOptions,
-  ): Promise<TaskOutput<OS>> {
-    const { data } = await this.api.tasks.schemas.run({
-      task_id: taskDef.taskId.toLowerCase(),
-      task_schema_id: taskDef.schema.id,
-      task_input: await taskDef.schema.input.parseAsync(input),
-      group: options.group,
-    })
+    options: RunTaskOptions<false>,
+  ): Promise<TaskRunResult<OS>>
+  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS, false>,
+    input: IS,
+    options: RunTaskOptions<true>,
+  ): Promise<TaskRunStreamResult<OS>>
+  protected async runTask<
+    IS extends InputSchema,
+    OS extends OutputSchema,
+    S extends true | false = false,
+  >(
+    taskDef: TaskDefinition<IS, OS, false>,
+    input: IS,
+    { group, stream }: RunTaskOptions<S>,
+  ) {
+    const init = {
+      params: {
+        path: {
+          task_id: taskDef.taskId.toLowerCase(),
+          task_schema_id: taskDef.schema.id,
+        },
+      },
+      body: {
+        task_input: await taskDef.schema.input.parseAsync(input),
+        group,
+        stream,
+      },
+    }
 
-    return taskDef.schema.output.parseAsync(data.task_output)
+    // Prepare a run call, but nothing is executed yet
+    const run = this.api.tasks.schemas.run(init)
+
+    if (stream) {
+      // Streaming response, we receive partial results
+
+      const { response, stream: rawStream } = await run.stream()
+
+      return {
+        response,
+        // Return an async iterator for easy consumption
+        stream: wrapAsyncIterator(
+          rawStream,
+          // Transform the server-sent events data to the expected outputs
+          // conforming to the schema (as best as possible)
+          async ({ data }): Promise<TaskRunStreamEvent<OS>> => {
+            // Allows us to make a deep partial version of the schema, whatever the schema looks like
+            const partialWrap = z.object({ partial: taskDef.schema.output })
+            const [parsed, partialParsed] = await Promise.all([
+              // We do a `safeParse` to avoid throwing, since it's expected that during
+              // streaming of partial results we'll have data that does not conform to schema
+              data && taskDef.schema.output.safeParseAsync(data.task_output),
+              data &&
+                (
+                  partialWrap.deepPartial() as typeof partialWrap
+                ).safeParseAsync({
+                  partial: data.task_output,
+                }),
+            ])
+
+            return {
+              data,
+              output: parsed?.data,
+              partialOutput: partialParsed?.data?.partial,
+            }
+          },
+        ),
+      }
+    } else {
+      // Non-streaming version, await the run to actually send the request
+      const { data, error, response } = await run
+      if (!data) {
+        throw new WorkflowAIApiRequestError(response, error)
+      }
+
+      return {
+        data,
+        response,
+        output: await taskDef.schema.output.parseAsync(data.task_output),
+      } as TaskRunResult<OS>
+    }
   }
 
   protected async importTaskRun<
@@ -97,21 +179,31 @@ export class WorkflowAI {
       taskDef.schema.output.parseAsync(output),
     ])
 
-    const { data } = await this.api.tasks.schemas.runs.import({
-      ...options,
-      task_id: taskDef.taskId.toLowerCase(),
-      task_schema_id: taskDef.schema.id,
-      task_input,
-      task_output,
+    const { data, response, error } = await this.api.tasks.schemas.runs.import({
+      params: {
+        path: {
+          task_id: taskDef.taskId.toLowerCase(),
+          task_schema_id: taskDef.schema.id,
+        },
+      },
+      body: {
+        ...options,
+        task_input,
+        task_output,
+      },
     })
 
-    return data
+    if (!data) {
+      throw new WorkflowAIApiRequestError(response, error)
+    }
+
+    return { data, response }
   }
 
-  public async compileTask<IS extends InputSchema, OS extends OutputSchema>(
+  public async useTask<IS extends InputSchema, OS extends OutputSchema>(
     _taskDef: TaskDefinition<IS, OS, true>,
     defaultOptions?: Partial<RunTaskOptions>,
-  ): Promise<ExecutableTask<IS, OS>> {
+  ): Promise<UseTaskResult<IS, OS>> {
     let taskDef: TaskDefinition<IS, OS>
 
     // Make sure we have a schema ID, either passed or by upserting the task
@@ -125,16 +217,44 @@ export class WorkflowAI {
       )
     }
 
-    const runTask: ExecutableTask<IS, OS> = (input, overrideOptions) => {
+    const run: UseTaskResult<IS, OS>['run'] = (input, overrideOptions) => {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
       } as RunTaskOptions
 
-      return this.runTask<IS, OS>(taskDef, input, options)
+      let runPromise: Promise<TaskRunResult<OS>>
+
+      const getRunPromise = () => {
+        if (!runPromise) {
+          runPromise = this.runTask<IS, OS>(taskDef, input, {
+            ...options,
+            stream: false,
+          })
+        }
+        return runPromise
+      }
+
+      return {
+        get [Symbol.toStringTag]() {
+          return Promise.resolve()[Symbol.toStringTag]
+        },
+        then: (...r) => getRunPromise().then(...r),
+        catch: (...r) => getRunPromise().catch(...r),
+        finally: (...r) => getRunPromise().finally(...r),
+        stream: () =>
+          this.runTask<IS, OS>(taskDef, input, {
+            ...options,
+            stream: true,
+          }),
+      }
     }
 
-    runTask.importRun = async (input, output, overrideOptions) => {
+    const importRun: UseTaskResult<IS, OS>['importRun'] = async (
+      input,
+      output,
+      overrideOptions,
+    ) => {
       return this.importTaskRun(taskDef, input, output, {
         ...defaultOptions,
         ...overrideOptions,
@@ -149,6 +269,9 @@ export class WorkflowAI {
       })
     }
 
-    return runTask
+    return {
+      run,
+      importRun,
+    }
   }
 }

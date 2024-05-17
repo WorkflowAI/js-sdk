@@ -26,7 +26,29 @@ const validVarName = (text: string): string => {
   return `${anyCase.substring(0, 1).toLowerCase()}${anyCase.substring(1)}`
 }
 
-export type FileDataProvider = 'fs-promise' | 'fetch' | 'axios'
+const cleanZodDescribe = (code: string, asComments: boolean): string => {
+  const lines = code.split('\n')
+  const cleanLines = lines.map((line) => {
+    return line.replace(
+      /^(\s*)(("[^"]+": z\.)?.*)\.describe\("([^"]+)"\)/,
+      (_match, indents, pre, prop, description) => {
+        if (prop && asComments) {
+          return `${indents}/**\n${indents} * ${description}\n${indents} */\n${indents}${pre}`
+        } else {
+          return `${indents}${pre}`
+        }
+      },
+    )
+  })
+
+  return cleanLines.join('\n')
+}
+
+export enum FileDataProvider {
+  FILE_SYSTEM = 'fs-promise',
+  FETCH = 'fetch',
+  AXIOS = 'axios',
+}
 
 type GeneratedCode = {
   language: 'bash' | 'typescript'
@@ -51,15 +73,16 @@ type GetPlaygroundSnippetsConfig = {
     url?: string | null | undefined
   }
   fileDataProvider?: FileDataProvider
+  descriptionAsComments?: boolean
 }
 
 type GetPlaygroundSnippetsResult = {
   isUsingFileDataProvider: boolean
   installSdk: GeneratedCode
   initializeClient: GeneratedCode
-  compileTask: GeneratedCode
+  initializeTask: GeneratedCode
   runTask: GeneratedCode
-  importTaskRun: GeneratedCode
+  streamRunTask: GeneratedCode
 }
 
 const base64DataToFileDataProvider = (
@@ -69,9 +92,10 @@ const base64DataToFileDataProvider = (
   return str.replace(
     /"[-A-Za-z0-9+/]{50,}={0,3}"/g,
     {
-      'fs-promise': 'readFile("/path/to/file")',
-      fetch: '(await fetch("http://url.to/file")).arrayBuffer()',
-      axios:
+      [FileDataProvider.FILE_SYSTEM]: 'readFile("/path/to/file")',
+      [FileDataProvider.FETCH]:
+        '(await fetch("http://url.to/file")).arrayBuffer()',
+      [FileDataProvider.AXIOS]:
         '(await axios.get("http://url.to/file", { responseType: "arraybuffer" })).data',
     }[fileDataProvider],
   )
@@ -87,7 +111,8 @@ export const getPlaygroundSnippets = async (
     groupId,
     example,
     api,
-    fileDataProvider = 'fs-promise',
+    fileDataProvider = FileDataProvider.FILE_SYSTEM,
+    descriptionAsComments,
   } = {
     ...config,
   }
@@ -136,12 +161,13 @@ const workflowAI = new WorkflowAI({
       `.trim(),
     },
 
-    compileTask: {
+    initializeTask: {
       language: 'typescript',
       code: `
 import { z } from "@workflowai/workflowai"
 
-${beautifyTypescript(`const ${taskFunctionName} = await workflowAI.compileTask({
+${cleanZodDescribe(
+  beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
   taskId: "${taskId}",
   schema: {
     id: ${schema.id},
@@ -152,7 +178,9 @@ ${beautifyTypescript(`const ${taskFunctionName} = await workflowAI.compileTask({
   group: {
     id: "${groupId}",
   },
-})`)}
+})`),
+  !!descriptionAsComments,
+)}
       `.trim(),
     },
 
@@ -168,27 +196,31 @@ ${[
 
 const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
 
-const output = await ${taskFunctionName}(input)
+const { output } = await ${taskFunctionName}(input)
 
 console.log(output)
-      `.trim(),
+`.trim(),
     },
 
-    importTaskRun: {
+    streamRunTask: {
       language: 'typescript',
       code: `
 ${[
-  'import { TaskInput, TaskOutput } from "@workflowai/workflowai"',
+  'import { TaskInput } from "@workflowai/workflowai"',
   isUsingFileDataProvider && fileProviderImport,
 ]
   .filter(Boolean)
   .join('\n')}
 
 const input: TaskInput<typeof ${taskFunctionName}> = ${beautifiedInput}
-const output: TaskOutput<typeof ${taskFunctionName}> = ${beautifyTypescript(JSON.stringify(example.output))}
 
-await ${taskFunctionName}.importRun(input, output)
-      `.trim(),
+const { stream } = await ${taskFunctionName}(input).stream()
+
+for await (const { output, partialOutput } of stream) {
+  console.log(output) // Conforms to output schema
+  console.log(partialOutput) // All properties of output schema are optional
+}
+`.trim(),
     },
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/api",
-  "version": "1.0.3",
+  "version": "1.2.0",
   "description": "workflowAI typed API client",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -47,11 +47,12 @@
     "dry": "npm run build && npm pub --dry-run",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {
-    "openapi-typescript-fetch": "^2.0.0"
-  },
   "devDependencies": {
     "openapi-typescript": "^6.7.5",
     "zod": "^3.23.6"
+  },
+  "dependencies": {
+    "fetch-event-stream": "^0.1.5",
+    "openapi-fetch": "^0.9.5"
   }
 }

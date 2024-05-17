@@ -1,7 +1,7 @@
-import { Fetcher, Middleware } from 'openapi-typescript-fetch'
-
-import { paths } from './generated/openapi'
-import { getEnv } from './getEnv'
+import { createJsonClient, createStreamClient } from './http-clients'
+import { Middleware, throwError } from './middlewares'
+import { getEnv } from './utils/getEnv'
+import { withStream } from './utils/withStream'
 
 export type InitWorkflowAIApiConfig = {
   key?: string | undefined
@@ -12,95 +12,72 @@ export type InitWorkflowAIApiConfig = {
 export function initWorkflowAIApi(
   config?: InitWorkflowAIApiConfig | undefined,
 ) {
-  const { key, url, use } = {
+  const {
+    key,
+    url,
+    use: middlewares = [],
+  } = {
     key: getEnv('WORKFLOWAI_API_KEY'),
     url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',
     ...config,
   }
 
-  const fetcher = Fetcher.for<paths>()
+  // Add error handing middleware AT THE END of the chain
+  middlewares.push(throwError)
 
-  // Default configuration
-  fetcher.configure({
-    baseUrl: url,
-    init: {
-      headers: {
-        Authorization: `Bearer ${key}`,
-      },
-    },
-    use,
-  })
+  const json = createJsonClient({ url, key, use: middlewares })
+  const stream = createStreamClient({ url, key, use: middlewares })
 
   return {
     tasks: {
-      generate: fetcher.path('/tasks/generate').method('post').create(),
-      list: fetcher.path('/tasks').method('get').create(),
-      upsert: fetcher.path('/tasks').method('post').create(),
+      generate: json.POST('/tasks/generate'),
+      list: json.GET('/tasks'),
+      upsert: json.POST('/tasks'),
 
       groups: {
-        get: fetcher
-          .path('/tasks/{task_id}/groups/{group_id}')
-          .method('get')
-          .create(),
+        get: json.GET('/tasks/{task_id}/groups/{group_id}'),
       },
 
       schemas: {
-        get: fetcher
-          .path('/tasks/{task_id}/schemas/{task_schema_id}')
-          .method('get')
-          .create(),
-        run: fetcher
-          .path('/tasks/{task_id}/schemas/{task_schema_id}/run')
-          .method('post')
-          .create(),
+        get: json.GET('/tasks/{task_id}/schemas/{task_schema_id}'),
+        run: withStream(
+          json.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
+          stream.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
+        ),
 
         runs: {
-          list: fetcher
-            .path('/tasks/{task_id}/schemas/{task_schema_id}/runs')
-            .method('get')
-            .create(),
-          import: fetcher
-            .path('/tasks/{task_id}/schemas/{task_schema_id}/runs')
-            .method('post')
-            .create(),
-          aggregate: fetcher
-            .path('/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate')
-            .method('get')
-            .create(),
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
+          import: json.POST('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
+          aggregate: json.GET(
+            '/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate',
+          ),
         },
 
         examples: {
-          list: fetcher
-            .path('/tasks/{task_id}/schemas/{task_schema_id}/examples')
-            .method('get')
-            .create(),
-          create: fetcher
-            .path('/tasks/{task_id}/schemas/{task_schema_id}/examples')
-            .method('post')
-            .create(),
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/examples'),
+          create: json.POST(
+            '/tasks/{task_id}/schemas/{task_schema_id}/examples',
+          ),
         },
 
         scores: {
-          list: fetcher
-            .path('/tasks/{task_id}/schemas/{task_schema_id}/scores')
-            .method('get')
-            .create(),
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/scores'),
         },
       },
     },
 
     runs: {
-      get: fetcher.path('/runs/{run_id}').method('get').create(),
-      annotate: fetcher.path('/runs/{run_id}/annotate').method('post').create(),
+      get: json.GET('/runs/{run_id}'),
+      annotate: json.POST('/runs/{run_id}/annotate'),
     },
 
     models: {
-      list: fetcher.path('/models').method('get').create(),
+      list: json.GET('/models'),
     },
 
     examples: {
-      get: fetcher.path('/examples/{example_id}').method('get').create(),
-      delete: fetcher.path('/examples/{example_id}').method('delete').create(),
+      get: json.GET('/examples/{example_id}'),
+      delete: json.DELETE('/examples/{example_id}'),
     },
   }
 }

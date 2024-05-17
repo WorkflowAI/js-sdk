@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/schema",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "workflowAI schema helpers",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -41,11 +41,9 @@
     "build:test": "tsc -p ./configs/tsconfig.test.json",
     "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
-    "prepublishOnly--DISABLED": "npm run test && npm run build",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "json-refs": "^3.0.15",
     "json-schema-to-zod": "^2.1.0",
     "zod": "^3.23.7",
     "zod-to-json-schema": "^3.23.0"

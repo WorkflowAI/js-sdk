@@ -2,7 +2,7 @@
 
 import { expect, test } from '@jest/globals'
 
-import { getEnv } from '../getEnv'
+import { getEnv } from '../utils/getEnv'
 
 const rand = (): string => `RANDOM${String(Math.random()).split('.').pop()}`
 

@@ -1,4 +1,3 @@
-import { resolveRefs } from 'json-refs'
 import {
   JsonSchemaObject,
   jsonSchemaToZod,
@@ -6,13 +5,15 @@ import {
 } from 'json-schema-to-zod'
 
 import { Definition, definitions } from './definitions'
+import { hydrateRefs } from './json-schema-refs'
 
 const makeParserOverride =
   (type: keyof Definition['zodSchema']): ParserOverride =>
   (schema, _refs) => {
-    if (schema.title) {
+    if (schema.$ref) {
       const definition = definitions.find(
-        ({ jsonSchemaTitle }) => jsonSchemaTitle === schema.title,
+        ({ jsonSchemaDefinitionKey }) =>
+          jsonSchemaDefinitionKey === schema.$ref.split('/$defs/').pop(),
       )
       if (definition) {
         return `z.${definition.zodSchema[type]}()`
@@ -28,7 +29,7 @@ const schemaToZod = async (
   jsonSchema: JsonSchemaObject,
   parserOverride: ParserOverride,
 ): Promise<string> => {
-  const { resolved: resolvedJsonSchema } = await resolveRefs(jsonSchema)
+  const resolvedJsonSchema = hydrateRefs(jsonSchema, { keepRefs: true })
   return jsonSchemaToZod(resolvedJsonSchema, { parserOverride })
 }
 

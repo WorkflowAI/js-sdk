@@ -4,7 +4,7 @@ import * as extensions from './zod/extensions'
 type ZodExtensionName = keyof typeof extensions & keyof typeof z
 
 export type Definition = {
-  jsonSchemaTitle: string
+  jsonSchemaDefinitionKey: string
   zodSchema: {
     input: ZodExtensionName
     output: ZodExtensionName
@@ -13,14 +13,14 @@ export type Definition = {
 
 export const definitions: Definition[] = [
   {
-    jsonSchemaTitle: 'DatetimeLocal',
+    jsonSchemaDefinitionKey: 'DatetimeLocal',
     zodSchema: {
       input: 'datetimeLocal',
       output: 'datetimeLocal',
     },
   },
   {
-    jsonSchemaTitle: 'Image',
+    jsonSchemaDefinitionKey: 'Image',
     zodSchema: {
       input: 'imageInput',
       output: 'imageOutput',
