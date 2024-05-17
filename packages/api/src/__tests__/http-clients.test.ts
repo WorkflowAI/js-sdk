@@ -43,6 +43,8 @@ describe('createJsonClient', () => {
     expect(client.GET).toBeInstanceOf(Function)
     expect(client.POST).toBeInstanceOf(Function)
     expect(client.DELETE).toBeInstanceOf(Function)
+    expect(client.PUT).toBeInstanceOf(Function)
+    expect(client.PATCH).toBeInstanceOf(Function)
   })
 
   it('should call createClient with correct options', () => {
