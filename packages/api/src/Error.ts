@@ -1,18 +1,29 @@
+/**
+ * Custom error class for Workflow AI API request errors.
+ */
 export class WorkflowAIApiRequestError extends Error {
   /**
-   * Request url
+   * The URL of the failed request.
    */
   url: string
   /**
-   * HTTP response status code
+   * The HTTP response status code of the failed request.
    */
   status: number
   /**
-   * Error responses might include JSON in body with error details
+   * Additional error details that might be included in the response body.
    */
   detail: unknown
+  /**
+   * The original response object of the failed request.
+   */
   response: Response
 
+  /**
+   * Creates a new WorkflowAIApiRequestError instance.
+   * @param response The response object of the failed request.
+   * @param detail Additional error details that might be included in the response body.
+   */
   constructor(response: Response, detail?: unknown) {
     super(
       `Failed to request ${response.url}${detail ? ': ' + JSON.stringify(detail) : ''}`,
