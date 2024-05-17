@@ -29,28 +29,56 @@ export function initWorkflowAIApi(
   const stream = createStreamClient({ url, key, use: middlewares })
 
   return {
+    examples: {
+      get: json.GET('/examples/{example_id}'),
+      delete: json.DELETE('/examples/{example_id}'),
+    },
+
+    models: {
+      list: json.GET('/models'),
+    },
+
+    runs: {
+      get: json.GET('/runs/{run_id}'),
+      ratings: {
+        create: json.POST('/runs/{run_id}/ratings'),
+        update: json.PATCH('/runs/{run_id}/ratings/{score_id}'),
+        delete: json.DELETE('/runs/{run_id}/ratings/{score_id}'),
+      },
+      examples: {
+        create: json.POST('/runs/{run_id}/examples'),
+      },
+    },
+
     tasks: {
       generate: json.POST('/tasks/generate'),
       list: json.GET('/tasks'),
       upsert: json.POST('/tasks'),
 
-      groups: {
-        get: json.GET('/tasks/{task_id}/groups/{group_id}'),
-      },
-
       schemas: {
         get: json.GET('/tasks/{task_id}/schemas/{task_schema_id}'),
+        generateInput: json.POST(
+          '/tasks/{task_id}/schemas/{task_schema_id}/input',
+        ),
+        getPythonCode: json.GET(
+          '/tasks/{task_id}/schemas/{task_schema_id}/python',
+        ),
         run: withStream(
           json.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
           stream.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
         ),
 
+        groups: {
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/groups'),
+          create: json.POST('/tasks/{task_id}/schemas/{task_schema_id}/groups'),
+          get: json.GET(
+            '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}',
+          ),
+        },
+
         runs: {
           list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
           import: json.POST('/tasks/{task_id}/schemas/{task_schema_id}/runs'),
-          aggregate: json.GET(
-            '/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate',
-          ),
         },
 
         examples: {
@@ -60,24 +88,68 @@ export function initWorkflowAIApi(
           ),
         },
 
-        scores: {
-          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/scores'),
+        datasets: {
+          list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/datasets'),
+          examples: {
+            list: json.GET(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/examples',
+            ),
+          },
+          inputs: {
+            list: json.GET(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/inputs',
+            ),
+          },
+          runs: {
+            list: json.GET(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/runs',
+            ),
+          },
+          groups: {
+            list: json.GET(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups',
+            ),
+            evaluate: json.POST(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/evaluate',
+            ),
+            get: json.GET(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/{group_id}',
+            ),
+          },
+        },
+
+        evaluators: {
+          list: json.GET(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators',
+          ),
+          create: json.POST(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators',
+          ),
+          generateInstructions: json.POST(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-instructions',
+          ),
+          get: json.GET(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
+          ),
+          delete: json.DELETE(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
+          ),
+          replace: json.PUT(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
+          ),
         },
       },
     },
 
-    runs: {
-      get: json.GET('/runs/{run_id}'),
-      annotate: json.POST('/runs/{run_id}/annotate'),
-    },
-
-    models: {
-      list: json.GET('/models'),
-    },
-
-    examples: {
-      get: json.GET('/examples/{example_id}'),
-      delete: json.DELETE('/examples/{example_id}'),
+    organization: {
+      settings: {
+        get: json.GET('/organization/settings'),
+        providers: {
+          getSchemas: json.GET('/organization/settings/providers/schemas'),
+          create: json.POST('/organization/settings/providers'),
+          delete: json.DELETE('/organization/settings/providers/{provider_id}'),
+        },
+      },
     },
   }
 }

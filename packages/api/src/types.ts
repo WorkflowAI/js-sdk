@@ -4,5 +4,4 @@
 
 import { components } from './generated/openapi'
 
-export type TaskSchemaRunGroup =
-  components['schemas']['api__routers__task_schemas__RunRequest__Group']
+export type TaskGroupReference = components['schemas']['TaskGroupReference']
