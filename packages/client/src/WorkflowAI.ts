@@ -1,7 +1,7 @@
 import {
   initWorkflowAIApi,
   InitWorkflowAIApiConfig,
-  type TaskGroupReference,
+  Schemas,
   type WorkflowAIApi,
   WorkflowAIApiRequestError,
   wrapAsyncIterator,
@@ -24,7 +24,7 @@ export type WorkflowAIConfig = {
 }
 
 export type RunTaskOptions<S extends true | false = false> = {
-  group: TaskGroupReference
+  group: Schemas['RunRequest']['group']
   stream?: S
 }
 
