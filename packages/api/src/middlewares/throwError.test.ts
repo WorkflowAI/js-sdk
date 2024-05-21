@@ -43,8 +43,8 @@ describe('throwError middleware', () => {
 
     try {
       await throwError.onResponse?.(response, {} as MergedOptions)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
       expect(error.message).toBe(
         `Failed to request ${response.url}: {"message":"Something went wrong"}`,
@@ -70,8 +70,8 @@ describe('throwError middleware', () => {
 
     try {
       await throwError.onResponse?.(response, {} as MergedOptions)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
       expect(error.message).toBe(`Failed to request ${response.url}`)
       expect(error.detail).toBeUndefined()

@@ -102,8 +102,8 @@ describe('wrapAsyncIterator', () => {
           transformedIterator.throw?.(new Error('Test Error'))
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       expect(error.message).toBe('Test Error')
       expect(throwCalled).toBe(true)
     }
