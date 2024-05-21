@@ -1,4 +1,4 @@
-import { WorkflowAIApiRequestError } from '../Error'
+import { WorkflowAIApiRequestError } from './Error'
 
 describe('WorkflowAIApiRequestError', () => {
   test('should create a new instance with response and detail', () => {

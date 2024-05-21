@@ -1,4 +1,4 @@
-import { IMAGE_INPUT, IMAGE_OUTPUT } from '../../atoms/image'
+import { IMAGE_INPUT, IMAGE_OUTPUT } from './image'
 
 describe('IMAGE_INPUT', () => {
   it('should validate a valid image input object', () => {
@@ -6,7 +6,7 @@ describe('IMAGE_INPUT', () => {
       name: 'image.png',
       content_type: 'image/png',
       data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==', // a 1x1 red dot
-    };
+    }
 
     expect(IMAGE_INPUT.safeParse(validInput).success).toBe(true)
   })
@@ -15,7 +15,7 @@ describe('IMAGE_INPUT', () => {
     const validInput = {
       content_type: 'image/jpeg',
       data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==', // a 1x1 red dot
-    };
+    }
 
     expect(IMAGE_INPUT.safeParse(validInput).success).toBe(true)
   })
@@ -64,7 +64,7 @@ describe('IMAGE_OUTPUT', () => {
     const validOutput = {
       name: 'image.jpg',
       content_type: 'image/jpeg',
-      data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=='
+      data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==',
     }
 
     expect(IMAGE_OUTPUT.safeParse(validOutput).success).toBe(true)
@@ -83,7 +83,10 @@ describe('IMAGE_OUTPUT', () => {
     const invalidOutput = {
       name: 'image.png',
       content_type: 'image/png',
-      data: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==', 'base64'),
+      data: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==',
+        'base64',
+      ),
     }
 
     expect(IMAGE_OUTPUT.safeParse(invalidOutput).success).toBe(false)

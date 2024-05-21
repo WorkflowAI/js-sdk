@@ -1,4 +1,4 @@
-import { BASE64_DATA_URL_TO_BASE64 } from '../../atoms/data-url'
+import { BASE64_DATA_URL_TO_BASE64 } from './data-url'
 
 describe('BASE64_DATA_URL_TO_BASE64', () => {
   it('should transform a base64 data URL to a base64 string', () => {
@@ -15,7 +15,9 @@ describe('BASE64_DATA_URL_TO_BASE64', () => {
 
   it('should throw for an invalid base64 data URL', () => {
     const invalidBase64DataUrl = 'data:text/plain;base64,invalidbase64'
-    expect(() => BASE64_DATA_URL_TO_BASE64.parse(invalidBase64DataUrl)).toThrow()
+    expect(() =>
+      BASE64_DATA_URL_TO_BASE64.parse(invalidBase64DataUrl),
+    ).toThrow()
   })
 
   it('should throw for a non-base64 data URL string', () => {

@@ -1,7 +1,7 @@
-import * as indexExports from '../index'
-import * as schemaToZodExports from '../schemaToZod'
-import * as zodExports from '../zod'
-import * as zodToSchemaExports from '../zodToSchema'
+import * as indexExports from './index'
+import * as schemaToZodExports from './schemaToZod'
+import * as zodExports from './zod'
+import * as zodToSchemaExports from './zodToSchema'
 
 describe('index exports', () => {
   it('should re-export everything from schemaToZod', () => {

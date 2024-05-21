@@ -1,10 +1,10 @@
 import { expect, test } from '@jest/globals'
 import { z } from 'zod'
 
-import * as createClients from '../http-clients'
-import { Middleware, throwError } from '../middlewares'
-import * as getEnv from '../utils/getEnv'
-import { initWorkflowAIApi } from '../WorkflowAIApi'
+import * as createClients from './http-clients'
+import { Middleware, throwError } from './middlewares'
+import * as getEnv from './utils/getEnv'
+import { initWorkflowAIApi } from './WorkflowAIApi'
 
 beforeAll(() => {
   jest.spyOn(createClients, 'createJsonClient')

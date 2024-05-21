@@ -4,7 +4,7 @@
 
 import { JsonSchemaObject } from 'json-schema-to-zod'
 
-import { findRefs, hydrateRefs, Ref, resolveRefs } from '../json-schema-refs'
+import { findRefs, hydrateRefs, Ref, resolveRefs } from './json-schema-refs'
 
 describe('Find Refs', () => {
   it('Should work with sibling dependencies', () => {

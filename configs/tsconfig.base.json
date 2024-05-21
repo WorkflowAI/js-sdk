@@ -15,5 +15,5 @@
     "noFallthroughCasesInSwitch": true,
     "downlevelIteration": true,
     "isolatedModules": true
-  },
+  }
 }
