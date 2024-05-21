@@ -37,7 +37,7 @@ jobs:
       - name: Integration Test
         env:
           TEST_API_KEY: ${{ secrets.TEST_API_KEY }}
-          TEST_API_URL: ${{ secrets.TEST_API_URL || 'https://api.workflowai.dev' }}
-          TEST_TASK_ID: ${{ secrets.TEST_TASK_ID || 'get-celebrity-last-name' }}
-          TEST_TASK_SCHEMA_ID: ${{ secrets.TEST_TASK_SCHEMA_ID || '1' }}
+          TEST_API_URL: ${{ vars.TEST_API_URL || 'https://api.workflowai.dev' }}
+          TEST_TASK_ID: ${{ vars.TEST_TASK_ID || 'get-celebrity-last-name' }}
+          TEST_TASK_SCHEMA_ID: ${{ vars.TEST_TASK_SCHEMA_ID || '1' }}
         run: npx tsx ./bin/integration-testing/run.ts
