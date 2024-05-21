@@ -1,25 +1,17 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: Quality
+name: CI
 
 on: [push]
 
 jobs:
-  quality:
+  ci:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js LTS
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: "lts"
           cache: "npm"
 
       - name: Install dependencies
@@ -41,3 +33,7 @@ jobs:
           TEST_TASK_ID: ${{ vars.TEST_TASK_ID || 'get-celebrity-last-name' }}
           TEST_TASK_SCHEMA_ID: ${{ vars.TEST_TASK_SCHEMA_ID || '1' }}
         run: npx tsx ./bin/integration-testing/run.ts
+
+      - name: Publish to NPM
+        if: github.ref == 'refs/heads/main'
+        run: npx tsx ./bin/npm-publish
