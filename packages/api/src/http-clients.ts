@@ -54,10 +54,20 @@ export function createJsonClient(config: CreateHttpClientConfig) {
     (init: MaybeOptionalInit<paths[P], 'get'>) =>
       jsonClient.GET(path, { ...init, parseAs: 'json' })
 
+  const PUT =
+    <P extends PathsWithMethod<paths, 'put'>>(path: P) =>
+    (init: MaybeOptionalInit<paths[P], 'put'>) =>
+      jsonClient.PUT(path, { ...init, parseAs: 'json' })
+
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
     (init: MaybeOptionalInit<paths[P], 'post'>) =>
       jsonClient.POST(path, { ...init, parseAs: 'json' })
+
+  const PATCH =
+    <P extends PathsWithMethod<paths, 'patch'>>(path: P) =>
+    (init: MaybeOptionalInit<paths[P], 'patch'>) =>
+      jsonClient.PATCH(path, { ...init, parseAs: 'json' })
 
   const DELETE =
     <P extends PathsWithMethod<paths, 'delete'>>(path: P) =>
@@ -68,6 +78,8 @@ export function createJsonClient(config: CreateHttpClientConfig) {
     client: jsonClient,
     GET,
     POST,
+    PUT,
+    PATCH,
     DELETE,
   }
 }
