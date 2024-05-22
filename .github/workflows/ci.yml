@@ -36,5 +36,5 @@ jobs:
         run: npx tsx ./bin/integration-testing/run.ts
 
       - name: Publish to NPM
-        if: github.ref == 'refs/heads/main'
-        run: npx tsx ./bin/npm-publish
+        if: (github.ref_type == 'branch' && (github.ref_name == 'main' || github.ref_name == 'dev'))
+        run: npx tsx ./bin/npm-publish --branch=${{ github.ref_name }}
