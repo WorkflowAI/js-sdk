@@ -43,9 +43,10 @@ jobs:
 
       - name: Bump package version
         if: steps.has-git-diff.outcome == 'success'
-        run: npm version patch -w=@workflowai/api
+        run: npm version ${{ (github.event.inputs.branch == 'main' && 'patch') || 'prepatch' }} -w=@workflowai/api
 
       - name: Commit and push changes
+        if: steps.has-git-diff.outcome == 'success'
         id: commit-push
         uses: devops-infra/action-commit-push@master
         # https://github.com/devops-infra/action-commit-push
@@ -70,6 +71,7 @@ jobs:
           draft: false
 
       - name: Run CI workflow
+        if: steps.has-git-diff.outcome == 'success'
         uses: benc-uk/workflow-dispatch@v1
         # https://github.com/marketplace/actions/workflow-dispatch
         with:
