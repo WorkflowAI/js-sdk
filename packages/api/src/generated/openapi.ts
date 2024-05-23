@@ -176,6 +176,13 @@ export interface paths {
      */
     post: operations['generate_io_tasks_generate_post']
   }
+  '/tasks/schemas/iterate': {
+    /**
+     * Generate Via Chat
+     * @description Build a new task based on natural language, allowing for multiple iterations
+     */
+    post: operations['generate_via_chat_tasks_schemas_iterate_post']
+  }
   '/tasks': {
     /** List Tasks */
     get: operations['list_tasks_tasks_get']
@@ -185,12 +192,26 @@ export interface paths {
      */
     post: operations['create_task_tasks_post']
   }
+  '/tasks/{task_id}/schemas': {
+    /**
+     * Create Task Schema
+     * @description Create a new task schema for a given task id
+     */
+    post: operations['create_task_schema_tasks__task_id__schemas_post']
+  }
   '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-instructions': {
     /**
      * Generate Instructions
      * @description Automatically generate instructions from the existing examples and ratingsA minimum number of runs with ratings and examples are required to generate instructions
      */
     post: operations['generate_instructions_tasks__task_id__schemas__task_schema_id__evaluators_suggested_instructions_post']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-field-evaluations': {
+    /**
+     * Generate Field Evaluations
+     * @description Generate a set of field evaluations for a task
+     */
+    post: operations['generate_field_evaluations_tasks__task_id__schemas__task_schema_id__evaluators_suggested_field_evaluations_post']
   }
   '/tasks/{task_id}/schemas/{task_schema_id}/evaluators': {
     /**
@@ -308,6 +329,106 @@ export interface components {
     ApiTaskIO: {
       [key: string]: unknown
     }
+    /** ArrayComparisonOptions */
+    'ArrayComparisonOptions-Input': {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default array
+       * @constant
+       * @enum {string}
+       */
+      type?: 'array'
+      /**
+       * Strict Equality
+       * @description Whether to compare the array for strict equality. Setting this to true will skip the comparison for the array's elements
+       */
+      strict_equality?: boolean | null
+      /**
+       * Element Evaluation
+       * @description The evaluation for the array's elements, required if strict_equality is not true
+       */
+      element_evaluation?:
+        | (
+            | components['schemas']['StringComparisonOptions']
+            | components['schemas']['NumberComparisonOptions']
+            | components['schemas']['BooleanComparisonOptions']
+            | components['schemas']['ObjectComparisonOptions-Input']
+            | components['schemas']['ArrayComparisonOptions-Input']
+          )
+        | null
+      /**
+       * Ignore Order
+       * @description Whether to ignore the order of the elements in the array If set to true, the computed score will be 1 if there is a set of pairs of distinct elements that each have a score of 1
+       */
+      ignore_order?: boolean | null
+    }
+    /** ArrayComparisonOptions */
+    'ArrayComparisonOptions-Output': {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default array
+       * @constant
+       * @enum {string}
+       */
+      type?: 'array'
+      /**
+       * Strict Equality
+       * @description Whether to compare the array for strict equality. Setting this to true will skip the comparison for the array's elements
+       */
+      strict_equality?: boolean | null
+      /**
+       * Element Evaluation
+       * @description The evaluation for the array's elements, required if strict_equality is not true
+       */
+      element_evaluation?:
+        | (
+            | components['schemas']['StringComparisonOptions']
+            | components['schemas']['NumberComparisonOptions']
+            | components['schemas']['BooleanComparisonOptions']
+            | components['schemas']['ObjectComparisonOptions-Output']
+            | components['schemas']['ArrayComparisonOptions-Output']
+          )
+        | null
+      /**
+       * Ignore Order
+       * @description Whether to ignore the order of the elements in the array If set to true, the computed score will be 1 if there is a set of pairs of distinct elements that each have a score of 1
+       */
+      ignore_order?: boolean | null
+    }
+    /** AvailableEvaluator */
+    AvailableEvaluator: {
+      /**
+       * Metric
+       * @enum {string}
+       */
+      metric: 'correctness' | 'latency' | 'cost' | 'quality'
+      /** Triggers */
+      triggers: ('auto' | 'manual')[]
+      /** Type */
+      type:
+        | (
+            | 'evaluate_output'
+            | 'compare_outputs'
+            | 'code_compare_outputs'
+            | 'field_based'
+          )
+        | ('latency' | 'cost' | 'user')
+      /**
+       * Uses Examples
+       * @default false
+       */
+      uses_examples?: boolean
+    }
     /** AzureOpenAIConfig */
     AzureOpenAIConfig: {
       /**
@@ -336,6 +457,50 @@ export interface components {
       | 'gpt-4-vision-preview'
       | 'gpt-35-turbo-1106'
       | 'gpt-35-turbo-0125'
+    /** BooleanComparisonOptions */
+    BooleanComparisonOptions: {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default boolean
+       * @constant
+       * @enum {string}
+       */
+      type?: 'boolean'
+    }
+    /** BuildTaskIteration */
+    BuildTaskIteration: {
+      /** User Message */
+      user_message: string
+      /** Assistant Answer */
+      assistant_answer: string
+      /**
+       * Task Name
+       * @description A name for the task
+       */
+      task_name?: string | null
+      /**
+       * Task Input Schema
+       * @description A proposed JSON schema of the task input
+       */
+      task_input_schema?: Record<string, never> | null
+      /**
+       * Task Output Schema
+       * @description A proposed JSON schema of the task output
+       */
+      task_output_schema?: Record<string, never> | null
+    }
+    /** BuildTaskRequest */
+    BuildTaskRequest: {
+      /** @description The previous iteration of the task building process, as returned by the API */
+      previous_iterations?: components['schemas']['BuildTaskIteration'] | null
+      /** User Message */
+      user_message: string
+    }
     /**
      * CodeEvaluator
      * @description An evaluator that will compare the output of a run with the output of an associated example using code
@@ -343,12 +508,20 @@ export interface components {
     CodeEvaluator: {
       /**
        * Type
+       * @default code_compare_outputs
        * @constant
        * @enum {string}
        */
-      type: 'code_compare_outputs'
+      type?: 'code_compare_outputs'
       /** Python Code */
       python_code: string
+      /**
+       * Uses Examples
+       * @default true
+       * @constant
+       * @enum {boolean}
+       */
+      uses_examples?: true
     }
     /**
      * CodeEvaluatorBuilder
@@ -373,11 +546,12 @@ export interface components {
       name?: string | null
       /**
        * Evaluator Type
-       * @default the type of evaluator that should be created
+       * @description the type of evaluator that should be created
        */
-      evaluator_type?:
+      evaluator_type:
         | components['schemas']['TaskEvaluatorBuilder']
         | components['schemas']['CodeEvaluatorBuilder']
+        | components['schemas']['FieldBasedEvaluatorBuilder']
     }
     /** CreateTaskGroupRequest */
     CreateTaskGroupRequest: {
@@ -401,8 +575,8 @@ export interface components {
        */
       use_external_runner?: boolean
     }
-    /** CreateTaskRequest */
-    CreateTaskRequest: {
+    /** CreateTaskRequestWithID */
+    CreateTaskRequestWithID: {
       /**
        * Name
        * @description the task display name
@@ -439,7 +613,8 @@ export interface components {
        * @description the output of the task. Must match the output schema
        */
       task_output: Record<string, never>
-      group: components['schemas']['Group']
+      /** @description A reference to the task group the task run belongs to. */
+      group: components['schemas']['TaskGroupReference']
       /**
        * Id
        * @description The id to use for a task run. If not provided a uuid will be generated
@@ -465,6 +640,18 @@ export interface components {
        * @description The raw completions used to generate the task output.
        */
       llm_completions?: components['schemas']['LLMCompletion'][] | null
+      /**
+       * Cost Usd
+       * @description The cost of the task run in USD
+       */
+      cost_usd?: number | null
+    }
+    /** CreateTaskSchemaRequest */
+    CreateTaskSchemaRequest: {
+      /** Input Schema */
+      input_schema: Record<string, never>
+      /** Output Schema */
+      output_schema: Record<string, never>
     }
     /**
      * DataSetResponse
@@ -505,6 +692,68 @@ export interface components {
       average_score: number
       /** @description The evaluator that computed the score */
       evaluator: components['schemas']['core__domain__tasks__task_group_aggregate__TaskGroupAggregate__Evaluation__Evaluator']
+    }
+    /** FieldBasedEvaluationConfig */
+    'FieldBasedEvaluationConfig-Input': {
+      /** Options */
+      options:
+        | components['schemas']['StringComparisonOptions']
+        | components['schemas']['NumberComparisonOptions']
+        | components['schemas']['BooleanComparisonOptions']
+        | components['schemas']['ObjectComparisonOptions-Input']
+        | components['schemas']['ArrayComparisonOptions-Input']
+      default_semantic_matching_group_properties?:
+        | components['schemas']['TaskGroupProperties']
+        | null
+    }
+    /** FieldBasedEvaluationConfig */
+    'FieldBasedEvaluationConfig-Output': {
+      /** Options */
+      options:
+        | components['schemas']['StringComparisonOptions']
+        | components['schemas']['NumberComparisonOptions']
+        | components['schemas']['BooleanComparisonOptions']
+        | components['schemas']['ObjectComparisonOptions-Output']
+        | components['schemas']['ArrayComparisonOptions-Output']
+      default_semantic_matching_group_properties?:
+        | components['schemas']['TaskGroupProperties']
+        | null
+    }
+    /**
+     * FieldBasedEvaluator
+     * @description An evaluator that will compare the output of a run with the output of an
+     * associated example using field based comparisons
+     */
+    FieldBasedEvaluator: {
+      /**
+       * Type
+       * @default field_based
+       * @constant
+       * @enum {string}
+       */
+      type?: 'field_based'
+      config: components['schemas']['FieldBasedEvaluationConfig-Output']
+      /**
+       * Uses Examples
+       * @default true
+       * @constant
+       * @enum {boolean}
+       */
+      uses_examples?: true
+    }
+    /**
+     * FieldBasedEvaluatorBuilder
+     * @description An evaluator that will compare the output of a run with the output of an
+     * associated example using field based comparisons
+     */
+    FieldBasedEvaluatorBuilder: {
+      /**
+       * Type
+       * @constant
+       * @enum {string}
+       */
+      type: 'field_based'
+      field_based_evaluation_config: components['schemas']['FieldBasedEvaluationConfig-Input']
     }
     /** GenerateCodeResponse */
     GenerateCodeResponse: {
@@ -570,21 +819,6 @@ export interface components {
       /** Api Key */
       api_key: string
     }
-    /** Group */
-    Group: {
-      /**
-       * Id
-       * @description An optional client provided id for the group. Must be unique. If not provided, properties is required and a uuid will be generated. If provided and properties is unset, a corresponding group must exist.
-       */
-      id?: string | null
-      /** @description The properties used for executing the run. Must be provided if the id is not provided. */
-      properties?: components['schemas']['TaskGroupProperties'] | null
-      /**
-       * Tags
-       * @description A list of tags to associate with the group.Tags will be indexed.
-       */
-      tags?: string[] | null
-    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -593,11 +827,34 @@ export interface components {
     /** LLMCompletion */
     LLMCompletion: {
       /** Messages */
-      messages?: Record<string, never>[] | null
+      messages: Record<string, never>[]
       /** Response */
       response?: string | null
-      /** Cost In Usd */
-      cost_in_usd?: number | null
+      usage?: components['schemas']['LLMUsage'] | null
+    }
+    /** LLMUsage */
+    LLMUsage: {
+      /** Prompt Token Count */
+      prompt_token_count?: number | null
+      /** Prompt Cost Usd */
+      prompt_cost_usd?: number | null
+      /** Completion Token Count */
+      completion_token_count?: number | null
+      /** Completion Cost Usd */
+      completion_cost_usd?: number | null
+    }
+    /** Latency */
+    Latency: {
+      /**
+       * Average Seconds
+       * @description The average latency for the group
+       */
+      average_seconds: number
+      /**
+       * Standard Deviation Seconds
+       * @description The standard deviation of the latency
+       */
+      standard_deviation_seconds: number | null
     }
     /** Model */
     Model: {
@@ -617,6 +874,90 @@ export interface components {
     ModelResponse: {
       /** Models */
       models: components['schemas']['Model'][]
+    }
+    /** NumberComparisonOptions */
+    NumberComparisonOptions: {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default number
+       * @constant
+       * @enum {string}
+       */
+      type?: 'number'
+      /**
+       * Delta
+       * @description The maximum difference allowed between the expected and actual value.If not provided an exact match is required
+       */
+      delta?: number | null
+    }
+    /** ObjectComparisonOptions */
+    'ObjectComparisonOptions-Input': {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default object
+       * @constant
+       * @enum {string}
+       */
+      type?: 'object'
+      /**
+       * Strict Equality
+       * @description Whether to compare the object for strict equality. Setting this to true will skip the comparison for the object's fields
+       */
+      strict_equality?: boolean | null
+      /**
+       * Property Evaluations
+       * @description The evaluations for the object's properties. Required if strict_equality is not true
+       */
+      property_evaluations?: {
+        [key: string]:
+          | components['schemas']['StringComparisonOptions']
+          | components['schemas']['NumberComparisonOptions']
+          | components['schemas']['BooleanComparisonOptions']
+          | components['schemas']['ObjectComparisonOptions-Input']
+          | components['schemas']['ArrayComparisonOptions-Input']
+      } | null
+    }
+    /** ObjectComparisonOptions */
+    'ObjectComparisonOptions-Output': {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default object
+       * @constant
+       * @enum {string}
+       */
+      type?: 'object'
+      /**
+       * Strict Equality
+       * @description Whether to compare the object for strict equality. Setting this to true will skip the comparison for the object's fields
+       */
+      strict_equality?: boolean | null
+      /**
+       * Property Evaluations
+       * @description The evaluations for the object's properties. Required if strict_equality is not true
+       */
+      property_evaluations?: {
+        [key: string]:
+          | components['schemas']['StringComparisonOptions']
+          | components['schemas']['NumberComparisonOptions']
+          | components['schemas']['BooleanComparisonOptions']
+          | components['schemas']['ObjectComparisonOptions-Output']
+          | components['schemas']['ArrayComparisonOptions-Output']
+      } | null
     }
     /** OpenAIConfig */
     OpenAIConfig: {
@@ -639,13 +980,6 @@ export interface components {
     Page_DataSetResponse_: {
       /** Items */
       items: components['schemas']['DataSetResponse'][]
-      /** Count */
-      count?: number | null
-    }
-    /** Page[Evaluator] */
-    Page_Evaluator_: {
-      /** Items */
-      items: components['schemas']['api__routers__task_evaluators__Evaluator'][]
       /** Count */
       count?: number | null
     }
@@ -702,6 +1036,16 @@ export interface components {
     Page_TaskInput_: {
       /** Items */
       items: components['schemas']['TaskInput'][]
+      /** Count */
+      count?: number | null
+    }
+    /** Page[Union[AvailableEvaluator, TaskEvaluator]] */
+    Page_Union_AvailableEvaluator__TaskEvaluator__: {
+      /** Items */
+      items: (
+        | components['schemas']['AvailableEvaluator']
+        | components['schemas']['TaskEvaluator']
+      )[]
       /** Count */
       count?: number | null
     }
@@ -930,6 +1274,8 @@ export interface components {
       end_time?: string | null
       /** Duration Seconds */
       duration_seconds?: number | null
+      /** Cost Usd */
+      cost_usd?: number | null
       /**
        * Created At
        * Format: date-time
@@ -1070,11 +1416,36 @@ export interface components {
       /** Code */
       code: string
     }
+    /** StringComparisonOptions */
+    StringComparisonOptions: {
+      /**
+       * Ignore
+       * @default false
+       */
+      ignore?: boolean
+      /**
+       * Type
+       * @default string
+       * @constant
+       * @enum {string}
+       */
+      type?: 'string'
+      /**
+       * Semantics
+       * @description Whether to compare the semantics of the strings instead of the exact values
+       */
+      semantics?: boolean | null
+      /**
+       * Case Sensitive
+       * @description Whether to compare the strings in a case sensitive way
+       */
+      case_sensitive?: boolean | null
+    }
     /**
-     * TaskEvaluator
+     * TaskBasedEvaluator
      * @description An evaluator that will compare the run output with the output of an associated example using an LLM
      */
-    TaskEvaluator: {
+    TaskBasedEvaluator: {
       /**
        * Type
        * @enum {string}
@@ -1092,6 +1463,35 @@ export interface components {
       task_schema_id: number
       /** @description The group that is used to run the evaluator task */
       task_group: components['schemas']['TaskGroup']
+      /**
+       * Uses Examples
+       * @description Whether the evaluator requires examples
+       */
+      uses_examples: boolean
+    }
+    /** TaskEvaluator */
+    TaskEvaluator: {
+      /** Id */
+      id: string
+      /** Name */
+      name: string
+      /**
+       * Metric
+       * @description The metric to evaluate the task on
+       * @default correctness
+       * @enum {string}
+       */
+      metric?: 'correctness' | 'latency' | 'cost' | 'quality'
+      /**
+       * Triggers
+       * @description The triggers that will cause the evaluator to run
+       */
+      triggers?: ('auto' | 'manual')[]
+      /** Evaluator Type */
+      evaluator_type:
+        | components['schemas']['TaskBasedEvaluator']
+        | components['schemas']['CodeEvaluator']
+        | components['schemas']['FieldBasedEvaluator']
     }
     /**
      * TaskEvaluatorBuilder
@@ -1186,11 +1586,7 @@ export interface components {
        * @description Evaluations for the group, with a single evaluation per evaluator
        */
       evaluations: components['schemas']['Evaluation'][]
-      /**
-       * Average Duration Seconds
-       * @description The duration of the evaluation in seconds
-       */
-      average_duration_seconds: number
+      latency: components['schemas']['Latency']
       /**
        * Cost Per Thousand Runs Usd
        * @description The cost per thousand runs in USD
@@ -1332,17 +1728,6 @@ export interface components {
        * @description Corrections to the task output as a json object keypath: value
        */
       corrections: Record<string, never>
-    }
-    /** Evaluator */
-    api__routers__task_evaluators__Evaluator: {
-      /** Id */
-      id: string
-      /** Name */
-      name: string
-      /** Evaluator Type */
-      evaluator_type:
-        | components['schemas']['TaskEvaluator']
-        | components['schemas']['CodeEvaluator']
     }
     /** CreateExampleRequest */
     api__schemas__create_example_request__CreateExampleRequest: {
@@ -2003,6 +2388,8 @@ export interface operations {
         exclude_fields?:
           | ('task_input' | 'task_output' | 'llm_completions')[]
           | null
+        /** @description A list of score filters with the format <evaluator_name>[=]score. If more than one is provided, at least one condition must be satisfied */
+        score_filters?: string[] | null
         /** @description The number of items to return */
         limit?: number
         /** @description The number of items to skip */
@@ -2109,6 +2496,8 @@ export interface operations {
         exclude_fields?:
           | ('task_input' | 'task_output' | 'llm_completions')[]
           | null
+        /** @description A list of score filters with the format <evaluator_name>[=]score. If more than one is provided, at least one condition must be satisfied */
+        score_filters?: string[] | null
         /** @description The number of items to return */
         limit?: number
         /** @description The number of items to skip */
@@ -2245,6 +2634,8 @@ export interface operations {
             end_time?: string | null
             /** Duration Seconds */
             duration_seconds?: number | null
+            /** Cost Usd */
+            cost_usd?: number | null
             /**
              * Created At
              * Format: date-time
@@ -2302,11 +2693,21 @@ export interface operations {
               /** LLMCompletion */
               LLMCompletion: {
                 /** Messages */
-                messages?: Record<string, never>[] | null
+                messages: Record<string, never>[]
                 /** Response */
                 response?: string | null
-                /** Cost In Usd */
-                cost_in_usd?: number | null
+                usage?: $defs['LLMUsage'] | null
+              }
+              /** LLMUsage */
+              LLMUsage: {
+                /** Prompt Token Count */
+                prompt_token_count?: number | null
+                /** Prompt Cost Usd */
+                prompt_cost_usd?: number | null
+                /** Completion Token Count */
+                completion_token_count?: number | null
+                /** Completion Cost Usd */
+                completion_cost_usd?: number | null
               }
               /** SerializableTaskEvaluation */
               SerializableTaskEvaluation: {
@@ -2549,6 +2950,8 @@ export interface operations {
         exclude_fields?:
           | ('task_input' | 'task_output' | 'llm_completions')[]
           | null
+        /** @description A list of score filters with the format <evaluator_name>[=]score. If more than one is provided, at least one condition must be satisfied */
+        score_filters?: string[] | null
         /** @description The number of items to return */
         limit?: number
         /** @description The number of items to skip */
@@ -2626,6 +3029,31 @@ export interface operations {
       }
     }
   }
+  /**
+   * Generate Via Chat
+   * @description Build a new task based on natural language, allowing for multiple iterations
+   */
+  generate_via_chat_tasks_schemas_iterate_post: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BuildTaskRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['BuildTaskIteration']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   /** List Tasks */
   list_tasks_tasks_get: {
     responses: {
@@ -2644,7 +3072,37 @@ export interface operations {
   create_task_tasks_post: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateTaskRequest']
+        'application/json': components['schemas']['CreateTaskRequestWithID']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskVariant']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Task Schema
+   * @description Create a new task schema for a given task id
+   */
+  create_task_schema_tasks__task_id__schemas_post: {
+    parameters: {
+      path: {
+        task_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaskSchemaRequest']
       }
     }
     responses: {
@@ -2701,6 +3159,32 @@ export interface operations {
     }
   }
   /**
+   * Generate Field Evaluations
+   * @description Generate a set of field evaluations for a task
+   */
+  generate_field_evaluations_tasks__task_id__schemas__task_schema_id__evaluators_suggested_field_evaluations_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['FieldBasedEvaluationConfig-Output']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
    * List Evaluators
    * @description List all evaluators for a task
    */
@@ -2715,7 +3199,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['Page_Evaluator_']
+          'application/json': components['schemas']['Page_Union_AvailableEvaluator__TaskEvaluator__']
         }
       }
       /** @description Validation Error */
@@ -2746,7 +3230,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['api__routers__task_evaluators__Evaluator']
+          'application/json': components['schemas']['TaskEvaluator']
         }
       }
       /** @description Validation Error */
@@ -2764,16 +3248,17 @@ export interface operations {
   get_evaluator_tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__get: {
     parameters: {
       path: {
-        evaluator_id: string
         task_id: string
         task_schema_id: number
+        /** @description The id of the evaluator */
+        evaluator_id: string
       }
     }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['api__routers__task_evaluators__Evaluator']
+          'application/json': components['schemas']['TaskEvaluator']
         }
       }
       /** @description Validation Error */
@@ -2791,6 +3276,7 @@ export interface operations {
   replace_evaluator_tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__put: {
     parameters: {
       path: {
+        /** @description The id of the evaluator */
         evaluator_id: string
         task_id: string
         task_schema_id: number
@@ -2805,7 +3291,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['api__routers__task_evaluators__Evaluator']
+          'application/json': components['schemas']['TaskEvaluator']
         }
       }
       /** @description Validation Error */
@@ -2823,6 +3309,7 @@ export interface operations {
   delete_evaluator_tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__delete: {
     parameters: {
       path: {
+        /** @description The id of the evaluator */
         evaluator_id: string
         task_id: string
         task_schema_id: number
