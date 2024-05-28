@@ -46,6 +46,7 @@ try {
         'pub',
         `-w=${localPackageSpecs.name}`,
         `--tag=${tag}`,
+        '--loglevel=error',
       ])
     
       assert(!publishCmd.error, publishCmd.error)
@@ -60,6 +61,7 @@ try {
         `add`,
         `${localPackageSpecs.name}@${localPackageSpecs.version}`,
         tag,
+        '--loglevel=error',
       ])
     
       assert(!tagCmd.error, tagCmd.error)
