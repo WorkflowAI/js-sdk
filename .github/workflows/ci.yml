@@ -3,13 +3,13 @@ name: CI
 on: [push, workflow_dispatch]
 
 jobs:
-  ci:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js LTS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
           check-latest: true
@@ -35,6 +35,29 @@ jobs:
           TEST_TASK_SCHEMA_ID: ${{ vars.TEST_TASK_SCHEMA_ID || '1' }}
         run: npx tsx ./bin/integration-testing/run.ts
 
+  publish:
+    needs: quality
+    if: (github.ref_type == 'branch' && (github.ref_name == 'main' || github.ref_name == 'dev'))
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: npm
+          registry-url: "https://registry.npmjs.org" # Must be specified to create a .npmrc file with auth token env var (see publish action below)
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
       - name: Publish to NPM
-        if: (github.ref_type == 'branch' && (github.ref_name == 'main' || github.ref_name == 'dev'))
         run: npx tsx ./bin/npm-publish --branch=${{ github.ref_name }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
