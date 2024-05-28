@@ -24,16 +24,17 @@ try {
     const localPackageSpecs = JSON.parse(readFileSync(localPackageJsonFilePath, 'utf-8')) as { name: string, version: string }
 
     // Find published package versions
-    const npmVersionsCmd = spawnSync('npm', [
+    const npmViewCmd = spawnSync('npm', [
       'view',
       localPackageSpecs.name,
       'versions',
+      'dist-tags',
       '--json'
     ])
-    assert(!npmVersionsCmd.error, npmVersionsCmd.error)
-    assert(!npmVersionsCmd.stderr.toString(), `Failed to lookup package versions on NPM: ${npmVersionsCmd.stderr.toString()}`)
+    assert(!npmViewCmd.error, npmViewCmd.error)
+    assert(!npmViewCmd.stderr.toString(), `Failed to lookup package on NPM: ${npmViewCmd.stderr.toString()}`)
 
-    const npmVersions = JSON.parse(npmVersionsCmd.stdout.toString()) as string[]
+    const { versions: npmVersions, 'dist-tags': npmTags } = JSON.parse(npmViewCmd.stdout.toString()) as { versions: string[], 'dist-tags': Record<string, string> }
 
     // Tag a version as "next" if it is a prerelease or if we are not on main branch
     const tag = (isMainBranch && !localPackageSpecs.version.includes('-')) ? 'latest' : 'next'
@@ -44,7 +45,7 @@ try {
       const publishCmd = spawnSync('npm', [
         'pub',
         `-w=${localPackageSpecs.name}`,
-        `--tag ${tag}`,
+        `--tag=${tag}`,
       ])
     
       assert(!publishCmd.error, publishCmd.error)
@@ -52,8 +53,8 @@ try {
     
       console.log(`Published ${localPackageSpecs.name}@${localPackageSpecs.version} to NPM with tag "${tag}"`)
     }
-    else {
-      // Version has been published, so just make sure the correct tag is applied to it
+    else if (npmTags[tag] !== localPackageSpecs.version) {
+      // Version has been published, so just make sure the correct tag is applied to it, if it's not already
       const tagCmd = spawnSync('npm', [
         'dist-tag',
         `add`,
@@ -65,6 +66,9 @@ try {
       assert(!tagCmd.stderr.toString(), `Failed to add tag "${tag}" to ${localPackageSpecs.name}@${localPackageSpecs.version}: ${tagCmd.stderr.toString()}`)
     
       console.log(`Added tag "${tag}" to ${localPackageSpecs.name}@${localPackageSpecs.version} on NPM`)
+    }
+    else {
+      console.log(`Version ${localPackageSpecs.name}@${localPackageSpecs.version} already published on NPM with tag "${tag}"`)
     }
   }
 }
