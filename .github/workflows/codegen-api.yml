@@ -21,7 +21,7 @@ jobs:
           # We always base ourselves on main branch, aka prod
           ref: refs/heads/main
       - name: Use Node.js LTS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
           check-latest: true
