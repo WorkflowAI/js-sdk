@@ -5,7 +5,7 @@ import {
 } from 'json-schema-to-zod'
 
 import { Definition, definitions } from './definitions'
-import { hydrateRefs } from './json-schema-refs'
+import { hydrateRefs } from './json-schema/json-schema-refs'
 
 /**
  * Creates a parser override function for a specific type of Zod schema.
