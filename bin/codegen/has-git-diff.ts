@@ -15,10 +15,8 @@ try {
     console.log('Git changes are pending')
   }
   else {
-    console.log('No git changes')
+    core.setFailed('No git changes')
   }
-
-  core.setFailed('No git changes')
 }
 catch (error) {
   console.error(error)
