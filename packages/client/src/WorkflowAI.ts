@@ -23,9 +23,9 @@ export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig
 }
 
-export type RunTaskOptions<S extends true | false = false> = {
+export type RunTaskOptions<Stream extends true | false = false> = {
   group: Schemas['RunRequest']['group']
-  stream?: S
+  stream?: Stream
 }
 
 export type ImportTaskRunOptions = Pick<
