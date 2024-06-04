@@ -10,8 +10,10 @@ import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
 import {
   hasSchemaId,
+  ImportRunFn,
   type InputSchema,
   type OutputSchema,
+  RunFn,
   type TaskDefinition,
   type TaskRunResult,
   type TaskRunStreamEvent,
@@ -25,12 +27,15 @@ export type WorkflowAIConfig = {
 
 export type RunTaskOptions<Stream extends true | false = false> = {
   group: Schemas['RunRequest']['group']
+  useCache?: Schemas['RunRequest']['use_cache']
+  labels?: Schemas['RunRequest']['labels']
+  metadata?: Schemas['RunRequest']['metadata']
   stream?: Stream
 }
 
-export type ImportTaskRunOptions = Pick<
-  Parameters<WorkflowAIApi['tasks']['schemas']['runs']['import']>[0]['body'],
-  'id' | 'group' | 'start_time' | 'end_time' | 'labels'
+export type ImportTaskRunOptions = Omit<
+  Schemas['CreateTaskRunRequest'],
+  'task_input' | 'task_output'
 >
 
 export class WorkflowAI {
@@ -96,7 +101,7 @@ export class WorkflowAI {
   >(
     taskDef: TaskDefinition<IS, OS, false>,
     input: IS,
-    { group, stream }: RunTaskOptions<S>,
+    { group, stream, labels, metadata, useCache }: RunTaskOptions<S>,
   ) {
     const init = {
       params: {
@@ -109,6 +114,9 @@ export class WorkflowAI {
         task_input: await taskDef.schema.input.parseAsync(input),
         group,
         stream,
+        labels,
+        metadata,
+        useCache: useCache || 'when_available',
       },
     }
 
@@ -217,7 +225,7 @@ export class WorkflowAI {
       )
     }
 
-    const run: UseTaskResult<IS, OS>['run'] = (input, overrideOptions) => {
+    const run: RunFn<IS, OS> = (input, overrideOptions) => {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
@@ -250,7 +258,7 @@ export class WorkflowAI {
       }
     }
 
-    const importRun: UseTaskResult<IS, OS>['importRun'] = async (
+    const importRun: ImportRunFn<IS, OS> = async (
       input,
       output,
       overrideOptions,
