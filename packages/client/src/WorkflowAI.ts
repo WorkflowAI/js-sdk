@@ -9,6 +9,11 @@ import {
 import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
 import {
+  GroupReference,
+  isGroupReference,
+  sanitizeGroupReference,
+} from './Group'
+import {
   hasSchemaId,
   ImportRunFn,
   type InputSchema,
@@ -26,7 +31,7 @@ export type WorkflowAIConfig = {
 }
 
 export type RunTaskOptions<Stream extends true | false = false> = {
-  group: Schemas['RunRequest']['group']
+  group: GroupReference
   useCache?: Schemas['RunRequest']['use_cache']
   labels?: Schemas['RunRequest']['labels']
   metadata?: Schemas['RunRequest']['metadata']
@@ -35,8 +40,10 @@ export type RunTaskOptions<Stream extends true | false = false> = {
 
 export type ImportTaskRunOptions = Omit<
   Schemas['CreateTaskRunRequest'],
-  'task_input' | 'task_output'
->
+  'task_input' | 'task_output' | 'group'
+> & {
+  group: GroupReference
+}
 
 export class WorkflowAI {
   protected api: WorkflowAIApi
@@ -112,7 +119,7 @@ export class WorkflowAI {
       },
       body: {
         task_input: await taskDef.schema.input.parseAsync(input),
-        group,
+        group: sanitizeGroupReference(group),
         stream,
         labels,
         metadata,
@@ -196,6 +203,7 @@ export class WorkflowAI {
       },
       body: {
         ...options,
+        group: sanitizeGroupReference(options.group),
         task_input,
         task_output,
       },
@@ -263,18 +271,16 @@ export class WorkflowAI {
       output,
       overrideOptions,
     ) => {
-      return this.importTaskRun(taskDef, input, output, {
+      const { group, ...options } = {
         ...defaultOptions,
         ...overrideOptions,
-        group: {
-          ...defaultOptions?.group,
-          ...overrideOptions?.group,
-          properties: {
-            ...defaultOptions?.group?.properties,
-            ...overrideOptions?.group?.properties,
-          },
-        },
-      })
+      }
+
+      if (!isGroupReference(group)) {
+        throw new Error('Group configuration is required to import a task run')
+      }
+
+      return this.importTaskRun(taskDef, input, output, { ...options, group })
     }
 
     return {
