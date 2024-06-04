@@ -56,6 +56,7 @@ export function initWorkflowAIApi(
       upsert: json.POST('/tasks'),
 
       schemas: {
+        create: json.POST('/tasks/{task_id}/schemas'),
         get: json.GET('/tasks/{task_id}/schemas/{task_schema_id}'),
         generateInput: json.POST(
           '/tasks/{task_id}/schemas/{task_schema_id}/input',
@@ -63,6 +64,7 @@ export function initWorkflowAIApi(
         getPythonCode: json.GET(
           '/tasks/{task_id}/schemas/{task_schema_id}/python',
         ),
+        iterate: json.POST('/tasks/schemas/iterate'),
         run: withStream(
           json.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
           stream.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
@@ -72,6 +74,9 @@ export function initWorkflowAIApi(
           list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/groups'),
           create: json.POST('/tasks/{task_id}/schemas/{task_schema_id}/groups'),
           get: json.GET(
+            '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}',
+          ),
+          update: json.PATCH(
             '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}',
           ),
         },
@@ -85,6 +90,12 @@ export function initWorkflowAIApi(
           list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/examples'),
           create: json.POST(
             '/tasks/{task_id}/schemas/{task_schema_id}/examples',
+          ),
+        },
+
+        benchmarks: {
+          list: json.GET(
+            '/tasks/{task_id}/schemas/{task_schema_id}/benchmarks',
           ),
         },
 
@@ -109,11 +120,13 @@ export function initWorkflowAIApi(
             list: json.GET(
               '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups',
             ),
-            evaluate: json.POST(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/evaluate',
-            ),
             get: json.GET(
               '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/{group_id}',
+            ),
+          },
+          benchmarks: {
+            create: json.POST(
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/benchmarks',
             ),
           },
         },
@@ -128,6 +141,9 @@ export function initWorkflowAIApi(
           generateInstructions: json.POST(
             '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-instructions',
           ),
+          generateFieldEvaluations: json.POST(
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-field-evaluations',
+          ),
           get: json.GET(
             '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
           ),
@@ -139,6 +155,10 @@ export function initWorkflowAIApi(
           ),
         },
       },
+    },
+
+    benchmarks: {
+      get: json.GET('/benchmarks/{benchmark_id}'),
     },
 
     organization: {
