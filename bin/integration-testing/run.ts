@@ -80,25 +80,45 @@ try {
 
   // Execute TS file and get console output
 
-  const { error, stdout } = spawnSync('npx', [
+  const runTaskResult = spawnSync('npx', [
     'tsx',
     executedFilePath
   ])
 
-  assert(!error, error)
+  assert(!runTaskResult.error, runTaskResult.error)
 
-  const resultJs = stdout.toString()
+  const resultJs = runTaskResult.stdout.toString()
 
-  // We can't do a JSON.parse because teh output is not formated as JSON but as JS code (missing quotes etc)
+  // We can't do a JSON.parse because the output is not formated as JSON but as JS code (missing quotes etc)
   const taskRunOutput = eval(`(${resultJs})`)
 
   // Check that the code generated gave us the same output
   assert.deepStrictEqual(taskRunOutput, exampleTaskRun.task_output)
 
-  console.log('End-to-end test passed')
+  console.log('Run task end-to-end passed')
+
+  // Write TS file with all the necessary snippets
+  writeFileSync(executedFilePath, [
+    snippets.initializeClient.code, 
+    snippets.initializeTask.code, 
+    snippets.importTaskRun.code,
+  ].join('\n\n\n'))
+
+  // Execute TS file and get console output
+
+  const importRunResult = spawnSync('npx', [
+    'tsx',
+    executedFilePath
+  ])
+
+  assert(!importRunResult.error, importRunResult.error)
+  assert(!importRunResult.stderr.toString(), importRunResult.stderr.toString())
+  assert(!importRunResult.stdout.toString(), importRunResult.stdout.toString())
+
+  console.log('Import run end-to-end passed')
 
   // Delete test file we just wrote
-  unlinkSync(executedFilePath)
+  // unlinkSync(executedFilePath)
 }
 catch (error) {
   console.error(error)

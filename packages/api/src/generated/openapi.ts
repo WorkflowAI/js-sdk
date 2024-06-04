@@ -44,18 +44,10 @@ export interface paths {
      */
     post: operations['create_example_runs__run_id__examples_post']
   }
-  '/runs/{run_id}/annotate': {
-    /**
-     * Annotate
-     * @deprecated
-     * @description Annotate (user evaluate) a task run.
-     */
-    post: operations['annotate_runs__run_id__annotate_post']
-  }
   '/tasks/{task_id}/schemas/{task_schema_id}/groups': {
     /**
      * List Groups
-     * @description List all groups for a task that are compatible with the schema.
+     * @description List all groups for a task schema.
      */
     get: operations['list_groups_tasks__task_id__schemas__task_schema_id__groups_get']
     /**
@@ -65,8 +57,16 @@ export interface paths {
     post: operations['create_group_tasks__task_id__schemas__task_schema_id__groups_post']
   }
   '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}': {
-    /** Group By Id */
+    /**
+     * Group By Id
+     * @description Retrieve a task group
+     */
     get: operations['group_by_id_tasks__task_id__schemas__task_schema_id__groups__group_id__get']
+    /**
+     * Patch Group By Id
+     * @description Update a task group
+     */
+    patch: operations['patch_group_by_id_tasks__task_id__schemas__task_schema_id__groups__group_id__patch']
   }
   '/tasks/{task_id}/schemas/{task_schema_id}/datasets': {
     /**
@@ -106,6 +106,7 @@ export interface paths {
   '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/evaluate': {
     /**
      * Evaluate Dataset Group
+     * @deprecated
      * @description Evaluate a task group given its properties, creating a group if needed
      */
     post: operations['evaluate_dataset_group_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups_evaluate_post']
@@ -116,6 +117,19 @@ export interface paths {
      * @description Aggregate the scores for a single task group on a dataset
      */
     get: operations['get_dataset_group_by_id_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups__group_id__get']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/benchmarks': {
+    /**
+     * List Benchmarks
+     * @deprecated
+     * @description List benchmarks for a given dataset. Use /tasks/{task_id}/schemas/{task_schema_id}/benchmarks instead
+     */
+    get: operations['list_benchmarks_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_get']
+    /**
+     * Create Benchmark
+     * @description Create a benchmark for a given dataset
+     */
+    post: operations['create_benchmark_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_post']
   }
   '/tasks/{task_id}/schemas/{task_schema_id}': {
     /** Get Task Schema */
@@ -165,6 +179,13 @@ export interface paths {
      */
     get: operations['list_scores_tasks__task_id__schemas__task_schema_id__scores_get']
   }
+  '/tasks/{task_id}/schemas/{task_schema_id}/benchmarks': {
+    /**
+     * List Benchmarks
+     * @description List benchmarks for a task schema.
+     */
+    get: operations['list_benchmarks_tasks__task_id__schemas__task_schema_id__benchmarks_get']
+  }
   '/tasks/{task_id}/schemas/{task_schema_id}/python': {
     /** Generate Python Code */
     get: operations['generate_python_code_tasks__task_id__schemas__task_schema_id__python_get']
@@ -172,6 +193,7 @@ export interface paths {
   '/tasks/generate': {
     /**
      * Generate Io
+     * @deprecated
      * @description Generate a new task based on natural language
      */
     post: operations['generate_io_tasks_generate_post']
@@ -270,6 +292,13 @@ export interface paths {
      */
     delete: operations['delete_provider_settings_organization_settings_providers__provider_id__delete']
   }
+  '/benchmarks/{benchmark_id}': {
+    /**
+     * Get Benchmark
+     * @description Retrieve a benchmark by ID
+     */
+    get: operations['get_benchmark_benchmarks__benchmark_id__get']
+  }
 }
 
 export type webhooks = Record<string, never>
@@ -286,26 +315,6 @@ export interface components {
       /**
        * Comment
        * @description An optional comment for the rating
-       */
-      comment?: string | null
-    }
-    /** AnnotateRequest */
-    AnnotateRequest: {
-      /**
-       * Score
-       * @description The score of the evaluation
-       */
-      score: number
-      /**
-       * Corrections
-       * @description Corrections to the task output as a json object keypath: value.
-       * If the score is 0 and there are no corrections, the example will not be created.
-       * Otherwise, the example will be created with the corrected output. If there is an evaluator associated with the task, the task run will be evaluated asynchronously against the example.
-       */
-      corrections?: Record<string, never> | null
-      /**
-       * Comment
-       * @description An optional comment from the evaluation
        */
       comment?: string | null
     }
@@ -411,23 +420,24 @@ export interface components {
        * Metric
        * @enum {string}
        */
-      metric: 'correctness' | 'latency' | 'cost' | 'quality'
+      metric: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
       /** Triggers */
       triggers: ('auto' | 'manual')[]
       /** Type */
       type:
-        | (
-            | 'evaluate_output'
-            | 'compare_outputs'
-            | 'code_compare_outputs'
-            | 'field_based'
-          )
+        | ('evaluate_output' | 'compare_outputs')
+        | ('code_compare_outputs' | 'field_based' | 'faithfulness')
         | ('latency' | 'cost' | 'user')
       /**
        * Uses Examples
        * @default false
        */
       uses_examples?: boolean
+      /**
+       * Configurable
+       * @default false
+       */
+      configurable?: boolean
     }
     /** AzureOpenAIConfig */
     AzureOpenAIConfig: {
@@ -456,7 +466,82 @@ export interface components {
       | 'gpt-4-0125-preview'
       | 'gpt-4-vision-preview'
       | 'gpt-35-turbo-1106'
-      | 'gpt-35-turbo-0125'
+    /** Benchmark */
+    Benchmark: {
+      /** Id */
+      id: string
+      /** Task Id */
+      task_id: string
+      /** Task Schema Id */
+      task_schema_id: number
+      /** Dataset Id */
+      dataset_id: string
+      /** Type */
+      type: ('manual' | 'auto') | null
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'in_progress' | 'complete'
+      /**
+       * Evaluator Id
+       * @description The id of the evaluator that was used in the benchmark
+       */
+      evaluator_id: string | null
+      /** Metric */
+      metric:
+        | ('correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness')
+        | null
+      /**
+       * By Input
+       * @description A list of inputs and their runs
+       */
+      by_input: components['schemas']['ByInput'][]
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at?: string
+    }
+    /** BenchmarkItem */
+    BenchmarkItem: {
+      /** Id */
+      id: string
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'in_progress' | 'complete'
+      /** In Progress Run Count */
+      in_progress_run_count: number
+      /** Total Run Count */
+      total_run_count: number
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+      /** Type */
+      type: ('manual' | 'auto') | null
+    }
+    /** BenchmarkRequest */
+    BenchmarkRequest: {
+      /**
+       * Groups
+       * @description The groups to benchmark
+       */
+      groups: components['schemas']['TaskGroupReference'][]
+      /**
+       * Max Run Count
+       * @description The maximum number of runs to evaluate.
+       * @default 50
+       */
+      max_run_count?: number
+      /** Type */
+      type?: ('manual' | 'auto') | null
+      /** Evaluator Id */
+      evaluator_id?: string | null
+    }
     /** BooleanComparisonOptions */
     BooleanComparisonOptions: {
       /**
@@ -478,28 +563,76 @@ export interface components {
       user_message: string
       /** Assistant Answer */
       assistant_answer: string
-      /**
-       * Task Name
-       * @description A name for the task
-       */
-      task_name?: string | null
-      /**
-       * Task Input Schema
-       * @description A proposed JSON schema of the task input
-       */
-      task_input_schema?: Record<string, never> | null
-      /**
-       * Task Output Schema
-       * @description A proposed JSON schema of the task output
-       */
-      task_output_schema?: Record<string, never> | null
+      /** @description The task schema of the task generated in this iteration */
+      task_schema?: components['schemas']['TaskSchema'] | null
     }
     /** BuildTaskRequest */
     BuildTaskRequest: {
-      /** @description The previous iteration of the task building process, as returned by the API */
-      previous_iterations?: components['schemas']['BuildTaskIteration'] | null
+      /**
+       * Previous Iterations
+       * @description The previous iteration of the task building process, as returned by the API
+       */
+      previous_iterations?: components['schemas']['BuildTaskIteration'][] | null
       /** User Message */
       user_message: string
+    }
+    /** ByGroup */
+    ByGroup: {
+      /** Task Group Iteration */
+      task_group_iteration: number
+      /**
+       * Task Output Preview
+       * @description A preview of a task output
+       */
+      task_output_preview: string
+      /** Task Output Hash */
+      task_output_hash?: string | null
+      /**
+       * Task Run Id
+       * @description The task run id, available when the task run has started
+       */
+      task_run_id: string | null
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'in_queue' | 'in_progress' | 'complete' | 'failed'
+      /** Duration Seconds */
+      duration_seconds?: number | null
+      /** Cost Usd */
+      cost_usd?: number | null
+      /** Scores */
+      scores?: components['schemas']['SimplifiedScore'][] | null
+      /** Evaluating */
+      evaluating?: string[] | null
+    }
+    /** ByInput */
+    ByInput: {
+      /**
+       * Task Input Hash
+       * @description A hash describing the input. Unique per input
+       */
+      task_input_hash: string
+      /**
+       * Task Input Preview
+       * @description A preview of the input
+       */
+      task_input_preview: string
+      /**
+       * Example Id
+       * @description The id of the example that was used in the evaluation
+       */
+      example_id?: string | null
+      /**
+       * By Group
+       * @description A list of pending, running or completed runs by task groups for this input
+       */
+      by_group: components['schemas']['ByGroup'][]
+      /**
+       * Has Example
+       * @description Whether the input has an example. Deprecated, use example_id instead
+       */
+      has_example: boolean
     }
     /**
      * CodeEvaluator
@@ -522,6 +655,12 @@ export interface components {
        * @enum {boolean}
        */
       uses_examples?: true
+      /**
+       * Metric
+       * @default correctness
+       * @enum {string}
+       */
+      metric?: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
     }
     /**
      * CodeEvaluatorBuilder
@@ -552,6 +691,7 @@ export interface components {
         | components['schemas']['TaskEvaluatorBuilder']
         | components['schemas']['CodeEvaluatorBuilder']
         | components['schemas']['FieldBasedEvaluatorBuilder']
+        | components['schemas']['FaithfulnessEvaluatorBuilder']
     }
     /** CreateTaskGroupRequest */
     CreateTaskGroupRequest: {
@@ -587,14 +727,6 @@ export interface components {
       /** Output Schema */
       output_schema: Record<string, never>
       properties?: components['schemas']['TaskGroupProperties']
-      evaluator_options?:
-        | components['schemas']['SerializableEvaluatorOptions']
-        | null
-      /**
-       * Evaluator For
-       * @description A task id, if any, that this task can evaluate
-       */
-      evaluator_for?: string | null
       /**
        * Task Id
        * @description the task id, stable accross all variants. If not provided, an id based on the name is generated.
@@ -632,9 +764,14 @@ export interface components {
       end_time?: string | null
       /**
        * Labels
-       * @description A list of labels for the task run.
+       * @description A list of labels for the task run. Labels are indexed and searchable
        */
       labels?: string[] | null
+      /**
+       * Metadata
+       * @description Additional metadata to store with the task run.
+       */
+      metadata?: Record<string, never> | null
       /**
        * Llm Completions
        * @description The raw completions used to generate the task output.
@@ -693,6 +830,67 @@ export interface components {
       /** @description The evaluator that computed the score */
       evaluator: components['schemas']['core__domain__tasks__task_group_aggregate__TaskGroupAggregate__Evaluation__Evaluator']
     }
+    /**
+     * FaithfulnessEvaluator
+     * @description An evaluator that computes the faithfulness of the assistant's answer to the user's message
+     */
+    FaithfulnessEvaluator: {
+      /**
+       * Type
+       * @default faithfulness
+       * @constant
+       * @enum {string}
+       */
+      type?: 'faithfulness'
+      /**
+       * New User Message Keypath
+       * @description A keypath to describe where to find the new user message in the task input
+       */
+      new_user_message_keypath: (string | number)[]
+      /**
+       * New Assistant Answer Keypath
+       * @description A keypath to describe where to find the new assistant answer in the task output
+       */
+      new_assistant_answer_keypath: (string | number)[]
+      faithfulness_task_group_properties?:
+        | components['schemas']['TaskGroupProperties']
+        | null
+      /**
+       * Uses Examples
+       * @default true
+       * @constant
+       * @enum {boolean}
+       */
+      uses_examples?: true
+      /**
+       * Metric
+       * @default faithfulness
+       * @enum {string}
+       */
+      metric?: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
+    }
+    /** FaithfulnessEvaluatorBuilder */
+    FaithfulnessEvaluatorBuilder: {
+      /**
+       * Type
+       * @constant
+       * @enum {string}
+       */
+      type: 'faithfulness'
+      /**
+       * New User Message Keypath
+       * @description A keypath to describe where to find the new user message in the task input
+       */
+      new_user_message_keypath?: (string | number)[] | null
+      /**
+       * New Assistant Answer Keypath
+       * @description A keypath to describe where to find the new assistant answer in the task output
+       */
+      new_assistant_answer_keypath?: (string | number)[] | null
+      faithfulness_task_group_properties?:
+        | components['schemas']['TaskGroupProperties']
+        | null
+    }
     /** FieldBasedEvaluationConfig */
     'FieldBasedEvaluationConfig-Input': {
       /** Options */
@@ -740,6 +938,12 @@ export interface components {
        * @enum {boolean}
        */
       uses_examples?: true
+      /**
+       * Metric
+       * @default correctness
+       * @enum {string}
+       */
+      metric?: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
     }
     /**
      * FieldBasedEvaluatorBuilder
@@ -976,6 +1180,13 @@ export interface components {
       /** List of provider configurations */
       providers?: components['schemas']['ProviderSettings'][]
     }
+    /** Page[BenchmarkItem] */
+    Page_BenchmarkItem_: {
+      /** Items */
+      items: components['schemas']['BenchmarkItem'][]
+      /** Count */
+      count?: number | null
+    }
     /** Page[DataSetResponse] */
     Page_DataSetResponse_: {
       /** Items */
@@ -1004,13 +1215,6 @@ export interface components {
       /** Count */
       count?: number | null
     }
-    /** Page[SerializableTaskScoreAggregate] */
-    Page_SerializableTaskScoreAggregate_: {
-      /** Items */
-      items: components['schemas']['SerializableTaskScoreAggregate'][]
-      /** Count */
-      count?: number | null
-    }
     /** Page[SerializableTask] */
     Page_SerializableTask_: {
       /** Items */
@@ -1036,6 +1240,13 @@ export interface components {
     Page_TaskInput_: {
       /** Items */
       items: components['schemas']['TaskInput'][]
+      /** Count */
+      count?: number | null
+    }
+    /** Page[TaskScoreAggregate] */
+    Page_TaskScoreAggregate_: {
+      /** Items */
+      items: components['schemas']['TaskScoreAggregate'][]
       /** Count */
       count?: number | null
     }
@@ -1092,13 +1303,22 @@ export interface components {
        * @default false
        */
       stream?: boolean
-    }
-    /**
-     * SerializableEvaluatorOptions
-     * @description Specify how a task will be evaluated
-     */
-    SerializableEvaluatorOptions: {
-      [key: string]: unknown
+      /**
+       * Use Cache
+       * @default when_available
+       * @enum {string}
+       */
+      use_cache?: 'when_available' | 'only' | 'never'
+      /**
+       * Labels
+       * @description A list of labels for the task run. Labels are indexed and searchable
+       */
+      labels?: string[] | null
+      /**
+       * Metadata
+       * @description Additional metadata to store with the task run.
+       */
+      metadata?: Record<string, never> | null
     }
     /** SerializableTask */
     SerializableTask: {
@@ -1108,32 +1328,6 @@ export interface components {
       name: string
       /** Versions */
       versions: components['schemas']['PartialTaskVersion'][]
-    }
-    /** SerializableTaskEvaluation */
-    SerializableTaskEvaluation: {
-      /**
-       * Score
-       * @description The score of the evaluation
-       */
-      score: number
-      /**
-       * Tags
-       * @description Metadata added by the evaluator
-       */
-      tags?: string[] | null
-      /**
-       * Comment
-       * @description An optional comment from the evaluation
-       */
-      comment?: string | null
-      /** @description Information about the evaluator that computed the score */
-      evaluator: components['schemas']['core__domain__serializable__task_evaluation__SerializableTaskEvaluation__Evaluator']
-      /**
-       * Created At
-       * Format: date-time
-       * @description The time at which the score was created
-       */
-      created_at?: string
     }
     /** SerializableTaskExample */
     SerializableTaskExample: {
@@ -1298,12 +1492,17 @@ export interface components {
        * Scores
        * @description A list of scores computed for the task run. A run can be evaluated in multiple ways.
        */
-      scores?: components['schemas']['SerializableTaskEvaluation'][] | null
+      scores?: components['schemas']['TaskEvaluation'][] | null
       /**
        * Labels
        * @description A set of labels that are attached to the task runs. They are indexed.
        */
       labels?: string[] | null
+      /**
+       * Metadata
+       * @description A user set metadata key / value. Keys are not searchable.
+       */
+      metadata?: Record<string, never> | null
       /**
        * Llm Completions
        * @description A list of raw completions used to generate the task output
@@ -1344,25 +1543,6 @@ export interface components {
        */
       total_count?: number
     }
-    /**
-     * SerializableTaskScoreAggregate
-     * @description Score that is aggregated by runner version and tags
-     */
-    SerializableTaskScoreAggregate: {
-      /** Average Score */
-      average_score: number
-      /** Average Duration Seconds */
-      average_duration_seconds: number
-      /** Count */
-      count: number
-      evaluator: components['schemas']['core__domain__serializable__task_evaluation__SerializableTaskEvaluation__Evaluator']
-      /**
-       * First Appeared
-       * Format: date-time
-       */
-      first_appeared: string
-      group: components['schemas']['TaskGroup']
-    }
     /** SerializableTaskVariant */
     SerializableTaskVariant: {
       /**
@@ -1392,9 +1572,6 @@ export interface components {
       input_schema: components['schemas']['SerializableTaskIO']
       output_schema: components['schemas']['SerializableTaskIO']
       properties: components['schemas']['TaskGroupProperties']
-      evaluator_options?:
-        | components['schemas']['SerializableEvaluatorOptions']
-        | null
       /**
        * Created At
        * Format: date-time
@@ -1405,6 +1582,18 @@ export interface components {
        * @description A task id, if any, that this task can evaluate
        */
       evaluator_for?: string | null
+    }
+    /** SimplifiedScore */
+    SimplifiedScore: {
+      /** Score */
+      score: number
+      /** Evaluator Name */
+      evaluator_name: string
+      /**
+       * Example Id
+       * @description The id of the example that was used in the evaluation
+       */
+      example_id?: string | null
     }
     /** Snippet */
     Snippet: {
@@ -1464,10 +1653,47 @@ export interface components {
       /** @description The group that is used to run the evaluator task */
       task_group: components['schemas']['TaskGroup']
       /**
+       * Metric
+       * @default correctness
+       * @enum {string}
+       */
+      metric?: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
+      /**
        * Uses Examples
        * @description Whether the evaluator requires examples
        */
       uses_examples: boolean
+    }
+    /** TaskEvaluation */
+    TaskEvaluation: {
+      /**
+       * Score
+       * @description The score of the evaluation
+       */
+      score: number
+      /**
+       * Tags
+       * @description Metadata added by the evaluator
+       */
+      tags?: (('positive' | 'negative' | 'neutral') | string)[] | null
+      /**
+       * Comment
+       * @description An optional comment from the evaluation
+       */
+      comment?: string | null
+      /** @description Information about the evaluator that computed the score */
+      evaluator: components['schemas']['core__domain__tasks__task_evaluation__TaskEvaluation__Evaluator']
+      /**
+       * Created At
+       * Format: date-time
+       * @description The time at which the score was created
+       */
+      created_at?: string
+      /**
+       * Example Id
+       * @description The id of the example that was used in the evaluation
+       */
+      example_id?: string | null
     }
     /** TaskEvaluator */
     TaskEvaluator: {
@@ -1475,13 +1701,6 @@ export interface components {
       id: string
       /** Name */
       name: string
-      /**
-       * Metric
-       * @description The metric to evaluate the task on
-       * @default correctness
-       * @enum {string}
-       */
-      metric?: 'correctness' | 'latency' | 'cost' | 'quality'
       /**
        * Triggers
        * @description The triggers that will cause the evaluator to run
@@ -1492,6 +1711,18 @@ export interface components {
         | components['schemas']['TaskBasedEvaluator']
         | components['schemas']['CodeEvaluator']
         | components['schemas']['FieldBasedEvaluator']
+        | components['schemas']['FaithfulnessEvaluator']
+      /**
+       * Metric
+       * @enum {string}
+       */
+      metric: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
+      /** Type */
+      type:
+        | ('evaluate_output' | 'compare_outputs')
+        | ('code_compare_outputs' | 'field_based' | 'faithfulness')
+      /** Uses Examples */
+      uses_examples: boolean
     }
     /**
      * TaskEvaluatorBuilder
@@ -1541,6 +1772,11 @@ export interface components {
        * @description A list of tags associated with the group. When empty, tags are computed from the properties.
        */
       tags: string[]
+      /**
+       * Aliases
+       * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
+       */
+      aliases?: string[] | null
     }
     /**
      * TaskGroupAggregate
@@ -1566,6 +1802,11 @@ export interface components {
        * @description A list of tags associated with the group. When empty, tags are computed from the properties.
        */
       tags: string[]
+      /**
+       * Aliases
+       * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
+       */
+      aliases?: string[] | null
       /**
        * Run With Example Count
        * @description The number of runs for the group that have examples
@@ -1644,11 +1885,6 @@ export interface components {
        * @description The version of the runner used
        */
       runner_version?: string | null
-      /**
-       * Task Schema Id
-       * @description The schema id of the task. Used to restrict the group to a specific schema
-       */
-      task_schema_id?: number | null
       [key: string]: unknown
     }
     /**
@@ -1669,6 +1905,24 @@ export interface components {
       iteration?: number | null
       /** @description The properties to evaluate the task schema with. A group will be created if needed */
       properties?: components['schemas']['TaskGroupProperties'] | null
+      /**
+       * Alias
+       * @description An alias for the group
+       */
+      alias?: string | null
+    }
+    /** TaskGroupUpdate */
+    TaskGroupUpdate: {
+      /**
+       * Add Alias
+       * @description A new alias for the group. If the alias is already used in another group of the task schemait will be removed from the other group.
+       */
+      add_alias?: string | null
+      /**
+       * Remove Alias
+       * @description An alias to remove from the group. The request is a noop if the group does not have the alias
+       */
+      remove_alias?: string | null
     }
     /** TaskInput */
     TaskInput: {
@@ -1680,6 +1934,24 @@ export interface components {
        */
       task_input_hash: string
     }
+    /** TaskSchema */
+    TaskSchema: {
+      /**
+       * Task Name
+       * @description The name of the task in PascalCase
+       */
+      task_name: string
+      /**
+       * Input Json Schema
+       * @description The JSON schema of the task input
+       */
+      input_json_schema: Record<string, never>
+      /**
+       * Output Json Schema
+       * @description The JSON schema of the task output
+       */
+      output_json_schema: Record<string, never>
+    }
     /** TaskSchemaResponse */
     TaskSchemaResponse: {
       /** Task Id */
@@ -1688,6 +1960,25 @@ export interface components {
       schema_id: number
       input_schema: components['schemas']['SerializableTaskIO']
       output_schema: components['schemas']['SerializableTaskIO']
+    }
+    /**
+     * TaskScoreAggregate
+     * @description Score that is aggregated by runner version and tags
+     */
+    TaskScoreAggregate: {
+      /** Average Score */
+      average_score: number
+      /** Average Duration Seconds */
+      average_duration_seconds: number
+      /** Count */
+      count: number
+      evaluator: components['schemas']['core__domain__tasks__task_evaluation__TaskEvaluation__Evaluator']
+      /**
+       * First Appeared
+       * Format: date-time
+       */
+      first_appeared: string
+      group: components['schemas']['TaskGroup']
     }
     /**
      * UpdateRatingRequest
@@ -1751,8 +2042,18 @@ export interface components {
        */
       from_correction?: boolean | null
     }
+    /**
+     * Provider
+     * @enum {string}
+     */
+    core__domain__tasks__providers__Provider:
+      | 'openai'
+      | 'azure_openai'
+      | 'anthropic'
+      | 'groq'
+      | 'google'
     /** Evaluator */
-    core__domain__serializable__task_evaluation__SerializableTaskEvaluation__Evaluator: {
+    core__domain__tasks__task_evaluation__TaskEvaluation__Evaluator: {
       /**
        * Id
        * @description The id of the evaluator that computed the score. Only one score per id can be attached to a task run.
@@ -1765,17 +2066,14 @@ export interface components {
       name: string
       /** Properties */
       properties: Record<string, never>
+      /**
+       * Metric
+       * @description The metric that was used to compute the score
+       * @default correctness
+       * @enum {string}
+       */
+      metric?: 'correctness' | 'latency' | 'cost' | 'quality' | 'faithfulness'
     }
-    /**
-     * Provider
-     * @enum {string}
-     */
-    core__domain__tasks__providers__Provider:
-      | 'openai'
-      | 'azure_openai'
-      | 'anthropic'
-      | 'groq'
-      | 'google'
     /**
      * Evaluator
      * @description Information about the evaluator that computed a score
@@ -2005,39 +2303,8 @@ export interface operations {
     }
   }
   /**
-   * Annotate
-   * @deprecated
-   * @description Annotate (user evaluate) a task run.
-   */
-  annotate_runs__run_id__annotate_post: {
-    parameters: {
-      path: {
-        run_id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AnnotateRequest']
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': components['schemas']['SerializableTaskRun']
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': components['schemas']['HTTPValidationError']
-        }
-      }
-    }
-  }
-  /**
    * List Groups
-   * @description List all groups for a task that are compatible with the schema.
+   * @description List all groups for a task schema.
    */
   list_groups_tasks__task_id__schemas__task_schema_id__groups_get: {
     parameters: {
@@ -2092,13 +2359,50 @@ export interface operations {
       }
     }
   }
-  /** Group By Id */
+  /**
+   * Group By Id
+   * @description Retrieve a task group
+   */
   group_by_id_tasks__task_id__schemas__task_schema_id__groups__group_id__get: {
     parameters: {
       path: {
         task_id: string
-        /** @description The id of an existing group */
+        task_schema_id: number
+        /** @description The id, iteration or alias of an existing group */
         group_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGroup']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Patch Group By Id
+   * @description Update a task group
+   */
+  patch_group_by_id_tasks__task_id__schemas__task_schema_id__groups__group_id__patch: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The id, iteration or alias of an existing group */
+        group_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TaskGroupUpdate']
       }
     }
     responses: {
@@ -2262,6 +2566,7 @@ export interface operations {
   }
   /**
    * Evaluate Dataset Group
+   * @deprecated
    * @description Evaluate a task group given its properties, creating a group if needed
    */
   evaluate_dataset_group_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups_evaluate_post: {
@@ -2304,7 +2609,7 @@ export interface operations {
         dataset_id: string
         task_id: string
         task_schema_id: number
-        /** @description The id of an existing group */
+        /** @description The id, iteration or alias of an existing group */
         group_id: string
       }
     }
@@ -2313,6 +2618,72 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['TaskGroupAggregate']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Benchmarks
+   * @deprecated
+   * @description List benchmarks for a given dataset. Use /tasks/{task_id}/schemas/{task_schema_id}/benchmarks instead
+   */
+  list_benchmarks_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_get: {
+    parameters: {
+      query?: {
+        /** @description A status filter */
+        status?: ('in_progress' | 'complete') | null
+      }
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_BenchmarkItem_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Benchmark
+   * @description Create a benchmark for a given dataset
+   */
+  create_benchmark_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_post: {
+    parameters: {
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BenchmarkRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
         }
       }
       /** @description Validation Error */
@@ -2658,12 +3029,17 @@ export interface operations {
              * Scores
              * @description A list of scores computed for the task run. A run can be evaluated in multiple ways.
              */
-            scores?: $defs['SerializableTaskEvaluation'][] | null
+            scores?: $defs['TaskEvaluation'][] | null
             /**
              * Labels
              * @description A set of labels that are attached to the task runs. They are indexed.
              */
             labels?: string[] | null
+            /**
+             * Metadata
+             * @description A user set metadata key / value. Keys are not searchable.
+             */
+            metadata?: Record<string, never> | null
             /**
              * Llm Completions
              * @description A list of raw completions used to generate the task output
@@ -2689,6 +3065,18 @@ export interface operations {
                 name: string
                 /** Properties */
                 properties: Record<string, never>
+                /**
+                 * Metric
+                 * @description The metric that was used to compute the score
+                 * @default correctness
+                 * @enum {string}
+                 */
+                metric?:
+                  | 'correctness'
+                  | 'latency'
+                  | 'cost'
+                  | 'quality'
+                  | 'faithfulness'
               }
               /** LLMCompletion */
               LLMCompletion: {
@@ -2709,8 +3097,8 @@ export interface operations {
                 /** Completion Cost Usd */
                 completion_cost_usd?: number | null
               }
-              /** SerializableTaskEvaluation */
-              SerializableTaskEvaluation: {
+              /** TaskEvaluation */
+              TaskEvaluation: {
                 /**
                  * Score
                  * @description The score of the evaluation
@@ -2720,7 +3108,7 @@ export interface operations {
                  * Tags
                  * @description Metadata added by the evaluator
                  */
-                tags?: string[] | null
+                tags?: (('positive' | 'negative' | 'neutral') | string)[] | null
                 /**
                  * Comment
                  * @description An optional comment from the evaluation
@@ -2734,6 +3122,11 @@ export interface operations {
                  * @description The time at which the score was created
                  */
                 created_at?: string
+                /**
+                 * Example Id
+                 * @description The id of the example that was used in the evaluation
+                 */
+                example_id?: string | null
               }
               /** TaskGroup */
               TaskGroup: {
@@ -2756,6 +3149,11 @@ export interface operations {
                  * @description A list of tags associated with the group. When empty, tags are computed from the properties.
                  */
                 tags: string[]
+                /**
+                 * Aliases
+                 * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
+                 */
+                aliases?: string[] | null
               }
               /**
                * TaskGroupProperties
@@ -2808,11 +3206,6 @@ export interface operations {
                  * @description The version of the runner used
                  */
                 runner_version?: string | null
-                /**
-                 * Task Schema Id
-                 * @description The schema id of the task. Used to restrict the group to a specific schema
-                 */
-                task_schema_id?: number | null
                 [key: string]: unknown
               }
             }
@@ -2970,7 +3363,39 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': components['schemas']['Page_SerializableTaskScoreAggregate_']
+          'application/json': components['schemas']['Page_TaskScoreAggregate_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Benchmarks
+   * @description List benchmarks for a task schema.
+   */
+  list_benchmarks_tasks__task_id__schemas__task_schema_id__benchmarks_get: {
+    parameters: {
+      query?: {
+        /** @description A dataset id filter */
+        dataset_id?: string | null
+        /** @description A status filter */
+        status?: ('in_progress' | 'complete') | null
+      }
+      path: {
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_BenchmarkItem_']
         }
       }
       /** @description Validation Error */
@@ -3006,6 +3431,7 @@ export interface operations {
   }
   /**
    * Generate Io
+   * @deprecated
    * @description Generate a new task based on natural language
    */
   generate_io_tasks_generate_post: {
@@ -3403,6 +3829,32 @@ export interface operations {
       200: {
         content: {
           'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Benchmark
+   * @description Retrieve a benchmark by ID
+   */
+  get_benchmark_benchmarks__benchmark_id__get: {
+    parameters: {
+      path: {
+        /** @description The benchmark id */
+        benchmark_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
         }
       }
       /** @description Validation Error */

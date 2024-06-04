@@ -9,9 +9,16 @@ import {
 import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
 import {
+  GroupReference,
+  isGroupReference,
+  sanitizeGroupReference,
+} from './Group'
+import {
   hasSchemaId,
+  ImportRunFn,
   type InputSchema,
   type OutputSchema,
+  RunFn,
   type TaskDefinition,
   type TaskRunResult,
   type TaskRunStreamEvent,
@@ -23,15 +30,20 @@ export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig
 }
 
-export type RunTaskOptions<S extends true | false = false> = {
-  group: Schemas['RunRequest']['group']
-  stream?: S
+export type RunTaskOptions<Stream extends true | false = false> = {
+  group: GroupReference
+  useCache?: Schemas['RunRequest']['use_cache']
+  labels?: Schemas['RunRequest']['labels']
+  metadata?: Schemas['RunRequest']['metadata']
+  stream?: Stream
 }
 
-export type ImportTaskRunOptions = Pick<
-  Parameters<WorkflowAIApi['tasks']['schemas']['runs']['import']>[0]['body'],
-  'id' | 'group' | 'start_time' | 'end_time' | 'labels'
->
+export type ImportTaskRunOptions = Omit<
+  Schemas['CreateTaskRunRequest'],
+  'task_input' | 'task_output' | 'group'
+> & {
+  group: GroupReference
+}
 
 export class WorkflowAI {
   protected api: WorkflowAIApi
@@ -96,7 +108,7 @@ export class WorkflowAI {
   >(
     taskDef: TaskDefinition<IS, OS, false>,
     input: IS,
-    { group, stream }: RunTaskOptions<S>,
+    { group, stream, labels, metadata, useCache }: RunTaskOptions<S>,
   ) {
     const init = {
       params: {
@@ -107,8 +119,11 @@ export class WorkflowAI {
       },
       body: {
         task_input: await taskDef.schema.input.parseAsync(input),
-        group,
+        group: sanitizeGroupReference(group),
         stream,
+        labels,
+        metadata,
+        useCache: useCache || 'when_available',
       },
     }
 
@@ -188,6 +203,7 @@ export class WorkflowAI {
       },
       body: {
         ...options,
+        group: sanitizeGroupReference(options.group),
         task_input,
         task_output,
       },
@@ -217,7 +233,7 @@ export class WorkflowAI {
       )
     }
 
-    const run: UseTaskResult<IS, OS>['run'] = (input, overrideOptions) => {
+    const run: RunFn<IS, OS> = (input, overrideOptions) => {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
@@ -250,23 +266,21 @@ export class WorkflowAI {
       }
     }
 
-    const importRun: UseTaskResult<IS, OS>['importRun'] = async (
+    const importRun: ImportRunFn<IS, OS> = async (
       input,
       output,
       overrideOptions,
     ) => {
-      return this.importTaskRun(taskDef, input, output, {
+      const { group, ...options } = {
         ...defaultOptions,
         ...overrideOptions,
-        group: {
-          ...defaultOptions?.group,
-          ...overrideOptions?.group,
-          properties: {
-            ...defaultOptions?.group?.properties,
-            ...overrideOptions?.group?.properties,
-          },
-        },
-      })
+      }
+
+      if (!isGroupReference(group)) {
+        throw new Error('Group configuration is required to import a task run')
+      }
+
+      return this.importTaskRun(taskDef, input, output, { ...options, group })
     }
 
     return {
