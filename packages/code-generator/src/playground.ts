@@ -245,12 +245,12 @@ ${[
 const input: TaskInput<typeof ${importRunFunctionName}> = ${beautifiedInput}
 const output: TaskOutput<typeof ${importRunFunctionName}> = ${beautifiedOutput}
 
-await ${taskFunctionName}(input, output, {
+await ${importRunFunctionName}(input, output, {
   group: {
     properties: {
       provider: "openai",
       model: "gpt-4o-2024-05-13",
-      temperature: 0.3,
+      temperature: 0,
     }
   }
 })
