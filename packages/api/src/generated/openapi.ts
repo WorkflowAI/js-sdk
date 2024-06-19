@@ -144,14 +144,6 @@ export interface paths {
      */
     post: operations['create_task_run_tasks__task_id__schemas__task_schema_id__runs_post']
   }
-  '/tasks/{task_id}/schemas/{task_schema_id}/runs/aggregate': {
-    /**
-     * Aggregate Task Runs
-     * @deprecated
-     * @description Compute statistics for task runs for a task schema. Use /groups instead
-     */
-    get: operations['aggregate_task_runs_tasks__task_id__schemas__task_schema_id__runs_aggregate_get']
-  }
   '/tasks/{task_id}/schemas/{task_schema_id}/input': {
     /**
      * Generate Input
@@ -179,16 +171,17 @@ export interface paths {
      */
     get: operations['list_scores_tasks__task_id__schemas__task_schema_id__scores_get']
   }
-  '/tasks/{task_id}/schemas/{task_schema_id}/benchmarks': {
-    /**
-     * List Benchmarks
-     * @description List benchmarks for a task schema.
-     */
-    get: operations['list_benchmarks_tasks__task_id__schemas__task_schema_id__benchmarks_get']
-  }
   '/tasks/{task_id}/schemas/{task_schema_id}/python': {
     /** Generate Python Code */
     get: operations['generate_python_code_tasks__task_id__schemas__task_schema_id__python_get']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/inputs/generate': {
+    /** Create Inputs */
+    post: operations['create_inputs_tasks__task_id__schemas__task_schema_id__inputs_generate_post']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/inputs/{input_hash}': {
+    /** Get Input By Hash */
+    get: operations['get_input_by_hash_tasks__task_id__schemas__task_schema_id__inputs__input_hash__get']
   }
   '/tasks/generate': {
     /**
@@ -213,6 +206,15 @@ export interface paths {
      * @description Create a new task
      */
     post: operations['create_task_tasks_post']
+  }
+  '/tasks/{task_id}': {
+    /** Get Task */
+    get: operations['get_task_tasks__task_id__get']
+    /**
+     * Update Task
+     * @description Update a task
+     */
+    patch: operations['update_task_tasks__task_id__patch']
   }
   '/tasks/{task_id}/schemas': {
     /**
@@ -264,6 +266,13 @@ export interface paths {
      */
     delete: operations['delete_evaluator_tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__delete']
   }
+  '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}/trigger': {
+    /**
+     * Trigger Evaluator
+     * @description Trigger an evaluator. All runs that can be evaluated and are not already evaluated will be evaluated.
+     */
+    post: operations['trigger_evaluator_tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__trigger_post']
+  }
   '/organization/settings': {
     /**
      * Get Organization Settings
@@ -298,6 +307,391 @@ export interface paths {
      * @description Retrieve a benchmark by ID
      */
     get: operations['get_benchmark_benchmarks__benchmark_id__get']
+  }
+  '/tasks/{task_id}/schemas/{task_schema_id}/benchmarks': {
+    /**
+     * List Benchmarks
+     * @description List benchmarks for a task schema.
+     */
+    get: operations['list_benchmarks_tasks__task_id__schemas__task_schema_id__benchmarks_get']
+    /**
+     * Create Benchmark
+     * @description Create a benchmark given a list of inputs
+     */
+    post: operations['create_benchmark_tasks__task_id__schemas__task_schema_id__benchmarks_post']
+  }
+  '/tools/semantically-equivalent-words': {
+    /**
+     * Semantically Equivalent Words
+     * @description Generate words that are semantically equivalent to the given word
+     */
+    post: operations['semantically_equivalent_words_tools_semantically_equivalent_words_post']
+  }
+  '/{tenant}/tasks/{task_id}/examples/{example_id}': {
+    /** Get Task Example */
+    get: operations['get_task_example__tenant__tasks__task_id__examples__example_id__get']
+    /** Delete Task Example */
+    delete: operations['delete_task_example__tenant__tasks__task_id__examples__example_id__delete']
+  }
+  '/{tenant}/tasks/{task_id}/runs/{run_id}': {
+    /** Get Run */
+    get: operations['get_run__tenant__tasks__task_id__runs__run_id__get']
+  }
+  '/{tenant}/tasks/{task_id}/runs/{run_id}/ratings': {
+    /**
+     * Create Rating
+     * @description Add a user rating to a task run.
+     */
+    post: operations['create_rating__tenant__tasks__task_id__runs__run_id__ratings_post']
+  }
+  '/{tenant}/tasks/{task_id}/runs/{run_id}/ratings/{score_id}': {
+    /**
+     * Delete Rating
+     * @description Update a user rating to a task run.
+     */
+    delete: operations['delete_rating__tenant__tasks__task_id__runs__run_id__ratings__score_id__delete']
+    /**
+     * Update Rating
+     * @description Update a user rating to a task run.
+     */
+    patch: operations['update_rating__tenant__tasks__task_id__runs__run_id__ratings__score_id__patch']
+  }
+  '/{tenant}/tasks/{task_id}/runs/{run_id}/examples': {
+    /**
+     * Create Example
+     * @description Create an example from a task run
+     */
+    post: operations['create_example__tenant__tasks__task_id__runs__run_id__examples_post']
+  }
+  '/{tenant}/tasks/{task_id}/benchmarks/{benchmark_id}': {
+    /**
+     * Get Benchmark
+     * @description Retrieve a benchmark by ID
+     */
+    get: operations['get_benchmark__tenant__tasks__task_id__benchmarks__benchmark_id__get']
+  }
+  '/{tenant}/examples/{example_id}': {
+    /** Get Task Example */
+    get: operations['get_task_example__tenant__examples__example_id__get']
+    /** Delete Task Example */
+    delete: operations['delete_task_example__tenant__examples__example_id__delete']
+  }
+  '/{tenant}/models': {
+    /** List Models */
+    get: operations['list_models__tenant__models_get']
+  }
+  '/{tenant}/runs/{run_id}': {
+    /** Get Run */
+    get: operations['get_run__tenant__runs__run_id__get']
+  }
+  '/{tenant}/runs/{run_id}/ratings': {
+    /**
+     * Create Rating
+     * @description Add a user rating to a task run.
+     */
+    post: operations['create_rating__tenant__runs__run_id__ratings_post']
+  }
+  '/{tenant}/runs/{run_id}/ratings/{score_id}': {
+    /**
+     * Delete Rating
+     * @description Update a user rating to a task run.
+     */
+    delete: operations['delete_rating__tenant__runs__run_id__ratings__score_id__delete']
+    /**
+     * Update Rating
+     * @description Update a user rating to a task run.
+     */
+    patch: operations['update_rating__tenant__runs__run_id__ratings__score_id__patch']
+  }
+  '/{tenant}/runs/{run_id}/examples': {
+    /**
+     * Create Example
+     * @description Create an example from a task run
+     */
+    post: operations['create_example__tenant__runs__run_id__examples_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/groups': {
+    /**
+     * List Groups
+     * @description List all groups for a task schema.
+     */
+    get: operations['list_groups__tenant__tasks__task_id__schemas__task_schema_id__groups_get']
+    /**
+     * Create Group
+     * @description Create a task group for the task
+     */
+    post: operations['create_group__tenant__tasks__task_id__schemas__task_schema_id__groups_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}': {
+    /**
+     * Group By Id
+     * @description Retrieve a task group
+     */
+    get: operations['group_by_id__tenant__tasks__task_id__schemas__task_schema_id__groups__group_id__get']
+    /**
+     * Patch Group By Id
+     * @description Update a task group
+     */
+    patch: operations['patch_group_by_id__tenant__tasks__task_id__schemas__task_schema_id__groups__group_id__patch']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets': {
+    /**
+     * List Task Datasets
+     * @description Lists all datasets for a given task.
+     */
+    get: operations['list_task_datasets__tenant__tasks__task_id__schemas__task_schema_id__datasets_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/examples': {
+    /**
+     * List Dataset Examples
+     * @description List task examples present in a dataset
+     */
+    get: operations['list_dataset_examples__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__examples_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/inputs': {
+    /**
+     * List Dataset Inputs
+     * @description List all unique task inputs presents in a dataset
+     */
+    get: operations['list_dataset_inputs__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__inputs_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/runs': {
+    /**
+     * List Dataset Runs
+     * @description List task runs present in a dataset
+     */
+    get: operations['list_dataset_runs__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__runs_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups': {
+    /**
+     * List Dataset Groups
+     * @description Aggregate the scores per task group on a given dataset
+     */
+    get: operations['list_dataset_groups__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/evaluate': {
+    /**
+     * Evaluate Dataset Group
+     * @deprecated
+     * @description Evaluate a task group given its properties, creating a group if needed
+     */
+    post: operations['evaluate_dataset_group__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups_evaluate_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/{group_id}': {
+    /**
+     * Get Dataset Group By Id
+     * @description Aggregate the scores for a single task group on a dataset
+     */
+    get: operations['get_dataset_group_by_id__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups__group_id__get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/benchmarks': {
+    /**
+     * List Benchmarks
+     * @deprecated
+     * @description List benchmarks for a given dataset. Use /tasks/{task_id}/schemas/{task_schema_id}/benchmarks instead
+     */
+    get: operations['list_benchmarks__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_get']
+    /**
+     * Create Benchmark
+     * @description Create a benchmark for a given dataset
+     */
+    post: operations['create_benchmark__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}': {
+    /** Get Task Schema */
+    get: operations['get_task_schema__tenant__tasks__task_id__schemas__task_schema_id__get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/runs': {
+    /** List Task Runs */
+    get: operations['list_task_runs__tenant__tasks__task_id__schemas__task_schema_id__runs_get']
+    /**
+     * Create Task Run
+     * @description Import a task run
+     */
+    post: operations['create_task_run__tenant__tasks__task_id__schemas__task_schema_id__runs_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/input': {
+    /**
+     * Generate Input
+     * @description Generate an input for the given task
+     */
+    post: operations['generate_input__tenant__tasks__task_id__schemas__task_schema_id__input_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/run': {
+    /**
+     * Run Schema
+     * @description Run a task with a group id
+     */
+    post: operations['run_schema__tenant__tasks__task_id__schemas__task_schema_id__run_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/examples': {
+    /** List Examples */
+    get: operations['list_examples__tenant__tasks__task_id__schemas__task_schema_id__examples_get']
+    /** Add Example */
+    post: operations['add_example__tenant__tasks__task_id__schemas__task_schema_id__examples_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/scores': {
+    /**
+     * List Scores
+     * @deprecated
+     */
+    get: operations['list_scores__tenant__tasks__task_id__schemas__task_schema_id__scores_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/python': {
+    /** Generate Python Code */
+    get: operations['generate_python_code__tenant__tasks__task_id__schemas__task_schema_id__python_get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/inputs/generate': {
+    /** Create Inputs */
+    post: operations['create_inputs__tenant__tasks__task_id__schemas__task_schema_id__inputs_generate_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/inputs/{input_hash}': {
+    /** Get Input By Hash */
+    get: operations['get_input_by_hash__tenant__tasks__task_id__schemas__task_schema_id__inputs__input_hash__get']
+  }
+  '/{tenant}/tasks/generate': {
+    /**
+     * Generate Io
+     * @deprecated
+     * @description Generate a new task based on natural language
+     */
+    post: operations['generate_io__tenant__tasks_generate_post']
+  }
+  '/{tenant}/tasks/schemas/iterate': {
+    /**
+     * Generate Via Chat
+     * @description Build a new task based on natural language, allowing for multiple iterations
+     */
+    post: operations['generate_via_chat__tenant__tasks_schemas_iterate_post']
+  }
+  '/{tenant}/tasks': {
+    /** List Tasks */
+    get: operations['list_tasks__tenant__tasks_get']
+    /**
+     * Create Task
+     * @description Create a new task
+     */
+    post: operations['create_task__tenant__tasks_post']
+  }
+  '/{tenant}/tasks/{task_id}': {
+    /** Get Task */
+    get: operations['get_task__tenant__tasks__task_id__get']
+    /**
+     * Update Task
+     * @description Update a task
+     */
+    patch: operations['update_task__tenant__tasks__task_id__patch']
+  }
+  '/{tenant}/tasks/{task_id}/schemas': {
+    /**
+     * Create Task Schema
+     * @description Create a new task schema for a given task id
+     */
+    post: operations['create_task_schema__tenant__tasks__task_id__schemas_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-instructions': {
+    /**
+     * Generate Instructions
+     * @description Automatically generate instructions from the existing examples and ratingsA minimum number of runs with ratings and examples are required to generate instructions
+     */
+    post: operations['generate_instructions__tenant__tasks__task_id__schemas__task_schema_id__evaluators_suggested_instructions_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-field-evaluations': {
+    /**
+     * Generate Field Evaluations
+     * @description Generate a set of field evaluations for a task
+     */
+    post: operations['generate_field_evaluations__tenant__tasks__task_id__schemas__task_schema_id__evaluators_suggested_field_evaluations_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/evaluators': {
+    /**
+     * List Evaluators
+     * @description List all evaluators for a task
+     */
+    get: operations['list_evaluators__tenant__tasks__task_id__schemas__task_schema_id__evaluators_get']
+    /**
+     * Create Evaluator
+     * @description Create a task evaluator. The operation is idempotent, which means that identical evaluators will not be created.
+     */
+    post: operations['create_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators_post']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}': {
+    /**
+     * Get Evaluator
+     * @description Get a specific evaluator
+     */
+    get: operations['get_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__get']
+    /**
+     * Replace Evaluator
+     * @description Replace an evaluator. Note that the newly created evaluator will have a different it. This is equivalent to deleting the old evaluator and creating a new one.
+     */
+    put: operations['replace_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__put']
+    /**
+     * Delete Evaluator
+     * @description Delete an evaluator
+     */
+    delete: operations['delete_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__delete']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}/trigger': {
+    /**
+     * Trigger Evaluator
+     * @description Trigger an evaluator. All runs that can be evaluated and are not already evaluated will be evaluated.
+     */
+    post: operations['trigger_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__trigger_post']
+  }
+  '/{tenant}/organization/settings': {
+    /**
+     * Get Organization Settings
+     * @description List settings for a tenant
+     */
+    get: operations['get_organization_settings__tenant__organization_settings_get']
+  }
+  '/{tenant}/organization/settings/providers': {
+    /**
+     * Add Provider Settings
+     * @description Add a provider config
+     */
+    post: operations['add_provider_settings__tenant__organization_settings_providers_post']
+  }
+  '/{tenant}/organization/settings/providers/schemas': {
+    /**
+     * Get Provider Config Schema
+     * @description Get the json schema for the provider configs
+     */
+    get: operations['get_provider_config_schema__tenant__organization_settings_providers_schemas_get']
+  }
+  '/{tenant}/organization/settings/providers/{provider_id}': {
+    /**
+     * Delete Provider Settings
+     * @description Delete a provider config
+     */
+    delete: operations['delete_provider_settings__tenant__organization_settings_providers__provider_id__delete']
+  }
+  '/{tenant}/benchmarks/{benchmark_id}': {
+    /**
+     * Get Benchmark
+     * @description Retrieve a benchmark by ID
+     */
+    get: operations['get_benchmark__tenant__benchmarks__benchmark_id__get']
+  }
+  '/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/benchmarks': {
+    /**
+     * List Benchmarks
+     * @description List benchmarks for a task schema.
+     */
+    get: operations['list_benchmarks__tenant__tasks__task_id__schemas__task_schema_id__benchmarks_get']
+    /**
+     * Create Benchmark
+     * @description Create a benchmark given a list of inputs
+     */
+    post: operations['create_benchmark__tenant__tasks__task_id__schemas__task_schema_id__benchmarks_post']
+  }
+  '/{tenant}/tools/semantically-equivalent-words': {
+    /**
+     * Semantically Equivalent Words
+     * @description Generate words that are semantically equivalent to the given word
+     */
+    post: operations['semantically_equivalent_words__tenant__tools_semantically_equivalent_words_post']
   }
 }
 
@@ -475,7 +869,7 @@ export interface components {
       /** Task Schema Id */
       task_schema_id: number
       /** Dataset Id */
-      dataset_id: string
+      dataset_id: string | null
       /** Type */
       type: ('manual' | 'auto') | null
       /**
@@ -523,24 +917,6 @@ export interface components {
       created_at: string
       /** Type */
       type: ('manual' | 'auto') | null
-    }
-    /** BenchmarkRequest */
-    BenchmarkRequest: {
-      /**
-       * Groups
-       * @description The groups to benchmark
-       */
-      groups: components['schemas']['TaskGroupReference'][]
-      /**
-       * Max Run Count
-       * @description The maximum number of runs to evaluate.
-       * @default 50
-       */
-      max_run_count?: number
-      /** Type */
-      type?: ('manual' | 'auto') | null
-      /** Evaluator Id */
-      evaluator_id?: string | null
     }
     /** BooleanComparisonOptions */
     BooleanComparisonOptions: {
@@ -605,6 +981,8 @@ export interface components {
       scores?: components['schemas']['SimplifiedScore'][] | null
       /** Evaluating */
       evaluating?: string[] | null
+      /** Failed Reason */
+      failed_reason?: string | null
     }
     /** ByInput */
     ByInput: {
@@ -633,6 +1011,20 @@ export interface components {
        * @description Whether the input has an example. Deprecated, use example_id instead
        */
       has_example: boolean
+    }
+    /** ChatMessage */
+    ChatMessage: {
+      /**
+       * Role
+       * @description The role of the message sender
+       * @enum {string}
+       */
+      role: 'USER' | 'ASSISTANT'
+      /**
+       * Content
+       * @description The content of the message
+       */
+      content: string
     }
     /**
      * CodeEvaluator
@@ -701,7 +1093,7 @@ export interface components {
        */
       id?: string | null
       /** @description The properties used for executing runs. */
-      properties: components['schemas']['TaskGroupProperties']
+      properties: components['schemas']['TaskGroupProperties-Input']
       /**
        * Tags
        * @description A list of tags associated with the group. If not provided, tags are computed from the properties by creating strings from each key value pair <key>=<value>.
@@ -718,6 +1110,17 @@ export interface components {
     /** CreateTaskRequestWithID */
     CreateTaskRequestWithID: {
       /**
+       * Chat Messages
+       * @description the chat messages that originated the creation of the task, if created from the chat UI
+       */
+      chat_messages?: components['schemas']['ChatMessage'][] | null
+      /**
+       * Create First Iteration
+       * @description Wether or not to create a first iteration for the task, that uses the default model and LLM generated instructions
+       * @default false
+       */
+      create_first_iteration?: boolean
+      /**
        * Name
        * @description the task display name
        */
@@ -726,7 +1129,7 @@ export interface components {
       input_schema: Record<string, never>
       /** Output Schema */
       output_schema: Record<string, never>
-      properties?: components['schemas']['TaskGroupProperties']
+      properties?: components['schemas']['TaskGroupProperties-Input']
       /**
        * Task Id
        * @description the task id, stable accross all variants. If not provided, an id based on the name is generated.
@@ -745,7 +1148,7 @@ export interface components {
        * @description the output of the task. Must match the output schema
        */
       task_output: Record<string, never>
-      /** @description A reference to the task group the task run belongs to. */
+      /** @description A reference to the task group the task run belongs to. By default, we consider that the group is external */
       group: components['schemas']['TaskGroupReference']
       /**
        * Id
@@ -853,7 +1256,7 @@ export interface components {
        */
       new_assistant_answer_keypath: (string | number)[]
       faithfulness_task_group_properties?:
-        | components['schemas']['TaskGroupProperties']
+        | components['schemas']['TaskGroupProperties-Output']
         | null
       /**
        * Uses Examples
@@ -888,8 +1291,33 @@ export interface components {
        */
       new_assistant_answer_keypath?: (string | number)[] | null
       faithfulness_task_group_properties?:
-        | components['schemas']['TaskGroupProperties']
+        | components['schemas']['TaskGroupProperties-Input']
         | null
+    }
+    /** FewShotConfiguration */
+    FewShotConfiguration: {
+      /**
+       * Count
+       * @description The number of few-shot examples to use for the task
+       */
+      count?: number | null
+      /**
+       * Selection
+       * @description The selection method to use for few-shot examples
+       */
+      selection?: ('latest' | 'manual') | string | null
+      /**
+       * Examples
+       * @description The few-shot examples used for the task. If provided, count and selection are ignored. If not provided, count and selection are used to select examples and the examples list will be set in the final group.
+       */
+      examples?: components['schemas']['FewShotExample'][] | null
+    }
+    /** FewShotExample */
+    FewShotExample: {
+      /** Task Input */
+      task_input: Record<string, never>
+      /** Task Output */
+      task_output: Record<string, never>
     }
     /** FieldBasedEvaluationConfig */
     'FieldBasedEvaluationConfig-Input': {
@@ -901,7 +1329,7 @@ export interface components {
         | components['schemas']['ObjectComparisonOptions-Input']
         | components['schemas']['ArrayComparisonOptions-Input']
       default_semantic_matching_group_properties?:
-        | components['schemas']['TaskGroupProperties']
+        | components['schemas']['TaskGroupProperties-Input']
         | null
     }
     /** FieldBasedEvaluationConfig */
@@ -914,7 +1342,7 @@ export interface components {
         | components['schemas']['ObjectComparisonOptions-Output']
         | components['schemas']['ArrayComparisonOptions-Output']
       default_semantic_matching_group_properties?:
-        | components['schemas']['TaskGroupProperties']
+        | components['schemas']['TaskGroupProperties-Output']
         | null
     }
     /**
@@ -972,6 +1400,34 @@ export interface components {
        * @default
        */
       instructions?: string
+      /**
+       * @description The group to use for the task run.
+       * By default, a temperature of 1 is used
+       */
+      group?: components['schemas']['TaskGroupReference'] | null
+      /**
+       * Stream
+       * @default false
+       */
+      stream?: boolean
+    }
+    /** GenerateInputsRequest */
+    GenerateInputsRequest: {
+      /**
+       * Instructions
+       * @default
+       */
+      instructions?: string
+      /**
+       * @description The group to use for the task run.
+       * By default, a temperature of 1 is used
+       */
+      group?: components['schemas']['TaskGroupReference'] | null
+      /**
+       * Count
+       * @description The number of inputs to generate
+       */
+      count: number
       /**
        * Stream
        * @default false
@@ -1201,13 +1657,6 @@ export interface components {
       /** Count */
       count?: number | null
     }
-    /** Page[SerializableTaskRunAggregate] */
-    Page_SerializableTaskRunAggregate_: {
-      /** Items */
-      items: components['schemas']['SerializableTaskRunAggregate'][]
-      /** Count */
-      count?: number | null
-    }
     /** Page[SerializableTaskRun] */
     Page_SerializableTaskRun_: {
       /** Items */
@@ -1320,12 +1769,40 @@ export interface components {
        */
       metadata?: Record<string, never> | null
     }
+    /** SemanticallyEquivalentWordsRequest */
+    SemanticallyEquivalentWordsRequest: {
+      /** Word */
+      word: string
+      /**
+       * Count
+       * @description Number of words to generate
+       * @default 1
+       */
+      count?: number
+      group?: components['schemas']['TaskGroupReference']
+      /**
+       * Stream
+       * @description Whether to stream the result
+       * @default false
+       */
+      stream?: boolean
+    }
     /** SerializableTask */
     SerializableTask: {
       /** Id */
       id: string
       /** Name */
       name: string
+      /**
+       * Is Public
+       * @default false
+       */
+      is_public?: boolean
+      /**
+       * Tenant
+       * @default
+       */
+      tenant?: string
       /** Versions */
       versions: components['schemas']['PartialTaskVersion'][]
     }
@@ -1514,35 +1991,6 @@ export interface components {
        */
       config_id?: string | null
     }
-    /**
-     * SerializableTaskRunAggregate
-     * @description Score that is aggregated by runner version and tags
-     */
-    SerializableTaskRunAggregate: {
-      group: components['schemas']['TaskGroup']
-      /**
-       * First Appeared
-       * Format: date-time
-       */
-      first_appeared: string
-      /**
-       * Average Duration Seconds
-       * @description The average duration in seconds
-       */
-      average_duration_seconds?: number | null
-      /**
-       * Scored Count
-       * @description The number of scores
-       * @default 0
-       */
-      scored_count?: number
-      /**
-       * Total Count
-       * @description The number of task runs
-       * @default 0
-       */
-      total_count?: number
-    }
     /** SerializableTaskVariant */
     SerializableTaskVariant: {
       /**
@@ -1571,7 +2019,7 @@ export interface components {
       name: string
       input_schema: components['schemas']['SerializableTaskIO']
       output_schema: components['schemas']['SerializableTaskIO']
-      properties: components['schemas']['TaskGroupProperties']
+      properties: components['schemas']['TaskGroupProperties-Output']
       /**
        * Created At
        * Format: date-time
@@ -1605,7 +2053,10 @@ export interface components {
       /** Code */
       code: string
     }
-    /** StringComparisonOptions */
+    /**
+     * StringComparisonOptions
+     * @description Options to compare strings. By default, punctuation, accents, and case are ignored.
+     */
     StringComparisonOptions: {
       /**
        * Ignore
@@ -1629,6 +2080,11 @@ export interface components {
        * @description Whether to compare the strings in a case sensitive way
        */
       case_sensitive?: boolean | null
+      /**
+       * Strict Equality
+       * @description If set to true, strings will be expected to match exactly.
+       */
+      strict_equality?: boolean | null
     }
     /**
      * TaskBasedEvaluator
@@ -1713,6 +2169,12 @@ export interface components {
         | components['schemas']['FieldBasedEvaluator']
         | components['schemas']['FaithfulnessEvaluator']
       /**
+       * Active
+       * @description Whether the evaluator is active
+       * @default true
+       */
+      active?: boolean
+      /**
        * Metric
        * @enum {string}
        */
@@ -1766,7 +2228,7 @@ export interface components {
        */
       iteration: number
       /** @description The properties used for executing the run. */
-      properties: components['schemas']['TaskGroupProperties']
+      properties: components['schemas']['TaskGroupProperties-Output']
       /**
        * Tags
        * @description A list of tags associated with the group. When empty, tags are computed from the properties.
@@ -1777,6 +2239,11 @@ export interface components {
        * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
        */
       aliases?: string[] | null
+      /**
+       * Is External
+       * @description Whether the group is external, i-e not creating by internal runners
+       */
+      is_external?: boolean | null
     }
     /**
      * TaskGroupAggregate
@@ -1796,7 +2263,7 @@ export interface components {
        */
       iteration: number
       /** @description The properties used for executing the run. */
-      properties: components['schemas']['TaskGroupProperties']
+      properties: components['schemas']['TaskGroupProperties-Output']
       /**
        * Tags
        * @description A list of tags associated with the group. When empty, tags are computed from the properties.
@@ -1807,6 +2274,11 @@ export interface components {
        * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
        */
       aliases?: string[] | null
+      /**
+       * Is External
+       * @description Whether the group is external, i-e not creating by internal runners
+       */
+      is_external?: boolean | null
       /**
        * Run With Example Count
        * @description The number of runs for the group that have examples
@@ -1839,7 +2311,7 @@ export interface components {
      * @description Properties that described a way a task run was executed.
      * Although some keys are provided as an example, any key:value are accepted
      */
-    TaskGroupProperties: {
+    'TaskGroupProperties-Input': {
       /**
        * Model
        * @description The LLM model used for the run
@@ -1866,15 +2338,50 @@ export interface components {
        */
       max_tokens?: number | null
       /**
-       * Few Shot Count
-       * @description Number of few-shot examples to use for the task
+       * Runner Name
+       * @description The name of the runner used
        */
-      few_shot_count?: number | null
+      runner_name?: string | null
       /**
-       * Training Set Version
-       * @description The version of the training set used
+       * Runner Version
+       * @description The version of the runner used
        */
-      training_set_version?: string | null
+      runner_version?: string | null
+      /** @description Few shot configuration */
+      few_shot?: components['schemas']['FewShotConfiguration'] | null
+      [key: string]: unknown
+    }
+    /**
+     * TaskGroupProperties
+     * @description Properties that described a way a task run was executed.
+     * Although some keys are provided as an example, any key:value are accepted
+     */
+    'TaskGroupProperties-Output': {
+      /**
+       * Model
+       * @description The LLM model used for the run
+       */
+      model?: string | null
+      /**
+       * Provider
+       * @description The LLM provider used for the run
+       */
+      provider?: string | null
+      /**
+       * Temperature
+       * @description The temperature for generation
+       */
+      temperature?: number | null
+      /**
+       * Instructions
+       * @description The instructions passed to the runner in order to generate the prompt.
+       */
+      instructions?: string | null
+      /**
+       * Max Tokens
+       * @description The maximum tokens to generate in the prompt
+       */
+      max_tokens?: number | null
       /**
        * Runner Name
        * @description The name of the runner used
@@ -1885,6 +2392,8 @@ export interface components {
        * @description The version of the runner used
        */
       runner_version?: string | null
+      /** @description Few shot configuration */
+      few_shot?: components['schemas']['FewShotConfiguration'] | null
       [key: string]: unknown
     }
     /**
@@ -1904,12 +2413,17 @@ export interface components {
        */
       iteration?: number | null
       /** @description The properties to evaluate the task schema with. A group will be created if needed */
-      properties?: components['schemas']['TaskGroupProperties'] | null
+      properties?: components['schemas']['TaskGroupProperties-Input'] | null
       /**
        * Alias
        * @description An alias for the group
        */
       alias?: string | null
+      /**
+       * Is External
+       * @description Whether the group is external, i-e not created by internal runners
+       */
+      is_external?: boolean | null
     }
     /** TaskGroupUpdate */
     TaskGroupUpdate: {
@@ -1926,13 +2440,31 @@ export interface components {
     }
     /** TaskInput */
     TaskInput: {
-      /** Task Input */
-      task_input: Record<string, never>
+      /** Task Input Preview */
+      task_input_preview: string
+      /**
+       * Task Input
+       * @description The input or None if the field was excluded
+       */
+      task_input?: Record<string, never> | null
       /**
        * Task Input Hash
        * @description a hash describing the input
        */
       task_input_hash: string
+    }
+    /** TaskInputReference */
+    TaskInputReference: {
+      /**
+       * Task Input
+       * @description A task input. Only one of task_input or task_input_hash should be provided
+       */
+      task_input?: Record<string, never> | null
+      /**
+       * Task Input Hash
+       * @description a hash describing an input that already exists in out database. Only one of task_input or task_input_hash should be provided
+       */
+      task_input_hash?: string | null
     }
     /** TaskSchema */
     TaskSchema: {
@@ -1954,6 +2486,8 @@ export interface components {
     }
     /** TaskSchemaResponse */
     TaskSchemaResponse: {
+      /** Name */
+      name: string
       /** Task Id */
       task_id: string
       /** Schema Id */
@@ -1996,6 +2530,14 @@ export interface components {
        */
       comment?: string | null
     }
+    /** UpdateTaskRequest */
+    UpdateTaskRequest: {
+      /**
+       * Is Public
+       * @description whether the task is public
+       */
+      is_public: boolean
+    }
     /** ValidationError */
     ValidationError: {
       /** Location */
@@ -2016,9 +2558,46 @@ export interface components {
     api__routers__runs__CreateExampleRequest: {
       /**
        * Corrections
-       * @description Corrections to the task output as a json object keypath: value
+       * @description Corrections to the task output as a json object keypath: value. Only one of corrections or correct_output should be provided
        */
-      corrections: Record<string, never>
+      corrections?: Record<string, never> | null
+      /**
+       * Correct Output
+       * @description The correct output of the task. Only one of corrections or correct_output should be provided
+       */
+      correct_output?: Record<string, never> | null
+    }
+    /** BenchmarkRequest */
+    api__routers__task_benchmarks__BenchmarkRequest: {
+      /**
+       * Groups
+       * @description The groups to benchmark
+       */
+      groups: components['schemas']['TaskGroupReference'][]
+      /** Type */
+      type?: ('manual' | 'auto') | null
+      /** Evaluator Id */
+      evaluator_id?: string | null
+      /** Task Inputs */
+      task_inputs: components['schemas']['TaskInputReference'][]
+    }
+    /** BenchmarkRequest */
+    api__routers__task_datasets__BenchmarkRequest: {
+      /**
+       * Groups
+       * @description The groups to benchmark
+       */
+      groups: components['schemas']['TaskGroupReference'][]
+      /**
+       * Max Run Count
+       * @description The maximum number of runs to evaluate.
+       * @default 50
+       */
+      max_run_count?: number
+      /** Type */
+      type?: ('manual' | 'auto') | null
+      /** Evaluator Id */
+      evaluator_id?: string | null
     }
     /** CreateExampleRequest */
     api__schemas__create_example_request__CreateExampleRequest: {
@@ -2369,7 +2948,7 @@ export interface operations {
         task_id: string
         task_schema_id: number
         /** @description The id, iteration or alias of an existing group */
-        group_id: string
+        group_id: string | number
       }
     }
     responses: {
@@ -2397,7 +2976,7 @@ export interface operations {
         task_id: string
         task_schema_id: number
         /** @description The id, iteration or alias of an existing group */
-        group_id: string
+        group_id: string | number
       }
     }
     requestBody: {
@@ -2475,6 +3054,8 @@ export interface operations {
   list_dataset_inputs_tasks__task_id__schemas__task_schema_id__datasets__dataset_id__inputs_get: {
     parameters: {
       query?: {
+        /** @description Fields to exclude from the response */
+        exclude_fields?: 'task_input'[] | null
         /** @description The number of items to return */
         limit?: number
         /** @description The number of items to skip */
@@ -2610,7 +3191,7 @@ export interface operations {
         task_id: string
         task_schema_id: number
         /** @description The id, iteration or alias of an existing group */
-        group_id: string
+        group_id: string | number
       }
     }
     responses: {
@@ -2676,7 +3257,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['BenchmarkRequest']
+        'application/json': components['schemas']['api__routers__task_datasets__BenchmarkRequest']
       }
     }
     responses: {
@@ -2745,6 +3326,8 @@ export interface operations {
         group_hash?: string | null
         /** @description The iteration of a task run group */
         group_iteration?: number | null
+        /** @description A list of group iterations */
+        group_iterations?: number[] | null
         /** @description A list of group tags */
         group_tags?: string[] | null
         task_output_filters?: string[] | null
@@ -2811,83 +3394,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['SerializableTaskRun']
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': components['schemas']['HTTPValidationError']
-        }
-      }
-    }
-  }
-  /**
-   * Aggregate Task Runs
-   * @deprecated
-   * @description Compute statistics for task runs for a task schema. Use /groups instead
-   */
-  aggregate_task_runs_tasks__task_id__schemas__task_schema_id__runs_aggregate_get: {
-    parameters: {
-      query?: {
-        /** @description The hash of the task input */
-        task_input_hash?: string | null
-        /** @description The hash of the task output */
-        task_output_hash?: string | null
-        /** @description Whether the task has been scored */
-        has_scores?: boolean | null
-        /** @description A list of evaluator names that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by?: string[] | null
-        /** @description A list of evaluator names that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by?: string[] | null
-        /** @description A list of evaluator ids that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        evaluated_by_ids?: string[] | null
-        /** @description A list of evaluator ids that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
-        not_evaluated_by_ids?: string[] | null
-        /** @description Whether the task has an associated example */
-        has_example?: boolean | null
-        /** @description The id of the example associated with the task run */
-        example_id?: string | null
-        /** @description An id of a task run group */
-        group_id?: string | null
-        /** @description The hash of a task run group */
-        group_hash?: string | null
-        /** @description The iteration of a task run group */
-        group_iteration?: number | null
-        /** @description A list of group tags */
-        group_tags?: string[] | null
-        task_output_filters?: string[] | null
-        task_input_filters?: string[] | null
-        /** @description The field to sort by */
-        sort_by?: 'created_at' | 'recent'
-        /** @description A list of labels to filter by */
-        labels?: string[] | null
-        /** @description Make sure only one task run is returned per unique value of the requested field */
-        unique_by?: 'task_input_hash' | 'task_output_hash' | 'example_id' | ''
-        /** @description A list of fields to exclude from the response */
-        exclude_fields?:
-          | ('task_input' | 'task_output' | 'llm_completions')[]
-          | null
-        /** @description A list of score filters with the format <evaluator_name>[=]score. If more than one is provided, at least one condition must be satisfied */
-        score_filters?: string[] | null
-        /** @description The number of items to return */
-        limit?: number
-        /** @description The number of items to skip */
-        offset?: number | null
-        /** @description The version of the task input class */
-        task_input_schema_version?: string | null
-        /** @description The version of the task output class */
-        task_output_schema_version?: string | null
-      }
-      path: {
-        task_id: string
-        task_schema_id: number
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': components['schemas']['Page_SerializableTaskRunAggregate_']
         }
       }
       /** @description Validation Error */
@@ -3078,6 +3584,31 @@ export interface operations {
                   | 'quality'
                   | 'faithfulness'
               }
+              /** FewShotConfiguration */
+              FewShotConfiguration: {
+                /**
+                 * Count
+                 * @description The number of few-shot examples to use for the task
+                 */
+                count?: number | null
+                /**
+                 * Selection
+                 * @description The selection method to use for few-shot examples
+                 */
+                selection?: ('latest' | 'manual') | string | null
+                /**
+                 * Examples
+                 * @description The few-shot examples used for the task. If provided, count and selection are ignored. If not provided, count and selection are used to select examples and the examples list will be set in the final group.
+                 */
+                examples?: $defs['FewShotExample'][] | null
+              }
+              /** FewShotExample */
+              FewShotExample: {
+                /** Task Input */
+                task_input: Record<string, never>
+                /** Task Output */
+                task_output: Record<string, never>
+              }
               /** LLMCompletion */
               LLMCompletion: {
                 /** Messages */
@@ -3154,6 +3685,11 @@ export interface operations {
                  * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
                  */
                 aliases?: string[] | null
+                /**
+                 * Is External
+                 * @description Whether the group is external, i-e not creating by internal runners
+                 */
+                is_external?: boolean | null
               }
               /**
                * TaskGroupProperties
@@ -3187,16 +3723,6 @@ export interface operations {
                  */
                 max_tokens?: number | null
                 /**
-                 * Few Shot Count
-                 * @description Number of few-shot examples to use for the task
-                 */
-                few_shot_count?: number | null
-                /**
-                 * Training Set Version
-                 * @description The version of the training set used
-                 */
-                training_set_version?: string | null
-                /**
                  * Runner Name
                  * @description The name of the runner used
                  */
@@ -3206,6 +3732,8 @@ export interface operations {
                  * @description The version of the runner used
                  */
                 runner_version?: string | null
+                /** @description Few shot configuration */
+                few_shot?: $defs['FewShotConfiguration'] | null
                 [key: string]: unknown
               }
             }
@@ -3329,6 +3857,8 @@ export interface operations {
         group_hash?: string | null
         /** @description The iteration of a task run group */
         group_iteration?: number | null
+        /** @description A list of group iterations */
+        group_iterations?: number[] | null
         /** @description A list of group tags */
         group_tags?: string[] | null
         task_output_filters?: string[] | null
@@ -3374,38 +3904,6 @@ export interface operations {
       }
     }
   }
-  /**
-   * List Benchmarks
-   * @description List benchmarks for a task schema.
-   */
-  list_benchmarks_tasks__task_id__schemas__task_schema_id__benchmarks_get: {
-    parameters: {
-      query?: {
-        /** @description A dataset id filter */
-        dataset_id?: string | null
-        /** @description A status filter */
-        status?: ('in_progress' | 'complete') | null
-      }
-      path: {
-        task_id: string
-        task_schema_id: number
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          'application/json': components['schemas']['Page_BenchmarkItem_']
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          'application/json': components['schemas']['HTTPValidationError']
-        }
-      }
-    }
-  }
   /** Generate Python Code */
   generate_python_code_tasks__task_id__schemas__task_schema_id__python_get: {
     parameters: {
@@ -3419,6 +3917,87 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['GenerateCodeResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Create Inputs */
+  create_inputs_tasks__task_id__schemas__task_schema_id__inputs_generate_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateInputsRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /** Generated */
+            generated: $defs['ApiTaskIO'][]
+            $defs: {
+              /**
+               * ApiTaskIO
+               * @description Mixin for task io objects that are used in the API
+               * It makes sure that the class methods are not called directly
+               */
+              ApiTaskIO: {
+                [key: string]: unknown
+              }
+            }
+          }
+          'text/event-stream': {
+            /** Index */
+            index: number
+            generated: $defs['ApiTaskIO']
+            $defs: {
+              /**
+               * ApiTaskIO
+               * @description Mixin for task io objects that are used in the API
+               * It makes sure that the class methods are not called directly
+               */
+              ApiTaskIO: {
+                [key: string]: unknown
+              }
+            }
+          }
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Input By Hash */
+  get_input_by_hash_tasks__task_id__schemas__task_schema_id__inputs__input_hash__get: {
+    parameters: {
+      path: {
+        /** @description The hash of the input */
+        input_hash: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': Record<string, never>
         }
       }
       /** @description Validation Error */
@@ -3506,6 +4085,58 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['SerializableTaskVariant']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Task */
+  get_task_tasks__task_id__get: {
+    parameters: {
+      path: {
+        task_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTask']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Update Task
+   * @description Update a task
+   */
+  update_task_tasks__task_id__patch: {
+    parameters: {
+      path: {
+        task_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateTaskRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
         }
       }
       /** @description Validation Error */
@@ -3757,6 +4388,34 @@ export interface operations {
     }
   }
   /**
+   * Trigger Evaluator
+   * @description Trigger an evaluator. All runs that can be evaluated and are not already evaluated will be evaluated.
+   */
+  trigger_evaluator_tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__trigger_post: {
+    parameters: {
+      path: {
+        /** @description The id of the evaluator */
+        evaluator_id: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
    * Get Organization Settings
    * @description List settings for a tenant
    */
@@ -3855,6 +4514,2442 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['Benchmark']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Benchmarks
+   * @description List benchmarks for a task schema.
+   */
+  list_benchmarks_tasks__task_id__schemas__task_schema_id__benchmarks_get: {
+    parameters: {
+      query?: {
+        /** @description A dataset id filter */
+        dataset_id?: string | null
+        /** @description A status filter */
+        status?: ('in_progress' | 'complete') | null
+      }
+      path: {
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_BenchmarkItem_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Benchmark
+   * @description Create a benchmark given a list of inputs
+   */
+  create_benchmark_tasks__task_id__schemas__task_schema_id__benchmarks_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['api__routers__task_benchmarks__BenchmarkRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Semantically Equivalent Words
+   * @description Generate words that are semantically equivalent to the given word
+   */
+  semantically_equivalent_words_tools_semantically_equivalent_words_post: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SemanticallyEquivalentWordsRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /** Words */
+            words: string[]
+          }
+          'text/event-stream': {
+            /** Index */
+            index: number
+            /** Word */
+            word: string
+          }
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Task Example */
+  get_task_example__tenant__tasks__task_id__examples__example_id__get: {
+    parameters: {
+      path: {
+        example_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Delete Task Example */
+  delete_task_example__tenant__tasks__task_id__examples__example_id__delete: {
+    parameters: {
+      path: {
+        example_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Run */
+  get_run__tenant__tasks__task_id__runs__run_id__get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Rating
+   * @description Add a user rating to a task run.
+   */
+  create_rating__tenant__tasks__task_id__runs__run_id__ratings_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddRatingRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Delete Rating
+   * @description Update a user rating to a task run.
+   */
+  delete_rating__tenant__tasks__task_id__runs__run_id__ratings__score_id__delete: {
+    parameters: {
+      path: {
+        score_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Update Rating
+   * @description Update a user rating to a task run.
+   */
+  update_rating__tenant__tasks__task_id__runs__run_id__ratings__score_id__patch: {
+    parameters: {
+      path: {
+        score_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRatingRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Example
+   * @description Create an example from a task run
+   */
+  create_example__tenant__tasks__task_id__runs__run_id__examples_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['api__routers__runs__CreateExampleRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Benchmark
+   * @description Retrieve a benchmark by ID
+   */
+  get_benchmark__tenant__tasks__task_id__benchmarks__benchmark_id__get: {
+    parameters: {
+      path: {
+        /** @description The benchmark id */
+        benchmark_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Task Example */
+  get_task_example__tenant__examples__example_id__get: {
+    parameters: {
+      path: {
+        example_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Delete Task Example */
+  delete_task_example__tenant__examples__example_id__delete: {
+    parameters: {
+      path: {
+        example_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** List Models */
+  list_models__tenant__models_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['ModelResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Run */
+  get_run__tenant__runs__run_id__get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Rating
+   * @description Add a user rating to a task run.
+   */
+  create_rating__tenant__runs__run_id__ratings_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddRatingRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Delete Rating
+   * @description Update a user rating to a task run.
+   */
+  delete_rating__tenant__runs__run_id__ratings__score_id__delete: {
+    parameters: {
+      path: {
+        score_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Update Rating
+   * @description Update a user rating to a task run.
+   */
+  update_rating__tenant__runs__run_id__ratings__score_id__patch: {
+    parameters: {
+      path: {
+        score_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRatingRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Example
+   * @description Create an example from a task run
+   */
+  create_example__tenant__runs__run_id__examples_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        run_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['api__routers__runs__CreateExampleRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Groups
+   * @description List all groups for a task schema.
+   */
+  list_groups__tenant__tasks__task_id__schemas__task_schema_id__groups_get: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_TaskGroup_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Group
+   * @description Create a task group for the task
+   */
+  create_group__tenant__tasks__task_id__schemas__task_schema_id__groups_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaskGroupRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGroup']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Group By Id
+   * @description Retrieve a task group
+   */
+  group_by_id__tenant__tasks__task_id__schemas__task_schema_id__groups__group_id__get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+        /** @description The id, iteration or alias of an existing group */
+        group_id: string | number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGroup']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Patch Group By Id
+   * @description Update a task group
+   */
+  patch_group_by_id__tenant__tasks__task_id__schemas__task_schema_id__groups__group_id__patch: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The id, iteration or alias of an existing group */
+        group_id: string | number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TaskGroupUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGroup']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Task Datasets
+   * @description Lists all datasets for a given task.
+   */
+  list_task_datasets__tenant__tasks__task_id__schemas__task_schema_id__datasets_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_DataSetResponse_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Dataset Examples
+   * @description List task examples present in a dataset
+   */
+  list_dataset_examples__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__examples_get: {
+    parameters: {
+      query?: {
+        /** @description The number of items to return */
+        limit?: number
+        /** @description The number of items to skip */
+        offset?: number | null
+      }
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_SerializableTaskExample_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Dataset Inputs
+   * @description List all unique task inputs presents in a dataset
+   */
+  list_dataset_inputs__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__inputs_get: {
+    parameters: {
+      query?: {
+        /** @description Fields to exclude from the response */
+        exclude_fields?: 'task_input'[] | null
+        /** @description The number of items to return */
+        limit?: number
+        /** @description The number of items to skip */
+        offset?: number | null
+      }
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_TaskInput_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Dataset Runs
+   * @description List task runs present in a dataset
+   */
+  list_dataset_runs__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__runs_get: {
+    parameters: {
+      query?: {
+        /** @description The number of items to return */
+        limit?: number
+        /** @description The number of items to skip */
+        offset?: number | null
+      }
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_SerializableTaskRun_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Dataset Groups
+   * @description Aggregate the scores per task group on a given dataset
+   */
+  list_dataset_groups__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups_get: {
+    parameters: {
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_TaskGroupAggregate_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Evaluate Dataset Group
+   * @deprecated
+   * @description Evaluate a task group given its properties, creating a group if needed
+   */
+  evaluate_dataset_group__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups_evaluate_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EvaluateTaskGroupRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGroupAggregate']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Dataset Group By Id
+   * @description Aggregate the scores for a single task group on a dataset
+   */
+  get_dataset_group_by_id__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__groups__group_id__get: {
+    parameters: {
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+        /** @description The id, iteration or alias of an existing group */
+        group_id: string | number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGroupAggregate']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Benchmarks
+   * @deprecated
+   * @description List benchmarks for a given dataset. Use /tasks/{task_id}/schemas/{task_schema_id}/benchmarks instead
+   */
+  list_benchmarks__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_get: {
+    parameters: {
+      query?: {
+        /** @description A status filter */
+        status?: ('in_progress' | 'complete') | null
+      }
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_BenchmarkItem_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Benchmark
+   * @description Create a benchmark for a given dataset
+   */
+  create_benchmark__tenant__tasks__task_id__schemas__task_schema_id__datasets__dataset_id__benchmarks_post: {
+    parameters: {
+      path: {
+        /** @description The dataset id */
+        dataset_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['api__routers__task_datasets__BenchmarkRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Task Schema */
+  get_task_schema__tenant__tasks__task_id__schemas__task_schema_id__get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskSchemaResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** List Task Runs */
+  list_task_runs__tenant__tasks__task_id__schemas__task_schema_id__runs_get: {
+    parameters: {
+      query?: {
+        /** @description The hash of the task input */
+        task_input_hash?: string | null
+        /** @description The hash of the task output */
+        task_output_hash?: string | null
+        /** @description Whether the task has been scored */
+        has_scores?: boolean | null
+        /** @description A list of evaluator names that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        evaluated_by?: string[] | null
+        /** @description A list of evaluator names that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        not_evaluated_by?: string[] | null
+        /** @description A list of evaluator ids that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        evaluated_by_ids?: string[] | null
+        /** @description A list of evaluator ids that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        not_evaluated_by_ids?: string[] | null
+        /** @description Whether the task has an associated example */
+        has_example?: boolean | null
+        /** @description The id of the example associated with the task run */
+        example_id?: string | null
+        /** @description An id of a task run group */
+        group_id?: string | null
+        /** @description The hash of a task run group */
+        group_hash?: string | null
+        /** @description The iteration of a task run group */
+        group_iteration?: number | null
+        /** @description A list of group iterations */
+        group_iterations?: number[] | null
+        /** @description A list of group tags */
+        group_tags?: string[] | null
+        task_output_filters?: string[] | null
+        task_input_filters?: string[] | null
+        /** @description The field to sort by */
+        sort_by?: 'created_at' | 'recent'
+        /** @description A list of labels to filter by */
+        labels?: string[] | null
+        /** @description Make sure only one task run is returned per unique value of the requested field */
+        unique_by?: 'task_input_hash' | 'task_output_hash' | 'example_id' | ''
+        /** @description A list of fields to exclude from the response */
+        exclude_fields?:
+          | ('task_input' | 'task_output' | 'llm_completions')[]
+          | null
+        /** @description A list of score filters with the format <evaluator_name>[=]score. If more than one is provided, at least one condition must be satisfied */
+        score_filters?: string[] | null
+        /** @description The number of items to return */
+        limit?: number
+        /** @description The number of items to skip */
+        offset?: number | null
+        /** @description The version of the task input class */
+        task_input_schema_version?: string | null
+        /** @description The version of the task output class */
+        task_output_schema_version?: string | null
+      }
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_SerializableTaskRun_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Task Run
+   * @description Import a task run
+   */
+  create_task_run__tenant__tasks__task_id__schemas__task_schema_id__runs_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaskRunRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskRun']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Generate Input
+   * @description Generate an input for the given task
+   */
+  generate_input__tenant__tasks__task_id__schemas__task_schema_id__input_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateInputRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /** Generated */
+            generated: Record<string, never>
+          }
+          'text/event-stream': {
+            /** Generated */
+            generated: Record<string, never>
+          }
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Run Schema
+   * @description Run a task with a group id
+   */
+  run_schema__tenant__tasks__task_id__schemas__task_schema_id__run_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RunRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /**
+             * Id
+             * @description the id of the task run. If not provided a uuid will be generated
+             */
+            id: string
+            /**
+             * Task Id
+             * @description the id of the associated task, read only
+             */
+            task_id: string
+            /**
+             * Task Schema Id
+             * @description the schema idx of the associated task, read only
+             */
+            task_schema_id: number
+            /** Task Input */
+            task_input: Record<string, never>
+            /**
+             * Task Input Hash
+             * @description a hash describing the input
+             */
+            task_input_hash: string
+            /**
+             * Task Input Preview
+             * @description A preview of the input data. This is used to display the input data in the UI.
+             * @default
+             */
+            task_input_preview?: string
+            /** Task Output */
+            task_output: Record<string, never>
+            /**
+             * Task Output Hash
+             * @description a hash describing the output
+             */
+            task_output_hash: string
+            /**
+             * Task Output Preview
+             * @description A preview of the output data. This is used to display the output data in the UI.
+             * @default
+             */
+            task_output_preview?: string
+            group: $defs['TaskGroup']
+            /** Start Time */
+            start_time?: string | null
+            /** End Time */
+            end_time?: string | null
+            /** Duration Seconds */
+            duration_seconds?: number | null
+            /** Cost Usd */
+            cost_usd?: number | null
+            /**
+             * Created At
+             * Format: date-time
+             * @description The time the task run was created
+             */
+            created_at?: string
+            /**
+             * Example Id
+             * @description The id of the example that share the same input as the task run
+             */
+            example_id?: string | null
+            /**
+             * Corrections
+             * @description The corrections that were applied to the task output if used as a base for an evaluation
+             */
+            corrections?: Record<string, never> | null
+            /** Parent Task Ids */
+            parent_task_ids?: string[] | null
+            /**
+             * Scores
+             * @description A list of scores computed for the task run. A run can be evaluated in multiple ways.
+             */
+            scores?: $defs['TaskEvaluation'][] | null
+            /**
+             * Labels
+             * @description A set of labels that are attached to the task runs. They are indexed.
+             */
+            labels?: string[] | null
+            /**
+             * Metadata
+             * @description A user set metadata key / value. Keys are not searchable.
+             */
+            metadata?: Record<string, never> | null
+            /**
+             * Llm Completions
+             * @description A list of raw completions used to generate the task output
+             */
+            llm_completions?: $defs['LLMCompletion'][] | null
+            /**
+             * Config Id
+             * @description The id of the config that was used to run the task
+             */
+            config_id?: string | null
+            $defs: {
+              /** Evaluator */
+              Evaluator: {
+                /**
+                 * Id
+                 * @description The id of the evaluator that computed the score. Only one score per id can be attached to a task run.
+                 */
+                id: string
+                /**
+                 * Name
+                 * @description The name of the evaluator that computed the score e-g 'equality' or 'user'
+                 */
+                name: string
+                /** Properties */
+                properties: Record<string, never>
+                /**
+                 * Metric
+                 * @description The metric that was used to compute the score
+                 * @default correctness
+                 * @enum {string}
+                 */
+                metric?:
+                  | 'correctness'
+                  | 'latency'
+                  | 'cost'
+                  | 'quality'
+                  | 'faithfulness'
+              }
+              /** FewShotConfiguration */
+              FewShotConfiguration: {
+                /**
+                 * Count
+                 * @description The number of few-shot examples to use for the task
+                 */
+                count?: number | null
+                /**
+                 * Selection
+                 * @description The selection method to use for few-shot examples
+                 */
+                selection?: ('latest' | 'manual') | string | null
+                /**
+                 * Examples
+                 * @description The few-shot examples used for the task. If provided, count and selection are ignored. If not provided, count and selection are used to select examples and the examples list will be set in the final group.
+                 */
+                examples?: $defs['FewShotExample'][] | null
+              }
+              /** FewShotExample */
+              FewShotExample: {
+                /** Task Input */
+                task_input: Record<string, never>
+                /** Task Output */
+                task_output: Record<string, never>
+              }
+              /** LLMCompletion */
+              LLMCompletion: {
+                /** Messages */
+                messages: Record<string, never>[]
+                /** Response */
+                response?: string | null
+                usage?: $defs['LLMUsage'] | null
+              }
+              /** LLMUsage */
+              LLMUsage: {
+                /** Prompt Token Count */
+                prompt_token_count?: number | null
+                /** Prompt Cost Usd */
+                prompt_cost_usd?: number | null
+                /** Completion Token Count */
+                completion_token_count?: number | null
+                /** Completion Cost Usd */
+                completion_cost_usd?: number | null
+              }
+              /** TaskEvaluation */
+              TaskEvaluation: {
+                /**
+                 * Score
+                 * @description The score of the evaluation
+                 */
+                score: number
+                /**
+                 * Tags
+                 * @description Metadata added by the evaluator
+                 */
+                tags?: (('positive' | 'negative' | 'neutral') | string)[] | null
+                /**
+                 * Comment
+                 * @description An optional comment from the evaluation
+                 */
+                comment?: string | null
+                /** @description Information about the evaluator that computed the score */
+                evaluator: $defs['Evaluator']
+                /**
+                 * Created At
+                 * Format: date-time
+                 * @description The time at which the score was created
+                 */
+                created_at?: string
+                /**
+                 * Example Id
+                 * @description The id of the example that was used in the evaluation
+                 */
+                example_id?: string | null
+              }
+              /** TaskGroup */
+              TaskGroup: {
+                /**
+                 * Id
+                 * @description The group id either client provided or generated, stable for given set of properties
+                 * @default
+                 */
+                id: string
+                /**
+                 * Iteration
+                 * @description The iteration of the group, incremented for each new group
+                 * @default 0
+                 */
+                iteration: number
+                /** @description The properties used for executing the run. */
+                properties: $defs['TaskGroupProperties']
+                /**
+                 * Tags
+                 * @description A list of tags associated with the group. When empty, tags are computed from the properties.
+                 */
+                tags: string[]
+                /**
+                 * Aliases
+                 * @description A list of aliases to use in place of iteration or id. An alias can be used to uniquely identify a group for a given task.
+                 */
+                aliases?: string[] | null
+                /**
+                 * Is External
+                 * @description Whether the group is external, i-e not creating by internal runners
+                 */
+                is_external?: boolean | null
+              }
+              /**
+               * TaskGroupProperties
+               * @description Properties that described a way a task run was executed.
+               * Although some keys are provided as an example, any key:value are accepted
+               */
+              TaskGroupProperties: {
+                /**
+                 * Model
+                 * @description The LLM model used for the run
+                 */
+                model?: string | null
+                /**
+                 * Provider
+                 * @description The LLM provider used for the run
+                 */
+                provider?: string | null
+                /**
+                 * Temperature
+                 * @description The temperature for generation
+                 */
+                temperature?: number | null
+                /**
+                 * Instructions
+                 * @description The instructions passed to the runner in order to generate the prompt.
+                 */
+                instructions?: string | null
+                /**
+                 * Max Tokens
+                 * @description The maximum tokens to generate in the prompt
+                 */
+                max_tokens?: number | null
+                /**
+                 * Runner Name
+                 * @description The name of the runner used
+                 */
+                runner_name?: string | null
+                /**
+                 * Runner Version
+                 * @description The version of the runner used
+                 */
+                runner_version?: string | null
+                /** @description Few shot configuration */
+                few_shot?: $defs['FewShotConfiguration'] | null
+                [key: string]: unknown
+              }
+            }
+          }
+          'text/event-stream': {
+            /** Run Id */
+            run_id: string
+            /** Task Output */
+            task_output: Record<string, never>
+          }
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** List Examples */
+  list_examples__tenant__tasks__task_id__schemas__task_schema_id__examples_get: {
+    parameters: {
+      query?: {
+        sort_by?: 'created_at' | 'random' | 'recent'
+        /** @description Whether to include or include the training set. Omit to ignore */
+        is_training?: boolean | null
+        /** @description A vector for semantic search of the input. As a list of floats or a comma separated float string */
+        task_input_vector?: string | null
+        /** @description filter whether examples come from corrections. Omit to ignore */
+        from_correction?: boolean | null
+        /** @description Make sure only one task run is returned per unique value of the requested field */
+        unique_by?: 'task_input_hash' | 'task_output_hash' | ''
+        /** @description A list of fields to exclude from the response */
+        exclude_fields?: ('task_input' | 'task_output')[] | null
+        /** @description The number of items to return */
+        limit?: number
+        /** @description The number of items to skip */
+        offset?: number | null
+        /** @description The version of the task input class */
+        task_input_schema_version?: string | null
+        /** @description The version of the task output class */
+        task_output_schema_version?: string | null
+      }
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_SerializableTaskExample_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Add Example */
+  add_example__tenant__tasks__task_id__schemas__task_schema_id__examples_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['api__schemas__create_example_request__CreateExampleRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskExample']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Scores
+   * @deprecated
+   */
+  list_scores__tenant__tasks__task_id__schemas__task_schema_id__scores_get: {
+    parameters: {
+      query?: {
+        /** @description The hash of the task input */
+        task_input_hash?: string | null
+        /** @description The hash of the task output */
+        task_output_hash?: string | null
+        /** @description Whether the task has been scored */
+        has_scores?: boolean | null
+        /** @description A list of evaluator names that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        evaluated_by?: string[] | null
+        /** @description A list of evaluator names that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        not_evaluated_by?: string[] | null
+        /** @description A list of evaluator ids that have evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        evaluated_by_ids?: string[] | null
+        /** @description A list of evaluator ids that have not evaluated the task run (aka computed a score)Ignored if empty. Use in replacement to has_scores when you want to filter by specific evaluators. */
+        not_evaluated_by_ids?: string[] | null
+        /** @description Whether the task has an associated example */
+        has_example?: boolean | null
+        /** @description The id of the example associated with the task run */
+        example_id?: string | null
+        /** @description An id of a task run group */
+        group_id?: string | null
+        /** @description The hash of a task run group */
+        group_hash?: string | null
+        /** @description The iteration of a task run group */
+        group_iteration?: number | null
+        /** @description A list of group iterations */
+        group_iterations?: number[] | null
+        /** @description A list of group tags */
+        group_tags?: string[] | null
+        task_output_filters?: string[] | null
+        task_input_filters?: string[] | null
+        /** @description The field to sort by */
+        sort_by?: 'created_at' | 'recent'
+        /** @description A list of labels to filter by */
+        labels?: string[] | null
+        /** @description Make sure only one task run is returned per unique value of the requested field */
+        unique_by?: 'task_input_hash' | 'task_output_hash' | 'example_id' | ''
+        /** @description A list of fields to exclude from the response */
+        exclude_fields?:
+          | ('task_input' | 'task_output' | 'llm_completions')[]
+          | null
+        /** @description A list of score filters with the format <evaluator_name>[=]score. If more than one is provided, at least one condition must be satisfied */
+        score_filters?: string[] | null
+        /** @description The number of items to return */
+        limit?: number
+        /** @description The number of items to skip */
+        offset?: number | null
+        /** @description The version of the task input class */
+        task_input_schema_version?: string | null
+        /** @description The version of the task output class */
+        task_output_schema_version?: string | null
+      }
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_TaskScoreAggregate_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Generate Python Code */
+  generate_python_code__tenant__tasks__task_id__schemas__task_schema_id__python_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['GenerateCodeResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Create Inputs */
+  create_inputs__tenant__tasks__task_id__schemas__task_schema_id__inputs_generate_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateInputsRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /** Generated */
+            generated: $defs['ApiTaskIO'][]
+            $defs: {
+              /**
+               * ApiTaskIO
+               * @description Mixin for task io objects that are used in the API
+               * It makes sure that the class methods are not called directly
+               */
+              ApiTaskIO: {
+                [key: string]: unknown
+              }
+            }
+          }
+          'text/event-stream': {
+            /** Index */
+            index: number
+            generated: $defs['ApiTaskIO']
+            $defs: {
+              /**
+               * ApiTaskIO
+               * @description Mixin for task io objects that are used in the API
+               * It makes sure that the class methods are not called directly
+               */
+              ApiTaskIO: {
+                [key: string]: unknown
+              }
+            }
+          }
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Input By Hash */
+  get_input_by_hash__tenant__tasks__task_id__schemas__task_schema_id__inputs__input_hash__get: {
+    parameters: {
+      path: {
+        /** @description The hash of the input */
+        input_hash: string
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Generate Io
+   * @deprecated
+   * @description Generate a new task based on natural language
+   */
+  generate_io__tenant__tasks_generate_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TaskGenerateRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskGenerateResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Generate Via Chat
+   * @description Build a new task based on natural language, allowing for multiple iterations
+   */
+  generate_via_chat__tenant__tasks_schemas_iterate_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BuildTaskRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['BuildTaskIteration']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** List Tasks */
+  list_tasks__tenant__tasks_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_SerializableTask_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Task
+   * @description Create a new task
+   */
+  create_task__tenant__tasks_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaskRequestWithID']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskVariant']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /** Get Task */
+  get_task__tenant__tasks__task_id__get: {
+    parameters: {
+      path: {
+        task_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTask']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Update Task
+   * @description Update a task
+   */
+  update_task__tenant__tasks__task_id__patch: {
+    parameters: {
+      path: {
+        task_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateTaskRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Task Schema
+   * @description Create a new task schema for a given task id
+   */
+  create_task_schema__tenant__tasks__task_id__schemas_post: {
+    parameters: {
+      path: {
+        task_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaskSchemaRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['SerializableTaskVariant']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Generate Instructions
+   * @description Automatically generate instructions from the existing examples and ratingsA minimum number of runs with ratings and examples are required to generate instructions
+   */
+  generate_instructions__tenant__tasks__task_id__schemas__task_schema_id__evaluators_suggested_instructions_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateInstructionsRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /** Evaluation Instructions */
+            evaluation_instructions: string
+          }
+          'text/event-stream': {
+            /** Evaluation Instructions */
+            evaluation_instructions: string
+          }
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Generate Field Evaluations
+   * @description Generate a set of field evaluations for a task
+   */
+  generate_field_evaluations__tenant__tasks__task_id__schemas__task_schema_id__evaluators_suggested_field_evaluations_post: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['FieldBasedEvaluationConfig-Output']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Evaluators
+   * @description List all evaluators for a task
+   */
+  list_evaluators__tenant__tasks__task_id__schemas__task_schema_id__evaluators_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_Union_AvailableEvaluator__TaskEvaluator__']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Evaluator
+   * @description Create a task evaluator. The operation is idempotent, which means that identical evaluators will not be created.
+   */
+  create_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateEvaluatorRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskEvaluator']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Evaluator
+   * @description Get a specific evaluator
+   */
+  get_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__get: {
+    parameters: {
+      path: {
+        task_id: string
+        task_schema_id: number
+        /** @description The id of the evaluator */
+        evaluator_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskEvaluator']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Replace Evaluator
+   * @description Replace an evaluator. Note that the newly created evaluator will have a different it. This is equivalent to deleting the old evaluator and creating a new one.
+   */
+  replace_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__put: {
+    parameters: {
+      path: {
+        /** @description The id of the evaluator */
+        evaluator_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateEvaluatorRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['TaskEvaluator']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Delete Evaluator
+   * @description Delete an evaluator
+   */
+  delete_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__delete: {
+    parameters: {
+      path: {
+        /** @description The id of the evaluator */
+        evaluator_id: string
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Trigger Evaluator
+   * @description Trigger an evaluator. All runs that can be evaluated and are not already evaluated will be evaluated.
+   */
+  trigger_evaluator__tenant__tasks__task_id__schemas__task_schema_id__evaluators__evaluator_id__trigger_post: {
+    parameters: {
+      path: {
+        /** @description The id of the evaluator */
+        evaluator_id: string
+        task_id: string
+        task_schema_id: number
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Organization Settings
+   * @description List settings for a tenant
+   */
+  get_organization_settings__tenant__organization_settings_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationSettings']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Add Provider Settings
+   * @description Add a provider config
+   */
+  add_provider_settings__tenant__organization_settings_providers_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json':
+          | components['schemas']['AzureOpenAIConfig']
+          | components['schemas']['GroqConfig']
+          | components['schemas']['AnthropicConfig']
+          | components['schemas']['OpenAIConfig']
+          | components['schemas']['GoogleProviderConfig']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['ProviderSettings']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Provider Config Schema
+   * @description Get the json schema for the provider configs
+   */
+  get_provider_config_schema__tenant__organization_settings_providers_schemas_get: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Delete Provider Settings
+   * @description Delete a provider config
+   */
+  delete_provider_settings__tenant__organization_settings_providers__provider_id__delete: {
+    parameters: {
+      path: {
+        provider_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Get Benchmark
+   * @description Retrieve a benchmark by ID
+   */
+  get_benchmark__tenant__benchmarks__benchmark_id__get: {
+    parameters: {
+      path: {
+        /** @description The benchmark id */
+        benchmark_id: string
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * List Benchmarks
+   * @description List benchmarks for a task schema.
+   */
+  list_benchmarks__tenant__tasks__task_id__schemas__task_schema_id__benchmarks_get: {
+    parameters: {
+      query?: {
+        /** @description A dataset id filter */
+        dataset_id?: string | null
+        /** @description A status filter */
+        status?: ('in_progress' | 'complete') | null
+      }
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Page_BenchmarkItem_']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Create Benchmark
+   * @description Create a benchmark given a list of inputs
+   */
+  create_benchmark__tenant__tasks__task_id__schemas__task_schema_id__benchmarks_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+        task_id: string
+        task_schema_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['api__routers__task_benchmarks__BenchmarkRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Benchmark']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  /**
+   * Semantically Equivalent Words
+   * @description Generate words that are semantically equivalent to the given word
+   */
+  semantically_equivalent_words__tenant__tools_semantically_equivalent_words_post: {
+    parameters: {
+      path: {
+        /** @description The tenant to use for the request */
+        tenant: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SemanticallyEquivalentWordsRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          'application/json': {
+            /** Words */
+            words: string[]
+          }
+          'text/event-stream': {
+            /** Index */
+            index: number
+            /** Word */
+            word: string
+          }
         }
       }
       /** @description Validation Error */
