@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/schema",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "workflowAI schema helpers",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -44,8 +44,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "json-schema-to-zod": "^2.1.0",
-    "zod": "^3.23.7",
-    "zod-to-json-schema": "^3.23.0"
+    "json-schema-to-zod": "^2.1.1",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.1"
   }
 }
