@@ -1,7 +1,12 @@
 import { events as asServerSentEvents } from 'fetch-event-stream'
-import createClient, { MaybeOptionalInit } from 'openapi-fetch'
+import createClient, {
+  MaybeOptionalInit,
+  PathMethods,
+  RequestOptions,
+} from 'openapi-fetch'
 import type {
   GetValueWithDefault,
+  HasRequiredKeys,
   MediaType,
   PathsWithMethod,
 } from 'openapi-typescript-helpers'
@@ -10,10 +15,26 @@ import type { paths } from './generated/openapi'
 import type { Middleware } from './middlewares'
 import { wrapAsyncIterator } from './utils/wrapAsyncIterator'
 
+type Init<
+  P extends PathMethods,
+  M extends keyof P,
+  I = MaybeOptionalInit<P, M>,
+> = HasRequiredKeys<I> extends never ? I & { [key: string]: unknown } : I
+
 type CreateHttpClientConfig = {
   url: string
   key: string | undefined
   use: Middleware[]
+}
+
+function extender<T>(extension: T) {
+  return function extend<O>(o: O): typeof o {
+    return { ...o, ...extension }
+  }
+}
+
+function forceParseAs(parseAs: RequestOptions<object>['parseAs']) {
+  return extender<Pick<RequestOptions<object>, 'parseAs'>>({ parseAs })
 }
 
 /**
@@ -49,30 +70,36 @@ function getClient<Paths extends object, Media extends MediaType>({
 export function createJsonClient(config: CreateHttpClientConfig) {
   const jsonClient = getClient<paths, 'application/json'>(config)
 
+  const cleanInit = forceParseAs('json')
+
   const GET =
     <P extends PathsWithMethod<paths, 'get'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'get'>) =>
-      jsonClient.GET(path, { ...init, parseAs: 'json' })
+    (init: Init<paths[P], 'get'>) =>
+      jsonClient.GET(path, cleanInit(init))
 
   const PUT =
     <P extends PathsWithMethod<paths, 'put'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'put'>) =>
-      jsonClient.PUT(path, { ...init, parseAs: 'json' })
+    <I = Init<paths[P], 'put'>>(init: I) =>
+      jsonClient.PUT(
+        path,
+        // @ts-expect-error For some obscure TS reason, PUT gives an error 🤷
+        cleanInit(init),
+      )
 
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'post'>) =>
-      jsonClient.POST(path, { ...init, parseAs: 'json' })
+    (init: Init<paths[P], 'post'>) =>
+      jsonClient.POST(path, cleanInit(init))
 
   const PATCH =
     <P extends PathsWithMethod<paths, 'patch'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'patch'>) =>
-      jsonClient.PATCH(path, { ...init, parseAs: 'json' })
+    (init: Init<paths[P], 'patch'>) =>
+      jsonClient.PATCH(path, cleanInit(init))
 
   const DELETE =
     <P extends PathsWithMethod<paths, 'delete'>>(path: P) =>
-    (init: MaybeOptionalInit<paths[P], 'delete'>) =>
-      jsonClient.DELETE(path, { ...init, parseAs: 'json' })
+    (init: Init<paths[P], 'delete'>) =>
+      jsonClient.DELETE(path, cleanInit(init))
 
   return {
     client: jsonClient,
@@ -93,14 +120,12 @@ export function createJsonClient(config: CreateHttpClientConfig) {
 export function createStreamClient(config: CreateHttpClientConfig) {
   const streamClient = getClient<paths, 'text/event-stream'>(config)
 
+  const cleanInit = forceParseAs('stream')
+
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
-    async (init: MaybeOptionalInit<paths[P], 'post'>) => {
-      const { response } = await streamClient.POST(path, {
-        ...init,
-        // Make sure to interpret responses as streams
-        parseAs: 'stream',
-      })
+    async (init: Init<paths[P], 'post'>) => {
+      const { response } = await streamClient.POST(path, cleanInit(init))
 
       return {
         response,
