@@ -16,5 +16,14 @@
     "json-summary",
     "text",
     "lcov"
+  ],
+  "globals": {
+    "ts-jest": {
+      "tsConfig": "./configs/tsconfig.base.json"
+    }
+  },
+  "automock": false,
+  "setupFiles": [
+    "./configs/setupJest.js"
   ]
 }
