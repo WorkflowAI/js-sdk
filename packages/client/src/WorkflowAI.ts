@@ -1,4 +1,5 @@
 import {
+  type FetchOptions,
   initWorkflowAIApi,
   InitWorkflowAIApiConfig,
   Schemas,
@@ -36,6 +37,7 @@ export type RunTaskOptions<Stream extends true | false = false> = {
   labels?: Schemas['RunRequest']['labels']
   metadata?: Schemas['RunRequest']['metadata']
   stream?: Stream
+  fetch?: FetchOptions
 }
 
 export type ImportTaskRunOptions = Omit<
@@ -108,9 +110,10 @@ export class WorkflowAI {
   >(
     taskDef: TaskDefinition<IS, OS, false>,
     input: IS,
-    { group, stream, labels, metadata, useCache }: RunTaskOptions<S>,
+    { group, stream, labels, metadata, useCache, fetch }: RunTaskOptions<S>,
   ) {
-    const init = {
+    // Prepare a run call, but nothing is executed yet
+    const run = this.api.tasks.schemas.run({
       params: {
         path: {
           task_id: taskDef.taskId.toLowerCase(),
@@ -123,12 +126,10 @@ export class WorkflowAI {
         stream,
         labels,
         metadata,
-        useCache: useCache || 'when_available',
+        use_cache: useCache || 'when_available',
       },
-    }
-
-    // Prepare a run call, but nothing is executed yet
-    const run = this.api.tasks.schemas.run(init)
+      ...fetch,
+    })
 
     if (stream) {
       // Streaming response, we receive partial results
@@ -237,6 +238,10 @@ export class WorkflowAI {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
+        fetch: {
+          ...defaultOptions?.fetch,
+          ...overrideOptions?.fetch,
+        },
       } as RunTaskOptions
 
       let runPromise: Promise<TaskRunResult<OS>>
