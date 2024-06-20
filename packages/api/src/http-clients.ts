@@ -13,6 +13,7 @@ import type {
 
 import type { paths } from './generated/openapi'
 import type { Middleware } from './middlewares'
+import { getRetriableFetch, RequestRetryInit } from './utils/fetch'
 import { wrapAsyncIterator } from './utils/wrapAsyncIterator'
 
 type Init<
@@ -27,14 +28,23 @@ type CreateHttpClientConfig = {
   use: Middleware[]
 }
 
-function extender<T>(extension: T) {
-  return function extend<O>(o: O): typeof o {
-    return { ...o, ...extension }
-  }
-}
+/**
+ * Cleans up and prepares init options for openapi-fetch
+ * @param init "Augmented" init, with retry options
+ * @param parseAs How to parse response, json or stream for example
+ * @returns Init expected by openapi-fetch
+ */
+function prepareInit<P extends PathMethods, M extends keyof P, I = Init<P, M>>(
+  init: I & RequestRetryInit,
+  parseAs: RequestOptions<object>['parseAs'],
+): I {
+  const { retries, retryDelay, maxRetryDelay, ...rest } = { ...init }
 
-function forceParseAs(parseAs: RequestOptions<object>['parseAs']) {
-  return extender<Pick<RequestOptions<object>, 'parseAs'>>({ parseAs })
+  return {
+    ...rest,
+    parseAs,
+    fetch: getRetriableFetch({ retries, retryDelay, maxRetryDelay }),
+  } as I
 }
 
 /**
@@ -70,36 +80,34 @@ function getClient<Paths extends object, Media extends MediaType>({
 export function createJsonClient(config: CreateHttpClientConfig) {
   const jsonClient = getClient<paths, 'application/json'>(config)
 
-  const cleanInit = forceParseAs('json')
-
   const GET =
     <P extends PathsWithMethod<paths, 'get'>>(path: P) =>
-    (init: Init<paths[P], 'get'>) =>
-      jsonClient.GET(path, cleanInit(init))
+    (init: Init<paths[P], 'get'> & RequestRetryInit) =>
+      jsonClient.GET(path, prepareInit(init, 'json'))
 
   const PUT =
     <P extends PathsWithMethod<paths, 'put'>>(path: P) =>
-    <I = Init<paths[P], 'put'>>(init: I) =>
+    <I = Init<paths[P], 'put'> & RequestRetryInit>(init: I) =>
       jsonClient.PUT(
         path,
         // @ts-expect-error For some obscure TS reason, PUT gives an error 🤷
-        cleanInit(init),
+        prepareInit(init, 'json'),
       )
 
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
-    (init: Init<paths[P], 'post'>) =>
-      jsonClient.POST(path, cleanInit(init))
+    (init: Init<paths[P], 'post'> & RequestRetryInit) =>
+      jsonClient.POST(path, prepareInit(init, 'json'))
 
   const PATCH =
     <P extends PathsWithMethod<paths, 'patch'>>(path: P) =>
-    (init: Init<paths[P], 'patch'>) =>
-      jsonClient.PATCH(path, cleanInit(init))
+    (init: Init<paths[P], 'patch'> & RequestRetryInit) =>
+      jsonClient.PATCH(path, prepareInit(init, 'json'))
 
   const DELETE =
     <P extends PathsWithMethod<paths, 'delete'>>(path: P) =>
-    (init: Init<paths[P], 'delete'>) =>
-      jsonClient.DELETE(path, cleanInit(init))
+    (init: Init<paths[P], 'delete'> & RequestRetryInit) =>
+      jsonClient.DELETE(path, prepareInit(init, 'json'))
 
   return {
     client: jsonClient,
@@ -120,12 +128,13 @@ export function createJsonClient(config: CreateHttpClientConfig) {
 export function createStreamClient(config: CreateHttpClientConfig) {
   const streamClient = getClient<paths, 'text/event-stream'>(config)
 
-  const cleanInit = forceParseAs('stream')
-
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
-    async (init: Init<paths[P], 'post'>) => {
-      const { response } = await streamClient.POST(path, cleanInit(init))
+    async (init: Init<paths[P], 'post'> & RequestRetryInit) => {
+      const { response } = await streamClient.POST(
+        path,
+        prepareInit(init, 'stream'),
+      )
 
       return {
         response,

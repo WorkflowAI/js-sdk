@@ -6,15 +6,15 @@ import { createJsonClient, createStreamClient } from './http-clients'
 const use = jest.fn()
 
 jest.mock('openapi-fetch', () => ({
-  default: jest.fn(),
+  __esModule: true,
+  default: jest.fn((options: Parameters<typeof createOpenapiClient>[0]) => {
+    return {
+      ...createOpenapiClient(options),
+      use,
+      isOpenApiClient: true,
+    }
+  }),
 }))
-;(createClient as jest.Mock).mockImplementation((options) => {
-  return {
-    ...createOpenapiClient(options),
-    use,
-    isOpenApiClient: true,
-  }
-})
 
 beforeEach(() => {
   jest.clearAllMocks()
