@@ -53,6 +53,6 @@
   },
   "dependencies": {
     "fetch-event-stream": "^0.1.5",
-    "openapi-fetch": "^0.9.7"
+    "openapi-fetch": "^0.9.8"
   }
 }
