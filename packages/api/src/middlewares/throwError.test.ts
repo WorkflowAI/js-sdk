@@ -1,5 +1,3 @@
-import { MergedOptions } from 'openapi-fetch'
-
 import { WorkflowAIApiRequestError } from '../Error'
 import { throwError } from './throwError'
 
@@ -14,17 +12,17 @@ describe('throwError middleware', () => {
       statusText: 'Internal Server Error',
     })
 
-    await expect(
-      throwError.onResponse?.(response, {} as MergedOptions),
-    ).rejects.toThrow(WorkflowAIApiRequestError)
+    await expect(throwError.onResponse?.(response)).rejects.toThrow(
+      WorkflowAIApiRequestError,
+    )
   })
 
   it('should not throw WorkflowAIApiRequestError if response status is 200', async () => {
     const response = new Response(null, { status: 200, statusText: 'OK' })
 
-    await expect(
-      throwError.onResponse?.(response, {} as MergedOptions),
-    ).resolves.not.toThrow(WorkflowAIApiRequestError)
+    await expect(throwError.onResponse?.(response)).resolves.not.toThrow(
+      WorkflowAIApiRequestError,
+    )
   })
 
   it('should throw WorkflowAIApiRequestError with correct error message', async () => {
@@ -42,7 +40,7 @@ describe('throwError middleware', () => {
     )
 
     try {
-      await throwError.onResponse?.(response, {} as MergedOptions)
+      await throwError.onResponse?.(response)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
@@ -69,7 +67,7 @@ describe('throwError middleware', () => {
     )
 
     try {
-      await throwError.onResponse?.(response, {} as MergedOptions)
+      await throwError.onResponse?.(response)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
