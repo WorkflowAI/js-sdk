@@ -1,5 +1,3 @@
-import type { Middleware } from 'openapi-fetch'
-
 import { WorkflowAIApiRequestError } from '../Error'
 
 /**
@@ -7,8 +5,8 @@ import { WorkflowAIApiRequestError } from '../Error'
  * @param res - The response object.
  * @returns The response object.
  */
-export const throwError: Middleware = {
-  async onResponse(res) {
+export const throwError = {
+  async onResponse(res: Response) {
     if (!res.ok) {
       let detail: unknown
       try {
