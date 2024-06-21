@@ -23,7 +23,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=18.13"
   },
   "scripts": {
     "-------- LINTING": "",
