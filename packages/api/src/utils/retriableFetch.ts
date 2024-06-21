@@ -2,8 +2,6 @@ import withRetry from 'fetch-retry'
 
 import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter'
 
-type GlobalFetch = typeof fetch
-
 const fetchWithRetry = withRetry(fetch)
 
 export type RequestRetryInit = {
@@ -28,11 +26,13 @@ export async function retriableFetch(
   input: Parameters<typeof fetchWithRetry>[0],
   init?: Parameters<typeof fetchWithRetry>[1] & RequestRetryInit,
 ): ReturnType<typeof fetchWithRetry> {
-  const {
-    retries = 1,
-    retryDelay = 5_000,
-    maxRetryDelay = 60_000,
-  } = { ...init }
+  let { retries, retryDelay, maxRetryDelay } = { ...init }
+
+  // Use this syntax instead of defaults in exploding above
+  // to override null values (not just undefined)
+  retries ??= 1
+  retryDelay ??= 5_000
+  maxRetryDelay ??= 60_000
 
   const abortRetriesAt = Date.now() + maxRetryDelay
 
@@ -62,13 +62,4 @@ export async function retriableFetch(
       return false
     },
   })
-}
-
-export function getRetriableFetch(retryInit: RequestRetryInit): GlobalFetch {
-  return async function (
-    input: Parameters<GlobalFetch>[0],
-    init?: Parameters<GlobalFetch>[1],
-  ): ReturnType<GlobalFetch> {
-    return retriableFetch(input, { ...init, ...retryInit })
-  }
 }

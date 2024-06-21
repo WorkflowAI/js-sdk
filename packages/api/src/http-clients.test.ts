@@ -2,6 +2,7 @@ import createClient, { Middleware } from 'openapi-fetch'
 const { default: createOpenapiClient } = jest.requireActual('openapi-fetch')
 
 import { createJsonClient, createStreamClient } from './http-clients'
+import { retriableFetch } from './utils/retriableFetch'
 
 const use = jest.fn()
 
@@ -52,6 +53,9 @@ describe('createJsonClient', () => {
       url: 'https://api.example.com',
       key: 'API_KEY_23',
       use: [],
+      fetch: {
+        retries: 3,
+      },
     }
     createJsonClient(config)
     expect(createClient).toHaveBeenCalledWith({
@@ -59,6 +63,8 @@ describe('createJsonClient', () => {
       headers: {
         Authorization: `Bearer API_KEY_23`,
       },
+      fetch: retriableFetch,
+      retries: 3,
     })
   })
 
@@ -105,6 +111,9 @@ describe('createStreamClient', () => {
       url: 'https://api.example.com',
       key: 'API_KEY_9',
       use: [],
+      fetch: {
+        retries: 3,
+      },
     }
     createStreamClient(config)
     expect(createClient).toHaveBeenCalledWith({
@@ -112,6 +121,8 @@ describe('createStreamClient', () => {
       headers: {
         Authorization: `Bearer API_KEY_9`,
       },
+      fetch: retriableFetch,
+      retries: 3,
     })
   })
 

@@ -11,9 +11,10 @@ import type {
   PathsWithMethod,
 } from 'openapi-typescript-helpers'
 
+import type { FetchOptions } from '.'
 import type { paths } from './generated/openapi'
 import type { Middleware } from './middlewares'
-import { getRetriableFetch, RequestRetryInit } from './utils/fetch'
+import { RequestRetryInit, retriableFetch } from './utils/retriableFetch'
 import { wrapAsyncIterator } from './utils/wrapAsyncIterator'
 
 type Init<
@@ -26,25 +27,30 @@ type CreateHttpClientConfig = {
   url: string
   key: string | undefined
   use: Middleware[]
+  fetch?: FetchOptions
 }
 
 /**
- * Cleans up and prepares init options for openapi-fetch
- * @param init "Augmented" init, with retry options
+ * Factory for prepareInit's
  * @param parseAs How to parse response, json or stream for example
- * @returns Init expected by openapi-fetch
  */
-function prepareInit<P extends PathMethods, M extends keyof P, I = Init<P, M>>(
-  init: I & RequestRetryInit,
-  parseAs: RequestOptions<object>['parseAs'],
-): I {
-  const { retries, retryDelay, maxRetryDelay, ...rest } = { ...init }
-
-  return {
-    ...rest,
-    parseAs,
-    fetch: getRetriableFetch({ retries, retryDelay, maxRetryDelay }),
-  } as I
+function getPrepareInit(parseAs: RequestOptions<object>['parseAs']) {
+  /**
+   * Cleans up and prepares init options for openapi-fetch
+   * Forse type casting to something openapi-fetch is ok with
+   * @param init "Augmented" init, with retry options
+   * @returns Init expected by openapi-fetch
+   */
+  return function prepareInit<
+    P extends PathMethods,
+    M extends keyof P,
+    I = Init<P, M>,
+  >(init: I & RequestRetryInit): I {
+    return {
+      ...init,
+      parseAs,
+    } as I // not very nice but we have to force openapi-fetch hand :/
+  }
 }
 
 /**
@@ -57,12 +63,15 @@ function getClient<Paths extends object, Media extends MediaType>({
   url,
   key,
   use,
+  fetch: fetchOptions,
 }: CreateHttpClientConfig) {
   const client = createClient<Paths, Media>({
     baseUrl: url,
     headers: {
       Authorization: `Bearer ${key}`,
     },
+    fetch: retriableFetch,
+    ...fetchOptions,
   })
 
   // Register middlewares
@@ -80,10 +89,12 @@ function getClient<Paths extends object, Media extends MediaType>({
 export function createJsonClient(config: CreateHttpClientConfig) {
   const jsonClient = getClient<paths, 'application/json'>(config)
 
+  const prepareInit = getPrepareInit('json')
+
   const GET =
     <P extends PathsWithMethod<paths, 'get'>>(path: P) =>
     (init: Init<paths[P], 'get'> & RequestRetryInit) =>
-      jsonClient.GET(path, prepareInit(init, 'json'))
+      jsonClient.GET(path, prepareInit(init))
 
   const PUT =
     <P extends PathsWithMethod<paths, 'put'>>(path: P) =>
@@ -91,23 +102,23 @@ export function createJsonClient(config: CreateHttpClientConfig) {
       jsonClient.PUT(
         path,
         // @ts-expect-error For some obscure TS reason, PUT gives an error 🤷
-        prepareInit(init, 'json'),
+        prepareInit(init),
       )
 
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
     (init: Init<paths[P], 'post'> & RequestRetryInit) =>
-      jsonClient.POST(path, prepareInit(init, 'json'))
+      jsonClient.POST(path, prepareInit(init))
 
   const PATCH =
     <P extends PathsWithMethod<paths, 'patch'>>(path: P) =>
     (init: Init<paths[P], 'patch'> & RequestRetryInit) =>
-      jsonClient.PATCH(path, prepareInit(init, 'json'))
+      jsonClient.PATCH(path, prepareInit(init))
 
   const DELETE =
     <P extends PathsWithMethod<paths, 'delete'>>(path: P) =>
     (init: Init<paths[P], 'delete'> & RequestRetryInit) =>
-      jsonClient.DELETE(path, prepareInit(init, 'json'))
+      jsonClient.DELETE(path, prepareInit(init))
 
   return {
     client: jsonClient,
@@ -128,13 +139,12 @@ export function createJsonClient(config: CreateHttpClientConfig) {
 export function createStreamClient(config: CreateHttpClientConfig) {
   const streamClient = getClient<paths, 'text/event-stream'>(config)
 
+  const prepareInit = getPrepareInit('stream')
+
   const POST =
     <P extends PathsWithMethod<paths, 'post'>>(path: P) =>
     async (init: Init<paths[P], 'post'> & RequestRetryInit) => {
-      const { response } = await streamClient.POST(
-        path,
-        prepareInit(init, 'stream'),
-      )
+      const { response } = await streamClient.POST(path, prepareInit(init))
 
       return {
         response,
