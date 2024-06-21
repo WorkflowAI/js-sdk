@@ -19,3 +19,6 @@ dist/
 
 # Local sandbox
 packages/sandbox/
+
+examples/*.ts
+!examples/generated-code.ts
