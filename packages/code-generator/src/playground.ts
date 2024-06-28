@@ -63,7 +63,7 @@ type GetPlaygroundSnippetsConfig = {
     input: JsonSchemaObject
     output: JsonSchemaObject
   }
-  groupIteration: number
+  group: { iteration: number } | { environment: string }
   example: {
     input: Record<string, unknown>
     output: Record<string, unknown>
@@ -109,7 +109,7 @@ export const getPlaygroundSnippets = async (
     taskId,
     taskName,
     schema,
-    groupIteration,
+    group,
     example,
     api,
     fileDataProvider = FileDataProvider.FILE_SYSTEM,
@@ -184,9 +184,7 @@ ${cleanZodDescribe(
     output: ${await outputSchemaToZod(schema.output)},
   },
 }, {
-  group: {
-    iteration: ${groupIteration},
-  },
+  group: ${JSON.stringify(group)},
 })`),
   !!descriptionAsComments,
 )}
