@@ -64,7 +64,9 @@ try {
       input: taskSchemas?.input_schema.json_schema,
       output: taskSchemas?.output_schema.json_schema,
     },
-    groupIteration: exampleTaskRun.group.iteration,
+    group: {
+      iteration: exampleTaskRun.group.iteration,
+    },
     example: {
       input: exampleTaskRun.task_input,
       output: exampleTaskRun.task_output,
