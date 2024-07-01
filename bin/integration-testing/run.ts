@@ -97,7 +97,55 @@ try {
   // Check that the code generated gave us the same output
   assert.deepStrictEqual(taskRunOutput, exampleTaskRun.task_output)
 
-  console.log('Run task end-to-end passed')
+  console.log('Run task (group iteration) end-to-end passed')
+
+  // Create snippets as they are created on the web
+  const devEnvSnippets = await getPlaygroundSnippets({
+    api: {
+      url: apiUrl,
+      key: apiKey,
+    },
+    taskId,
+    schema: {
+      id: taskSchemaId,
+      input: taskSchemas?.input_schema.json_schema,
+      output: taskSchemas?.output_schema.json_schema,
+    },
+    group: {
+      environment: 'dev',
+    },
+    example: {
+      input: exampleTaskRun.task_input,
+      output: exampleTaskRun.task_output,
+    },
+  })
+
+  // Write TS file with all the necessary snippets
+  writeFileSync(executedFilePath, [
+    devEnvSnippets.initializeClient.code, 
+    devEnvSnippets.initializeTask.code, 
+    devEnvSnippets.runTask.code,
+  ].join('\n\n\n'))
+
+  // Execute TS file and get console output
+
+  const runTaskDevEnvResult = spawnSync('npx', [
+    'tsx',
+    executedFilePath
+  ])
+
+  assert(!runTaskDevEnvResult.error, runTaskDevEnvResult.error)
+
+  const resultDevEnvJs = runTaskDevEnvResult.stdout.toString()
+
+  // We can't do a JSON.parse because the output is not formated as JSON but as JS code (missing quotes etc)
+  const taskDevEnvRunOutput = eval(`(${resultDevEnvJs})`)
+
+  // Check that the code generated gave us the same output
+  assert.deepStrictEqual(taskDevEnvRunOutput, exampleTaskRun.task_output)
+
+  console.log('Run task (group environment) end-to-end passed')
+
 
   // Write TS file with all the necessary snippets
   writeFileSync(executedFilePath, [
@@ -120,7 +168,7 @@ try {
   console.log('Import run end-to-end passed')
 
   // Delete test file we just wrote
-  // unlinkSync(executedFilePath)
+  unlinkSync(executedFilePath)
 }
 catch (error) {
   console.error(error)
