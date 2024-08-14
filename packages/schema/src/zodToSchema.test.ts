@@ -1,5 +1,5 @@
-import { z } from './zod'
-import { inputZodToSchema, outputZodToSchema } from './zodToSchema'
+import { z } from './zod/index.js'
+import { inputZodToSchema, outputZodToSchema } from './zodToSchema.js'
 
 const INPUT_DEFINITIONS = {
   $defs: {

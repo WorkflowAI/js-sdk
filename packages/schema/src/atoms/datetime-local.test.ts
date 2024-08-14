@@ -1,4 +1,4 @@
-import { DATETIME_LOCAL } from './datetime-local'
+import { DATETIME_LOCAL } from './datetime-local.js'
 
 describe('DATETIME_LOCAL', () => {
   it('should pass for valid data', () => {

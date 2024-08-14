@@ -1,2 +1,2 @@
-export * from './beautify'
-export * from './playground'
+export * from './beautify.js'
+export * from './playground.js'

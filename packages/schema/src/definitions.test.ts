@@ -1,6 +1,6 @@
-import { definitions } from './definitions'
-import { z } from './zod'
-import * as extensions from './zod/extensions'
+import { definitions } from './definitions.js'
+import * as extensions from './zod/extensions.js'
+import { z } from './zod/index.js'
 
 describe('definitions', () => {
   definitions.forEach((definition) => {

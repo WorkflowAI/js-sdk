@@ -1,5 +1,5 @@
-import * as indexExports from './index'
-import * as zodExports from './zod'
+import * as indexExports from './index.js'
+import * as zodExports from './zod.js'
 
 describe('index exports', () => {
   it('should re-export everything from zod', () => {

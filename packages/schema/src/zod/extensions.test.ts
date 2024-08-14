@@ -1,5 +1,5 @@
-import { DATETIME_LOCAL, IMAGE_INPUT, IMAGE_OUTPUT } from '../atoms'
-import { datetimeLocal, imageInput, imageOutput } from './extensions'
+import { DATETIME_LOCAL, IMAGE_INPUT, IMAGE_OUTPUT } from '../atoms/index.js'
+import { datetimeLocal, imageInput, imageOutput } from './extensions.js'
 
 describe('Extensions', () => {
   it('imageInput should return IMAGE_INPUT', () => {

@@ -1,4 +1,4 @@
-import { WorkflowAIApiRequestError } from '../Error'
+import { WorkflowAIApiRequestError } from '../Error.js'
 
 /**
  * Middleware function that throws a WorkflowAIApiRequestError if the response is not ok.

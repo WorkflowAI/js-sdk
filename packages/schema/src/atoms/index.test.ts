@@ -1,7 +1,7 @@
-import * as bufferExports from './buffer'
-import * as datetimeLocalExports from './datetime-local'
-import * as imageExports from './image'
-import * as indexExports from './index'
+import * as bufferExports from './buffer.js'
+import * as datetimeLocalExports from './datetime-local.js'
+import * as imageExports from './image.js'
+import * as indexExports from './index.js'
 
 describe('index exports', () => {
   it('should re-export everything from buffer', () => {

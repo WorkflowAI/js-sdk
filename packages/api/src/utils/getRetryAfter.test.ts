@@ -1,4 +1,4 @@
-import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter'
+import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter.js'
 
 describe('getRetryAfter', () => {
   describe('getRetryAfterDelay', () => {

@@ -1,7 +1,7 @@
 import { zodToJsonSchema } from 'zod-to-json-schema'
 
-import { definitions } from './definitions'
-import { z } from './zod'
+import { definitions } from './definitions.js'
+import { z } from './zod/index.js'
 
 type Definitions = Record<string, z.ZodTypeAny>
 

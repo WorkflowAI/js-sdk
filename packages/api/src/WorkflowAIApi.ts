@@ -1,8 +1,8 @@
-import type { FetchOptions } from '.'
-import { createJsonClient, createStreamClient } from './http-clients'
-import { Middleware, throwError } from './middlewares'
-import { getEnv } from './utils/getEnv'
-import { withStream } from './utils/withStream'
+import { createJsonClient, createStreamClient } from './http-clients.js'
+import type { FetchOptions } from './index.js'
+import { Middleware, throwError } from './middlewares/index.js'
+import { getEnv } from './utils/getEnv.js'
+import { withStream } from './utils/withStream.js'
 
 export type InitWorkflowAIApiConfig = {
   key?: string | undefined

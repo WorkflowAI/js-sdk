@@ -1,7 +1,7 @@
 import mockFetch from 'jest-fetch-mock'
 
-import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter'
-import { retriableFetch } from './retriableFetch'
+import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter.js'
+import { retriableFetch } from './retriableFetch.js'
 
 jest.mock('./getRetryAfter')
 

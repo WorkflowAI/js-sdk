@@ -13,7 +13,7 @@ import {
   GroupReference,
   isGroupReference,
   sanitizeGroupReference,
-} from './Group'
+} from './Group.js'
 import {
   hasSchemaId,
   ImportRunFn,
@@ -25,7 +25,7 @@ import {
   type TaskRunStreamEvent,
   type TaskRunStreamResult,
   type UseTaskResult,
-} from './Task'
+} from './Task.js'
 
 export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig

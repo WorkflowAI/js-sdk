@@ -1,5 +1,5 @@
-import { WorkflowAIApiRequestError } from '../Error'
-import { throwError } from './throwError'
+import { WorkflowAIApiRequestError } from '../Error.js'
+import { throwError } from './throwError.js'
 
 describe('throwError middleware', () => {
   it('should have onResponse defined', () => {

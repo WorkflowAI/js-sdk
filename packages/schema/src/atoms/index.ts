@@ -1,3 +1,3 @@
-export * from './buffer'
-export * from './datetime-local'
-export * from './image'
+export * from './buffer.js'
+export * from './datetime-local.js'
+export * from './image.js'

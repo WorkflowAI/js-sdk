@@ -1,6 +1,6 @@
 import withRetry from 'fetch-retry'
 
-import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter'
+import { getRetryAfterDelay, getRetryAfterHeader } from './getRetryAfter.js'
 
 const fetchWithRetry = withRetry(fetch)
 

@@ -1,8 +1,8 @@
 import type { WorkflowAIApi } from '@workflowai/api'
 import type { z } from '@workflowai/schema'
 
-import type { AsyncIteratorValue, DeepPartial } from './utils'
-import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI'
+import type { AsyncIteratorValue, DeepPartial } from './utils.js'
+import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI.js'
 
 type TaskId = string
 export type InputSchema = z.ZodTypeAny

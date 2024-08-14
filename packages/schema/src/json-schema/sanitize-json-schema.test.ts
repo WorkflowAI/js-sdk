@@ -1,4 +1,4 @@
-import { sanitize } from './sanitize-json-schema'
+import { sanitize } from './sanitize-json-schema.js'
 
 describe('Sanitize JSON schema', () => {
   describe('object', () => {

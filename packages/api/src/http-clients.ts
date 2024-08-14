@@ -11,11 +11,11 @@ import type {
   PathsWithMethod,
 } from 'openapi-typescript-helpers'
 
-import type { FetchOptions } from '.'
-import type { paths } from './generated/openapi'
-import type { Middleware } from './middlewares'
-import { RequestRetryInit, retriableFetch } from './utils/retriableFetch'
-import { wrapAsyncIterator } from './utils/wrapAsyncIterator'
+import type { paths } from './generated/openapi.js'
+import type { FetchOptions } from './index.js'
+import type { Middleware } from './middlewares/index.js'
+import { RequestRetryInit, retriableFetch } from './utils/retriableFetch.js'
+import { wrapAsyncIterator } from './utils/wrapAsyncIterator.js'
 
 type Init<
   P extends PathMethods,

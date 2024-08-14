@@ -1,4 +1,4 @@
-import { BASE64_DATA_URL_TO_BASE64 } from './data-url'
+import { BASE64_DATA_URL_TO_BASE64 } from './data-url.js'
 
 describe('BASE64_DATA_URL_TO_BASE64', () => {
   it('should transform a base64 data URL to a base64 string', () => {

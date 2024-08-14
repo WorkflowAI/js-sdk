@@ -1,8 +1,8 @@
 import createClient, { Middleware } from 'openapi-fetch'
 const { default: createOpenapiClient } = jest.requireActual('openapi-fetch')
 
-import { createJsonClient, createStreamClient } from './http-clients'
-import { retriableFetch } from './utils/retriableFetch'
+import { createJsonClient, createStreamClient } from './http-clients.js'
+import { retriableFetch } from './utils/retriableFetch.js'
 
 const use = jest.fn()
 
