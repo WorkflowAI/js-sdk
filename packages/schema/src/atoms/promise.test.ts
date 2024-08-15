@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { resolved } from './promise'
+import { resolved } from './promise.js'
 
 describe('resolved function', () => {
   it('should resolve a promise', async () => {

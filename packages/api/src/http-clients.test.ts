@@ -1,20 +1,21 @@
 import createClient, { Middleware } from 'openapi-fetch'
 const { default: createOpenapiClient } = jest.requireActual('openapi-fetch')
 
-import { createJsonClient, createStreamClient } from './http-clients'
+import { createJsonClient, createStreamClient } from './http-clients.js'
+import { retriableFetch } from './utils/retriableFetch.js'
 
 const use = jest.fn()
 
 jest.mock('openapi-fetch', () => ({
-  default: jest.fn(),
+  __esModule: true,
+  default: jest.fn((options: Parameters<typeof createOpenapiClient>[0]) => {
+    return {
+      ...createOpenapiClient(options),
+      use,
+      isOpenApiClient: true,
+    }
+  }),
 }))
-;(createClient as jest.Mock).mockImplementation((options) => {
-  return {
-    ...createOpenapiClient(options),
-    use,
-    isOpenApiClient: true,
-  }
-})
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -52,6 +53,9 @@ describe('createJsonClient', () => {
       url: 'https://api.example.com',
       key: 'API_KEY_23',
       use: [],
+      fetch: {
+        retries: 3,
+      },
     }
     createJsonClient(config)
     expect(createClient).toHaveBeenCalledWith({
@@ -59,6 +63,8 @@ describe('createJsonClient', () => {
       headers: {
         Authorization: `Bearer API_KEY_23`,
       },
+      fetch: retriableFetch,
+      retries: 3,
     })
   })
 
@@ -105,6 +111,9 @@ describe('createStreamClient', () => {
       url: 'https://api.example.com',
       key: 'API_KEY_9',
       use: [],
+      fetch: {
+        retries: 3,
+      },
     }
     createStreamClient(config)
     expect(createClient).toHaveBeenCalledWith({
@@ -112,6 +121,8 @@ describe('createStreamClient', () => {
       headers: {
         Authorization: `Bearer API_KEY_9`,
       },
+      fetch: retriableFetch,
+      retries: 3,
     })
   })
 

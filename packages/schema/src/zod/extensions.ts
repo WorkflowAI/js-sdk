@@ -1,4 +1,4 @@
-import { DATETIME_LOCAL, IMAGE_INPUT, IMAGE_OUTPUT } from '../atoms'
+import { DATETIME_LOCAL, IMAGE_INPUT, IMAGE_OUTPUT } from '../atoms/index.js'
 
 export const imageInput = () => IMAGE_INPUT
 export const imageOutput = () => IMAGE_OUTPUT

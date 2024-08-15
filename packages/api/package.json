@@ -1,9 +1,9 @@
 {
   "name": "@workflowai/api",
-  "version": "1.3.0",
-  "description": "workflowAI typed API client",
-  "author": "workflowAI",
-  "homepage": "https://workflowai.ai",
+  "version": "1.3.5",
+  "description": "WorkflowAI typed API client",
+  "author": "WorkflowAI",
+  "homepage": "https://workflowai.com",
   "keywords": [
     "workflowai",
     "ai",
@@ -24,11 +24,11 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18.20.2"
+    "node": ">=18.13"
   },
   "scripts": {
     "-------- CODEGEN": "",
-    "codegen:openapi": "openapi-typescript https://api.workflowai.ai/openapi.json -o ./src/generated/openapi.ts",
+    "codegen:openapi": "openapi-typescript $WORKFLOWAI_API_URL/openapi.json -o ./src/generated/openapi.ts",
     "codegen": "npm run codegen:openapi && npm run fix",
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
@@ -48,11 +48,12 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "openapi-typescript": "^6.7.5",
-    "zod": "^3.23.6"
+    "openapi-typescript": "^6.7.6",
+    "zod": "^3.23.8"
   },
   "dependencies": {
     "fetch-event-stream": "^0.1.5",
-    "openapi-fetch": "^0.9.5"
+    "fetch-retry": "^6.0.0",
+    "openapi-fetch": "^0.9.8"
   }
 }

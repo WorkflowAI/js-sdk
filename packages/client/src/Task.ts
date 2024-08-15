@@ -1,8 +1,8 @@
 import type { WorkflowAIApi } from '@workflowai/api'
 import type { z } from '@workflowai/schema'
 
-import type { AsyncIteratorValue, DeepPartial } from './utils'
-import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI'
+import type { AsyncIteratorValue, DeepPartial } from './utils.js'
+import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI.js'
 
 type TaskId = string
 export type InputSchema = z.ZodTypeAny
@@ -63,28 +63,35 @@ export type TaskRunStreamResult<OS extends OutputSchema> = Pick<
   stream: AsyncIterableIterator<TaskRunStreamEvent<OS>>
 }
 
+export type RunFn<
+  IS extends InputSchema,
+  OS extends OutputSchema,
+  Stream extends true | false = false,
+> = (
+  input: TaskInput<IS>,
+  options?: Partial<RunTaskOptions<Stream>>,
+) => Promise<TaskRunResult<OS>> & {
+  stream: () => Promise<TaskRunStreamResult<OS>>
+}
+
+export type ImportRunFn<IS extends InputSchema, OS extends OutputSchema> = (
+  input: TaskInput<IS>,
+  output: TaskOutput<OS>,
+  options?: Partial<ImportTaskRunOptions>,
+) => Promise<
+  Pick<
+    Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['runs']['import']>>,
+    'data' | 'response'
+  >
+>
+
 export type UseTaskResult<
   IS extends InputSchema,
   OS extends OutputSchema,
-  S extends true | false = false,
+  Stream extends true | false = false,
 > = {
-  run: (
-    input: TaskInput<IS>,
-    options?: Partial<RunTaskOptions<S>>,
-  ) => Promise<TaskRunResult<OS>> & {
-    stream: () => Promise<TaskRunStreamResult<OS>>
-  }
-
-  importRun: (
-    input: TaskInput<IS>,
-    output: TaskOutput<OS>,
-    options?: Partial<ImportTaskRunOptions>,
-  ) => Promise<
-    Pick<
-      Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['runs']['import']>>,
-      'data' | 'response'
-    >
-  >
+  run: RunFn<IS, OS, Stream>
+  importRun: ImportRunFn<IS, OS>
 }
 
 export type TaskInput<T> = T extends InputSchema
@@ -93,11 +100,15 @@ export type TaskInput<T> = T extends InputSchema
     ? TaskInput<IS>
     : T extends UseTaskResult<infer IS, infer _OS>
       ? TaskInput<IS>
-      : T extends UseTaskResult<infer IS, infer _OS>['run']
+      : T extends RunFn<infer IS, infer _OS>
         ? TaskInput<IS>
-        : T extends UseTaskResult<infer IS, infer _OS>['importRun']
+        : T extends ImportRunFn<infer IS, infer _OS>
           ? TaskInput<IS>
-          : never
+          : T extends UseTaskResult<infer IS, infer _OS>['run']
+            ? TaskInput<IS>
+            : T extends UseTaskResult<infer IS, infer _OS>['importRun']
+              ? TaskInput<IS>
+              : never
 
 export type TaskOutput<T> = T extends OutputSchema
   ? z.output<T>
@@ -105,8 +116,12 @@ export type TaskOutput<T> = T extends OutputSchema
     ? TaskOutput<OS>
     : T extends UseTaskResult<infer _IS, infer OS>
       ? TaskOutput<OS>
-      : T extends UseTaskResult<infer _IS, infer OS>['run']
+      : T extends RunFn<infer _IS, infer OS>
         ? TaskOutput<OS>
-        : T extends UseTaskResult<infer _IS, infer OS>['importRun']
+        : T extends ImportRunFn<infer _IS, infer OS>
           ? TaskOutput<OS>
-          : never
+          : T extends UseTaskResult<infer _IS, infer OS>['run']
+            ? TaskOutput<OS>
+            : T extends UseTaskResult<infer _IS, infer OS>['importRun']
+              ? TaskOutput<OS>
+              : never

@@ -1,14 +1,12 @@
-import type { Middleware } from 'openapi-fetch'
-
-import { WorkflowAIApiRequestError } from '../Error'
+import { WorkflowAIApiRequestError } from '../Error.js'
 
 /**
  * Middleware function that throws a WorkflowAIApiRequestError if the response is not ok.
  * @param res - The response object.
  * @returns The response object.
  */
-export const throwError: Middleware = {
-  async onResponse(res) {
+export const throwError = {
+  async onResponse(res: Response) {
     if (!res.ok) {
       let detail: unknown
       try {

@@ -4,7 +4,7 @@ import {
   outputSchemaToZod,
 } from '@workflowai/schema'
 
-import { beautifyTypescript } from './beautify'
+import { beautifyTypescript } from './beautify.js'
 
 /**
  * Transform a string into a valid TS/JS var name
@@ -63,7 +63,7 @@ type GetPlaygroundSnippetsConfig = {
     input: JsonSchemaObject
     output: JsonSchemaObject
   }
-  groupIteration: number
+  group: { iteration: number } | { environment: string }
   example: {
     input: Record<string, unknown>
     output: Record<string, unknown>
@@ -83,6 +83,7 @@ type GetPlaygroundSnippetsResult = {
   initializeTask: GeneratedCode
   runTask: GeneratedCode
   streamRunTask: GeneratedCode
+  importTaskRun: GeneratedCode
 }
 
 const base64DataToFileDataProvider = (
@@ -108,7 +109,7 @@ export const getPlaygroundSnippets = async (
     taskId,
     taskName,
     schema,
-    groupIteration,
+    group,
     example,
     api,
     fileDataProvider = FileDataProvider.FILE_SYSTEM,
@@ -118,12 +119,20 @@ export const getPlaygroundSnippets = async (
   }
 
   const taskFunctionName = validVarName(taskName || taskId)
+  const importRunFunctionName = validVarName(`import ${taskFunctionName} run`)
   const _stringifiedInput = JSON.stringify(example.input, null, 2)
+  const _stringifiedOutput = JSON.stringify(example.output, null, 2)
   const beautifiedInput = base64DataToFileDataProvider(
     _stringifiedInput,
     fileDataProvider,
   )
-  const isUsingFileDataProvider = beautifiedInput !== _stringifiedInput
+  const beautifiedOutput = base64DataToFileDataProvider(
+    _stringifiedOutput,
+    fileDataProvider,
+  )
+  const isUsingFileDataProvider =
+    beautifiedInput !== _stringifiedInput ||
+    beautifiedOutput !== _stringifiedOutput
 
   const fileProviderImport = {
     'fs-promise': 'import { readFile } from "fs/promises"',
@@ -167,7 +176,7 @@ const workflowAI = new WorkflowAI({
 import { z } from "@workflowai/workflowai"
 
 ${cleanZodDescribe(
-  beautifyTypescript(`const { run: ${taskFunctionName} } = await workflowAI.useTask({
+  beautifyTypescript(`const { run: ${taskFunctionName}, importRun: ${importRunFunctionName} } = await workflowAI.useTask({
   taskId: "${taskId}",
   schema: {
     id: ${schema.id},
@@ -175,9 +184,7 @@ ${cleanZodDescribe(
     output: ${await outputSchemaToZod(schema.output)},
   },
 }, {
-  group: {
-    iteration: ${groupIteration},
-  },
+  group: ${JSON.stringify(group)},
 })`),
   !!descriptionAsComments,
 )}
@@ -220,6 +227,31 @@ for await (const { output, partialOutput } of stream) {
   console.log(output) // Conforms to output schema
   console.log(partialOutput) // All properties of output schema are optional
 }
+`.trim(),
+    },
+
+    importTaskRun: {
+      language: 'typescript',
+      code: `
+${[
+  'import { TaskInput, TaskOutput } from "@workflowai/workflowai"',
+  isUsingFileDataProvider && fileProviderImport,
+]
+  .filter(Boolean)
+  .join('\n')}
+
+const input: TaskInput<typeof ${importRunFunctionName}> = ${beautifiedInput}
+const output: TaskOutput<typeof ${importRunFunctionName}> = ${beautifiedOutput}
+
+await ${importRunFunctionName}(input, output, {
+  group: {
+    properties: {
+      provider: "openai",
+      model: "gpt-4o-2024-05-13",
+      temperature: 0,
+    }
+  }
+})
 `.trim(),
     },
   }

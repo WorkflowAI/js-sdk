@@ -11,7 +11,7 @@ npm i
 - Conversion is done by [openapi-typescript](https://www.npmjs.com/package/openapi-typescript)
 
 ```
-npm run codegen
+WORKFLOWAI_API_URL=https://api.workflowai.ai npm run codegen
 ```
 
 ## Linter

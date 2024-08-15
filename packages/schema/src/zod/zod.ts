@@ -1,2 +1,2 @@
-export * from './extensions'
+export * from './extensions.js'
 export * from 'zod'

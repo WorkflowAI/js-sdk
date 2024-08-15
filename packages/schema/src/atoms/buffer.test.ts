@@ -1,4 +1,4 @@
-import { BASE64_TO_BUFFER, BUFFER, BUFFER_TO_BASE64 } from './buffer'
+import { BASE64_TO_BUFFER, BUFFER, BUFFER_TO_BASE64 } from './buffer.js'
 
 describe('BUFFER', () => {
   it('should validate a Buffer instance', () => {

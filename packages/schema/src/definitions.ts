@@ -1,5 +1,5 @@
-import { z } from './zod'
-import * as extensions from './zod/extensions'
+import * as extensions from './zod/extensions.js'
+import { z } from './zod/index.js'
 
 type ZodExtensionName = keyof typeof extensions & keyof typeof z
 
