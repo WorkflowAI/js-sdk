@@ -45,7 +45,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@workflowai/schema": "^1.0.6",
+    "@workflowai/schema": "^1.0.8-alpha.0",
     "simply-beautiful": "^1.0.1"
   }
 }
