@@ -28,13 +28,13 @@ const apiMethod = z
   )
 
 const headers: Middleware = {
-    onRequest: (req) => {
-      req.headers.set('x-workflowai-source', 'sdk')
-      req.headers.set('x-workflowai-language', 'typescript')
-      req.headers.set('x-workflowai-version', '0.1.0')
-      return req
-    },
-  }
+  onRequest: (req) => {
+    req.headers.set('x-workflowai-source', 'sdk')
+    req.headers.set('x-workflowai-language', 'typescript')
+    req.headers.set('x-workflowai-version', '0.1.0')
+    return req
+  },
+}
 
 describe('WorkflowAIApi', () => {
   test('export api init function', () => {
@@ -82,7 +82,7 @@ describe('WorkflowAIApi', () => {
           expect.objectContaining({ onRequest: expect.any(Function) }),
           expect.objectContaining({ onResponse: expect.any(Function) }),
         ]),
-      })
+      }),
     )
     expect(createClients.createStreamClient).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -91,7 +91,7 @@ describe('WorkflowAIApi', () => {
           expect.objectContaining({ onRequest: expect.any(Function) }),
           expect.objectContaining({ onResponse: expect.any(Function) }),
         ]),
-      })
+      }),
     )
   })
 
@@ -107,7 +107,7 @@ describe('WorkflowAIApi', () => {
           expect.objectContaining({ onRequest: expect.any(Function) }),
           expect.objectContaining({ onResponse: expect.any(Function) }),
         ]),
-      })
+      }),
     )
     expect(createClients.createStreamClient).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -117,7 +117,7 @@ describe('WorkflowAIApi', () => {
           expect.objectContaining({ onRequest: expect.any(Function) }),
           expect.objectContaining({ onResponse: expect.any(Function) }),
         ]),
-      })
+      }),
     )
   })
 
@@ -135,7 +135,7 @@ describe('WorkflowAIApi', () => {
           expect.objectContaining({ onRequest: expect.any(Function) }),
           expect.objectContaining({ onResponse: expect.any(Function) }),
         ]),
-      })
+      }),
     )
     expect(createClients.createStreamClient).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -145,7 +145,7 @@ describe('WorkflowAIApi', () => {
           expect.objectContaining({ onRequest: expect.any(Function) }),
           expect.objectContaining({ onResponse: expect.any(Function) }),
         ]),
-      })
+      }),
     )
   })
 
@@ -158,17 +158,10 @@ describe('WorkflowAIApi', () => {
       use: [m1, m2],
     }
     initWorkflowAIApi(config)
-    expect(createClients.createJsonClient).toHaveBeenCalledWith(
-      {
-        ...config,
-        fetch: undefined,
-        use: [
-          headers,
-          m1,
-          m2,
-          throwError,
-        ],
-      }
-    )
+    expect(createClients.createJsonClient).toHaveBeenCalledWith({
+      ...config,
+      fetch: undefined,
+      use: [headers, m1, m2, throwError],
+    })
   })
 })
