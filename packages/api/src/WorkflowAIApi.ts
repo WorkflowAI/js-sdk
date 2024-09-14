@@ -27,14 +27,14 @@ export function initWorkflowAIApi(
 
   const addCustomHeaders: Middleware = {
     onRequest: (req) => {
-      req.headers.set('x-workflowai-source', 'sdk');
-      req.headers.set('x-workflowai-language', 'typescript');
-      req.headers.set('x-workflowai-version', '0.1.0');
-      return req;
-    }
-  };
+      req.headers.set('x-workflowai-source', 'sdk')
+      req.headers.set('x-workflowai-language', 'typescript')
+      req.headers.set('x-workflowai-version', '0.1.0')
+      return req
+    },
+  }
 
-  middlewares.unshift(addCustomHeaders);
+  middlewares.unshift(addCustomHeaders)
   // Add error handing middleware AT THE END of the chain
   middlewares.push(throwError)
 
