@@ -34,7 +34,7 @@ jobs:
         run: npm run codegen
         env:
           # Use either prod or staging api to generate code
-          WORKFLOWAI_API_URL: ${{ (github.event.inputs.branch == 'main' && 'https://api.workflowai.ai') || 'https://api.workflowai.dev' }}
+          WORKFLOWAI_API_URL: ${{ (github.event.inputs.branch == 'main' && 'https://api.workflowai.com') || 'https://api.workflowai.dev' }}
 
       - name: Check if any file changed
         id: has-git-diff
