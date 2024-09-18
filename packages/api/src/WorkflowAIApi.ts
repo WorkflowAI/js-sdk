@@ -1,6 +1,6 @@
 import { createJsonClient, createStreamClient } from './http-clients.js'
 import type { FetchOptions } from './index.js'
-import { Middleware, throwError } from './middlewares/index.js'
+import { customHeaders, Middleware, throwError } from './middlewares/index.js'
 import { getEnv } from './utils/getEnv.js'
 import { withStream } from './utils/withStream.js'
 
@@ -25,16 +25,9 @@ export function initWorkflowAIApi(
     ...config,
   }
 
-  const addCustomHeaders: Middleware = {
-    onRequest: (req) => {
-      req.headers.set('x-workflowai-source', 'sdk')
-      req.headers.set('x-workflowai-language', 'typescript')
-      req.headers.set('x-workflowai-version', '0.1.0')
-      return req
-    },
-  }
 
-  middlewares.unshift(addCustomHeaders)
+
+  middlewares.unshift(customHeaders)
   // Add error handing middleware AT THE END of the chain
   middlewares.push(throwError)
 

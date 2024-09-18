@@ -2,10 +2,9 @@ import { expect, test } from '@jest/globals'
 import { z } from 'zod'
 
 import * as createClients from './http-clients.js'
-import { Middleware, throwError } from './middlewares/index.js'
+import { customHeaders, Middleware, throwError } from './middlewares/index.js'
 import * as getEnv from './utils/getEnv.js'
 import { initWorkflowAIApi } from './WorkflowAIApi.js'
-// import { onResponse } from 'openapi-fetch'
 
 beforeAll(() => {
   jest.spyOn(createClients, 'createJsonClient')
@@ -26,15 +25,6 @@ const apiMethod = z
       status: z.any(),
     }),
   )
-
-const headers: Middleware = {
-  onRequest: (req) => {
-    req.headers.set('x-workflowai-source', 'sdk')
-    req.headers.set('x-workflowai-language', 'typescript')
-    req.headers.set('x-workflowai-version', '0.1.0')
-    return req
-  },
-}
 
 describe('WorkflowAIApi', () => {
   test('export api init function', () => {
@@ -72,53 +62,33 @@ describe('WorkflowAIApi', () => {
     expect(outputSchema.parse(api)).toBeTruthy()
   })
 
-  test('create clients is called with the correct arguments, no middleware', () => {
+  test('create clients is called with the correct arguments, no middlware', () => {
     const config = { key: 'api_key', url: 'https://api.example.com' }
     initWorkflowAIApi(config)
-    expect(createClients.createJsonClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...config,
-        use: expect.arrayContaining([
-          expect.objectContaining({ onRequest: expect.any(Function) }),
-          expect.objectContaining({ onResponse: expect.any(Function) }),
-        ]),
-      }),
-    )
-    expect(createClients.createStreamClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...config,
-        use: expect.arrayContaining([
-          expect.objectContaining({ onRequest: expect.any(Function) }),
-          expect.objectContaining({ onResponse: expect.any(Function) }),
-        ]),
-      }),
-    )
+    expect(createClients.createJsonClient).toHaveBeenCalledWith({
+      ...config,
+      use: [customHeaders, throwError],
+    })
+    expect(createClients.createStreamClient).toHaveBeenCalledWith({
+      ...config,
+      use: [customHeaders, throwError],
+    })
   })
 
   test('create clients is called with defaults', () => {
     initWorkflowAIApi()
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_KEY')
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_URL')
-    expect(createClients.createJsonClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: undefined,
-        url: 'https://api.workflowai.ai',
-        use: expect.arrayContaining([
-          expect.objectContaining({ onRequest: expect.any(Function) }),
-          expect.objectContaining({ onResponse: expect.any(Function) }),
-        ]),
-      }),
-    )
-    expect(createClients.createStreamClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: undefined,
-        url: 'https://api.workflowai.ai',
-        use: expect.arrayContaining([
-          expect.objectContaining({ onRequest: expect.any(Function) }),
-          expect.objectContaining({ onResponse: expect.any(Function) }),
-        ]),
-      }),
-    )
+    expect(createClients.createJsonClient).toHaveBeenCalledWith({
+      key: undefined,
+      url: 'https://api.workflowai.ai',
+      use: [customHeaders, throwError],
+    })
+    expect(createClients.createStreamClient).toHaveBeenCalledWith({
+      key: undefined,
+      url: 'https://api.workflowai.ai',
+      use: [customHeaders, throwError],
+    })
   })
 
   test('create clients is called with values from env', () => {
@@ -127,29 +97,19 @@ describe('WorkflowAIApi', () => {
     initWorkflowAIApi()
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_KEY')
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_URL')
-    expect(createClients.createJsonClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: 'qui',
-        url: 'https://api.example.com',
-        use: expect.arrayContaining([
-          expect.objectContaining({ onRequest: expect.any(Function) }),
-          expect.objectContaining({ onResponse: expect.any(Function) }),
-        ]),
-      }),
-    )
-    expect(createClients.createStreamClient).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: 'qui',
-        url: 'https://api.example.com',
-        use: expect.arrayContaining([
-          expect.objectContaining({ onRequest: expect.any(Function) }),
-          expect.objectContaining({ onResponse: expect.any(Function) }),
-        ]),
-      }),
-    )
+    expect(createClients.createJsonClient).toHaveBeenCalledWith({
+      key: 'qui',
+      url: 'https://api.example.com',
+      use: [customHeaders, throwError],
+    })
+    expect(createClients.createStreamClient).toHaveBeenCalledWith({
+      key: 'qui',
+      url: 'https://api.example.com',
+      use: [customHeaders, throwError],
+    })
   })
 
-  test('create clients is called with the correct arguments, with middleware', () => {
+  test('create clients is called with the correct arguments, with middlware', () => {
     const m1: Middleware = { onRequest: jest.fn() }
     const m2: Middleware = { onRequest: jest.fn() }
     const config = {
@@ -160,8 +120,11 @@ describe('WorkflowAIApi', () => {
     initWorkflowAIApi(config)
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       ...config,
-      fetch: undefined,
-      use: [headers, m1, m2, throwError],
+      use: [customHeaders, m1, m2, throwError],
+    })
+    expect(createClients.createStreamClient).toHaveBeenCalledWith({
+      ...config,
+      use: [customHeaders, m1, m2, throwError],
     })
   })
 })
