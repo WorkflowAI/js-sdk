@@ -25,8 +25,6 @@ export function initWorkflowAIApi(
     ...config,
   }
 
-
-
   middlewares.unshift(customHeaders)
   // Add error handing middleware AT THE END of the chain
   middlewares.push(throwError)
