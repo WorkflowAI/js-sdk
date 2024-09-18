@@ -81,12 +81,12 @@ describe('WorkflowAIApi', () => {
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_URL')
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       key: undefined,
-      url: 'https://api.workflowai.ai',
+      url: 'https://api.workflowai.com',
       use: [customHeaders, throwError],
     })
     expect(createClients.createStreamClient).toHaveBeenCalledWith({
       key: undefined,
-      url: 'https://api.workflowai.ai',
+      url: 'https://api.workflowai.com',
       use: [customHeaders, throwError],
     })
   })

@@ -21,7 +21,7 @@ export function initWorkflowAIApi(
     fetch,
   } = {
     key: getEnv('WORKFLOWAI_API_KEY'),
-    url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',
+    url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.com',
     ...config,
   }
 
