@@ -14,11 +14,13 @@ function getPackageVersion() {
   }
 }
 
+const packageVersion = getPackageVersion()
+
 const customHeaders: Middleware = {
   onRequest: (req) => {
     req.headers.set('x-workflowai-source', 'sdk')
     req.headers.set('x-workflowai-language', 'typescript')
-    req.headers.set('x-workflowai-version', getPackageVersion())
+    req.headers.set('x-workflowai-version', packageVersion)
     return req
   },
 }
