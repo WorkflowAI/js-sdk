@@ -7,7 +7,7 @@ export type { Middleware } from 'openapi-fetch'
 function getPackageVersion() {
   try {
     const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
-    return packageJson?.version;
+    return packageJson?.version
   } catch (error) {
     console.error('Error reading package.json:', error)
     return undefined
