@@ -46,10 +46,14 @@ describe('throwError middleware', () => {
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
       expect(error.message).toBe(
         `Failed to request ${response.url}: {
-  "message": "Something went wrong"
+  "error": {
+    "details": {
+      "message": "Something went wrong"
+    }
+  }
 }`,
       )
-      expect(error.detail).toEqual({ message: 'Something went wrong' })
+
       expect(error.url).toBe(response.url)
       expect(error.status).toBe(response.status)
       expect(error.response).toBe(response)
@@ -92,19 +96,21 @@ describe('throwError middleware', () => {
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
       expect(error.message).toBe(
         `Failed to request ${response.url}: {
-  "details": {
-    "provider_status_code": 200,
-    "provider_error": null,
-    "provider_options": {
-      "model": "claude-3-haiku-20240307",
-      "temperature": 0.1,
-      "timeout": 180.2
+  "error": {
+    "details": {
+      "provider_status_code": 200,
+      "provider_error": null,
+      "provider_options": {
+        "model": "claude-3-haiku-20240307",
+        "temperature": 0.1,
+        "timeout": 180.2
+      },
+      "provider": null
     },
-    "provider": null
-  },
-  "message": "Received invalid JSON: at [icd10_code], 'I10' is not one of ['Z83.7', 'Z83.49', 'Z83.438', 'Z83.42', 'Z82.49', 'Z82.41']",
-  "status_code": 400,
-  "code": "invalid_generation"
+    "message": "Received invalid JSON: at [icd10_code], 'I10' is not one of ['Z83.7', 'Z83.49', 'Z83.438', 'Z83.42', 'Z82.49', 'Z82.41']",
+    "status_code": 400,
+    "code": "invalid_generation"
+  }
 }`,
       )
       expect(error.url).toBe(response.url)
@@ -124,14 +130,18 @@ describe('throwError middleware', () => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-
     try {
       await throwError.onResponse?.(response)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       expect(error).toBeInstanceOf(WorkflowAIApiRequestError)
-      expect(error.message).toBe(`Failed to request ${response.url}`)
-      expect(error.detail).toBeUndefined()
+      expect(error.message).toBe(`Failed to request ${response.url}: {
+  "error": {
+    "message": "Failed to parse response",
+    "status_code": 500
+  }
+}`
+      )
       expect(error.url).toBe(response.url)
       expect(error.status).toBe(response.status)
       expect(error.response).toBe(response)

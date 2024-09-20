@@ -29,3 +29,14 @@ export interface WorkflowAIApiError {
   }
   task_run_id?: string
 }
+
+export const extractError = (respJson: any): WorkflowAIApiError => {
+    if (Object.keys(respJson).length === 0) {
+      return { error: { message: "Default error message", status_code: 500, code: "internal_error" } };
+    }
+    try {
+      return { error: { details: respJson.error.details, message: respJson.error.message, status_code: respJson.error.status_code, code: respJson.error.code } }
+    } catch (e) {
+      return { error: { details: respJson.detail } }
+    }
+  }
