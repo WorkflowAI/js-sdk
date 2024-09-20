@@ -44,25 +44,11 @@ export const extractError = (respJson: unknown): WorkflowAIApiError => {
       },
     }
   }
-  try {
-    const errorResp = respJson as {
-      error?: {
-        details?: Record<string, unknown>
-        message?: string
-        status_code?: number
-        code?: ErrorCode
-      }
-    }
-    return {
-      error: {
-        details: errorResp.error?.details,
-        message: errorResp.error?.message,
-        status_code: errorResp.error?.status_code,
-        code: errorResp.error?.code,
-      },
-    }
-  } catch (_) {
+  if ('error' in respJson) {
+    return respJson as WorkflowAIApiError
+  } else if ('detail' in respJson) {
     const detailResp = respJson as { detail?: Record<string, unknown> }
-    return { error: { details: detailResp.detail } }
+    return { error: { details: detailResp.detail } } as WorkflowAIApiError
   }
+  return {} as WorkflowAIApiError
 }

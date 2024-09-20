@@ -109,7 +109,8 @@ describe('throwError middleware', () => {
     "message": "Received invalid JSON: at [icd10_code], 'I10' is not one of ['Z83.7', 'Z83.49', 'Z83.438', 'Z83.42', 'Z82.49', 'Z82.41']",
     "status_code": 400,
     "code": "invalid_generation"
-  }
+  },
+  "task_run_id": "5f96bd10-0538-4849-802e-47f8d5c4d48f"
 }`,
       )
       expect(error.url).toBe(response.url)
