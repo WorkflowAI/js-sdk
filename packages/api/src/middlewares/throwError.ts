@@ -8,16 +8,20 @@ import { extractError } from '../ErrorResponse.js'
  */
 export const throwError = {
   async onResponse(res: Response) {
-
-    let resp = {};
+    let resp = {}
     if (!res.ok) {
       try {
-        resp = await res.json();
-      } catch (error) {
-        resp = { error: { message: 'Failed to parse response', status_code: res.status } };
+        resp = await res.json()
+      } catch (_) {
+        resp = {
+          error: {
+            message: 'Failed to parse response',
+            status_code: res.status,
+          },
+        }
       }
-    
-    throw new WorkflowAIApiRequestError(res, extractError(resp))
+
+      throw new WorkflowAIApiRequestError(res, extractError(resp))
     }
     return res
   },

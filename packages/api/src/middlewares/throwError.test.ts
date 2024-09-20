@@ -53,7 +53,6 @@ describe('throwError middleware', () => {
   }
 }`,
       )
-
       expect(error.url).toBe(response.url)
       expect(error.status).toBe(response.status)
       expect(error.response).toBe(response)
@@ -140,8 +139,7 @@ describe('throwError middleware', () => {
     "message": "Failed to parse response",
     "status_code": 500
   }
-}`
-      )
+}`)
       expect(error.url).toBe(response.url)
       expect(error.status).toBe(response.status)
       expect(error.response).toBe(response)
