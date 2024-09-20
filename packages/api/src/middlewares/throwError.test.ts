@@ -28,7 +28,7 @@ describe('throwError middleware', () => {
   it('should throw WorkflowAIApiRequestError with correct error message', async () => {
     const response = new Response(
       JSON.stringify({
-        detail: {
+        error: {
           message: 'Something went wrong',
         },
       }),

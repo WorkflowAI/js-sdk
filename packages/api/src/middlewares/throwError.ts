@@ -8,12 +8,13 @@ import { WorkflowAIApiRequestError } from '../Error.js'
 export const throwError = {
   async onResponse(res: Response) {
     if (!res.ok) {
-      let detail: unknown
+      let error: unknown
       try {
-        detail = (await res.json())?.detail
+        const respJson = await res.json()
+        error = respJson?.error
       } finally {
         // eslint-disable-next-line no-unsafe-finally
-        throw new WorkflowAIApiRequestError(res, detail)
+        throw new WorkflowAIApiRequestError(res, error)
       }
     }
     return res
