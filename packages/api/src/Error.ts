@@ -26,7 +26,7 @@ export class WorkflowAIApiRequestError extends Error {
    */
   constructor(response: Response, detail?: unknown) {
     super(
-      `Failed to request ${response.url}${detail ? ': ' + JSON.stringify(detail) : ''}`,
+      `Failed to request ${response.url}${detail ? ': ' + JSON.stringify(detail, null, 2) : ''}`,
     )
 
     this.detail = detail

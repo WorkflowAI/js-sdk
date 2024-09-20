@@ -11,7 +11,7 @@ export const throwError = {
       let error: unknown
       try {
         const respJson = await res.json()
-        error = respJson?.error
+        error = respJson?.detail || respJson?.error
       } finally {
         // eslint-disable-next-line no-unsafe-finally
         throw new WorkflowAIApiRequestError(res, error)
