@@ -1,5 +1,5 @@
 import { WorkflowAIApiRequestError } from './Error.js'
-import { WorkflowAIApiError, extractError } from './ErrorResponse.js'
+import { extractError,WorkflowAIApiError } from './ErrorResponse.js'
 
 describe('WorkflowAIApiRequestError', () => {
   test('should create a new instance with response and detail', () => {
