@@ -12,7 +12,8 @@ export const throwError = {
     if (!res.ok) {
       try {
         resp = await res.json()
-      } catch (_) {
+      } catch (err) {
+        console.error('Failed to parse error response:', err)
         resp = {
           error: {
             message: 'Failed to parse response',
@@ -20,7 +21,6 @@ export const throwError = {
           },
         }
       }
-
       throw new WorkflowAIApiRequestError(res, extractError(resp))
     }
     return res
