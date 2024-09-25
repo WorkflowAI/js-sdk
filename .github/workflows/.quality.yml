@@ -1,0 +1,40 @@
+name: Quality
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        default: ${{ github.ref_name }}
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ["18.13.0", "lts/*"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          check-latest: ${{ matrix.node-version == 'lts/*' }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Linter
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit Tests
+        run: npm run test

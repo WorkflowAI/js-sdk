@@ -1,0 +1,19 @@
+name: branches
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+      - release/**
+      - staging/**
+      - hotfix/**
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  quality:
+    uses: ./.github/workflows/.quality.yml
+    secrets: inherit

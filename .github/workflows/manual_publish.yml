@@ -1,0 +1,33 @@
+name: Manual Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        default: "next"
+        description: "NPM tag to publish to"
+      branch:
+        type: string
+        default: "main"
+        description: "Branch to publish from"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  quality:
+    uses: ./.github/workflows/.quality.yml
+    secrets: inherit
+    with:
+      branch: ${{ inputs.branch }}
+
+  publish:
+    needs: quality
+    uses: ./.github/workflows/.publish.yml
+    secrets: inherit
+    with:
+      tag: ${{ inputs.tag }}
+      expectedVersion: ""
+      branch: ${{ inputs.branch }}

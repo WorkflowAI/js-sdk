@@ -1,0 +1,45 @@
+name: Publish
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        default: ${{ github.ref_name }}
+      tag:
+        type: string
+        required: true
+      expectedVersion:
+        type: string
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: npm
+          registry-url: "https://registry.npmjs.org" # Must be specified to create a .npmrc file with auth token env var (see publish action below)
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check version
+        run: npm run check-version ${{ inputs.expectedVersion }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to NPM
+        run: npx tsx ./bin/npm-publish --tag=${{ inputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -44,6 +44,7 @@
     "test:watch": "npm run test:ts-jest --watch",
     "test": "npm run test:ts-jest --",
     "test:ts-jest": "npx jest --config ./configs/jest.config.ts",
-    "set-version": "tsx bin/set-version.ts"
+    "set-version": "tsx bin/set-version.ts",
+    "check-version": "tsx bin/check-version.ts"
   }
 }
