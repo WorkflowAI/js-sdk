@@ -43,6 +43,7 @@
     "build": "npm run build --workspaces --if-present",
     "test:watch": "npm run test:ts-jest --watch",
     "test": "npm run test:ts-jest --",
-    "test:ts-jest": "npx jest --config ./configs/jest.config.ts"
+    "test:ts-jest": "npx jest --config ./configs/jest.config.ts",
+    "set-version": "tsx bin/set-version.ts"
   }
 }
