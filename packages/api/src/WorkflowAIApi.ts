@@ -1,8 +1,8 @@
-import type { FetchOptions } from '.'
-import { createJsonClient, createStreamClient } from './http-clients'
-import { Middleware, throwError } from './middlewares'
-import { getEnv } from './utils/getEnv'
-import { withStream } from './utils/withStream'
+import { createJsonClient, createStreamClient } from './http-clients.js'
+import type { FetchOptions } from './index.js'
+import { customHeaders, Middleware, throwError } from './middlewares/index.js'
+import { getEnv } from './utils/getEnv.js'
+import { withStream } from './utils/withStream.js'
 
 export type InitWorkflowAIApiConfig = {
   key?: string | undefined
@@ -21,10 +21,11 @@ export function initWorkflowAIApi(
     fetch,
   } = {
     key: getEnv('WORKFLOWAI_API_KEY'),
-    url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.ai',
+    url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.com',
     ...config,
   }
 
+  middlewares.unshift(customHeaders)
   // Add error handing middleware AT THE END of the chain
   middlewares.push(throwError)
 

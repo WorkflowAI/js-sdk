@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import { BASE64_TO_BUFFER, BUFFER_TO_BASE64 } from './buffer'
-import { BASE64_DATA_URL_TO_BASE64 } from './data-url'
-import { resolved } from './promise'
+import { BASE64_TO_BUFFER, BUFFER_TO_BASE64 } from './buffer.js'
+import { BASE64_DATA_URL_TO_BASE64 } from './data-url.js'
+import { resolved } from './promise.js'
 
 /**
  * Represents the content types for images.

@@ -4,9 +4,9 @@ import {
   ParserOverride,
 } from 'json-schema-to-zod'
 
-import { Definition, definitions } from './definitions'
-import { hydrateRefs } from './json-schema/json-schema-refs'
-import { sanitize } from './json-schema/sanitize-json-schema'
+import { Definition, definitions } from './definitions.js'
+import { hydrateRefs } from './json-schema/json-schema-refs.js'
+import { sanitize } from './json-schema/sanitize-json-schema.js'
 
 /**
  * Creates a parser override function for a specific type of Zod schema.

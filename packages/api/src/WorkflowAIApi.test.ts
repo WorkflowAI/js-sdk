@@ -1,10 +1,10 @@
 import { expect, test } from '@jest/globals'
 import { z } from 'zod'
 
-import * as createClients from './http-clients'
-import { Middleware, throwError } from './middlewares'
-import * as getEnv from './utils/getEnv'
-import { initWorkflowAIApi } from './WorkflowAIApi'
+import * as createClients from './http-clients.js'
+import { customHeaders, Middleware, throwError } from './middlewares/index.js'
+import * as getEnv from './utils/getEnv.js'
+import { initWorkflowAIApi } from './WorkflowAIApi.js'
 
 beforeAll(() => {
   jest.spyOn(createClients, 'createJsonClient')
@@ -67,11 +67,11 @@ describe('WorkflowAIApi', () => {
     initWorkflowAIApi(config)
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       ...config,
-      use: [throwError],
+      use: [customHeaders, throwError],
     })
     expect(createClients.createStreamClient).toHaveBeenCalledWith({
       ...config,
-      use: [throwError],
+      use: [customHeaders, throwError],
     })
   })
 
@@ -81,13 +81,13 @@ describe('WorkflowAIApi', () => {
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_URL')
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       key: undefined,
-      url: 'https://api.workflowai.ai',
-      use: [throwError],
+      url: 'https://api.workflowai.com',
+      use: [customHeaders, throwError],
     })
     expect(createClients.createStreamClient).toHaveBeenCalledWith({
       key: undefined,
-      url: 'https://api.workflowai.ai',
-      use: [throwError],
+      url: 'https://api.workflowai.com',
+      use: [customHeaders, throwError],
     })
   })
 
@@ -100,12 +100,12 @@ describe('WorkflowAIApi', () => {
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       key: 'qui',
       url: 'https://api.example.com',
-      use: [throwError],
+      use: [customHeaders, throwError],
     })
     expect(createClients.createStreamClient).toHaveBeenCalledWith({
       key: 'qui',
       url: 'https://api.example.com',
-      use: [throwError],
+      use: [customHeaders, throwError],
     })
   })
 
@@ -120,11 +120,11 @@ describe('WorkflowAIApi', () => {
     initWorkflowAIApi(config)
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       ...config,
-      use: [m1, m2, throwError],
+      use: [customHeaders, m1, m2, throwError],
     })
     expect(createClients.createStreamClient).toHaveBeenCalledWith({
       ...config,
-      use: [m1, m2, throwError],
+      use: [customHeaders, m1, m2, throwError],
     })
   })
 })

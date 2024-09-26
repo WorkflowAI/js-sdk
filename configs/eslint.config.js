@@ -3,6 +3,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:require-extensions/recommended',
     // 'prettier', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
   ],
   ignorePatterns: [],
@@ -12,6 +13,7 @@ module.exports = {
     'import',
     'simple-import-sort',
     'unused-imports',
+    'require-extensions',
   ],
   rules: {
     'import/order': 0, // turn off in favor of eslint-plugin-simple-import-sort

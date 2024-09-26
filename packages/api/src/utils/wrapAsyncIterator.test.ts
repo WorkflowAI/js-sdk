@@ -1,4 +1,4 @@
-import { wrapAsyncIterator } from './wrapAsyncIterator'
+import { wrapAsyncIterator } from './wrapAsyncIterator.js'
 
 describe('wrapAsyncIterator', () => {
   it('should transform values from the original async iterator', async () => {

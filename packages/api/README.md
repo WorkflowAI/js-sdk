@@ -15,7 +15,7 @@ import { initWorkflowAIApi } from '@workflowai/api'
 
 const workflowAIApi = initWorkflowAIApi({
   apiKey: '...', // optional, defaults to process.env.WORKFLOWAI_API_KEY
-  apiUrl: '...', // optional, defaults to process.env.WORKFLOWAI_API_URL, then to https://api.workflowai.ai
+  apiUrl: '...', // optional, defaults to process.env.WORKFLOWAI_API_URL, then to https://api.workflowai.com
   use: [], // optional, fetch middlewares
 })
 ```

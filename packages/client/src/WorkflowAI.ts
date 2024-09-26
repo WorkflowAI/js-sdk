@@ -9,11 +9,12 @@ import {
 } from '@workflowai/api'
 import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema'
 
+import { extractError } from '../../api/src/ErrorResponse.js'
 import {
   GroupReference,
   isGroupReference,
   sanitizeGroupReference,
-} from './Group'
+} from './Group.js'
 import {
   hasSchemaId,
   ImportRunFn,
@@ -25,7 +26,7 @@ import {
   type TaskRunStreamEvent,
   type TaskRunStreamResult,
   type UseTaskResult,
-} from './Task'
+} from './Task.js'
 
 export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig
@@ -79,7 +80,7 @@ export class WorkflowAI {
     })
 
     if (!data) {
-      throw new WorkflowAIApiRequestError(response, error)
+      throw new WorkflowAIApiRequestError(response, extractError(error))
     }
 
     return {
@@ -170,7 +171,7 @@ export class WorkflowAI {
       // Non-streaming version, await the run to actually send the request
       const { data, error, response } = await run
       if (!data) {
-        throw new WorkflowAIApiRequestError(response, error)
+        throw new WorkflowAIApiRequestError(response, extractError(error))
       }
 
       return {
@@ -211,7 +212,7 @@ export class WorkflowAI {
     })
 
     if (!data) {
-      throw new WorkflowAIApiRequestError(response, error)
+      throw new WorkflowAIApiRequestError(response, extractError(error))
     }
 
     return { data, response }

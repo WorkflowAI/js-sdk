@@ -1,4 +1,4 @@
-import { withStream } from './withStream'
+import { withStream } from './withStream.js'
 
 describe('withStream', () => {
   // Existing test case

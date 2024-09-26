@@ -4,7 +4,7 @@ import {
   outputSchemaToZod,
 } from '@workflowai/schema'
 
-import { beautifyTypescript } from './beautify'
+import { beautifyTypescript } from './beautify.js'
 
 /**
  * Transform a string into a valid TS/JS var name

@@ -1,6 +1,6 @@
 import { JsonSchemaObject } from 'json-schema-to-zod'
 
-import { inputSchemaToZod, outputSchemaToZod } from './schemaToZod'
+import { inputSchemaToZod, outputSchemaToZod } from './schemaToZod.js'
 
 const INPUT_DEFINITIONS = {
   DatetimeLocal: {

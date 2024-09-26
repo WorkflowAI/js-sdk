@@ -1,4 +1,4 @@
-import { IMAGE_INPUT, IMAGE_OUTPUT } from './image'
+import { IMAGE_INPUT, IMAGE_OUTPUT } from './image.js'
 
 describe('IMAGE_INPUT', () => {
   it('should validate a valid image input object', () => {

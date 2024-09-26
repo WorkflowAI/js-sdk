@@ -1,5 +1,5 @@
-import * as extensions from './extensions'
-import * as zodExports from './zod'
+import * as extensions from './extensions.js'
+import * as zodExports from './zod.js'
 
 describe('zod exports', () => {
   it('should re-export everything from extensions', () => {
