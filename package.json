@@ -1,7 +1,7 @@
 {
   "name": "@workflowai/workspaces",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.4.0-alpha.0",
   "description": "Collection of TS/JS libraries, private and public, for workflowAI.",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -43,6 +43,8 @@
     "build": "npm run build --workspaces --if-present",
     "test:watch": "npm run test:ts-jest --watch",
     "test": "npm run test:ts-jest --",
-    "test:ts-jest": "npx jest --config ./configs/jest.config.ts"
+    "test:ts-jest": "npx jest --config ./configs/jest.config.ts",
+    "set-version": "tsx bin/set-version.ts",
+    "check-version": "tsx bin/check-version.ts"
   }
 }

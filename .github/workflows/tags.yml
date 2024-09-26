@@ -1,0 +1,23 @@
+name: tags
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  quality:
+    uses: ./.github/workflows/.quality.yml
+    secrets: inherit
+
+  publish:
+    needs: quality
+    uses: ./.github/workflows/.publish.yml
+    secrets: inherit
+    with:
+      tag: latest
+      expectedVersion: ${{ github.ref_name }}
