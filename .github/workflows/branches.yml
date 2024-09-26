@@ -2,12 +2,8 @@ name: branches
 
 on:
   push:
-    branches-ignore:
-      - main
-      - dev
-      - release/**
-      - staging/**
-      - hotfix/**
+    branches:
+      - "*"
 
 permissions:
   contents: read
