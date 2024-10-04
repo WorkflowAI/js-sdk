@@ -1,5 +1,17 @@
-import { DATETIME_LOCAL, IMAGE_INPUT, IMAGE_OUTPUT, FILE_INPUT, FILE_OUTPUT } from '../atoms/index.js'
-import { datetimeLocal, imageInput, imageOutput, fileInput, fileOutput } from './extensions.js'
+import {
+  DATETIME_LOCAL,
+  IMAGE_INPUT,
+  IMAGE_OUTPUT,
+  FILE_INPUT,
+  FILE_OUTPUT,
+} from '../atoms/index.js'
+import {
+  datetimeLocal,
+  imageInput,
+  imageOutput,
+  fileInput,
+  fileOutput,
+} from './extensions.js'
 
 describe('Extensions', () => {
   it('imageInput should return IMAGE_INPUT', () => {
@@ -25,6 +37,5 @@ it('fileInput should return FILE_INPUT', () => {
 
 it('fileOutput should return FILE_OUTPUT', () => {
   const result = fileOutput()
-    expect(result).toBe(FILE_OUTPUT)
-  })
-
+  expect(result).toBe(FILE_OUTPUT)
+})

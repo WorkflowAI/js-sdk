@@ -387,4 +387,3 @@ describe('File', () => {
     expect(zodSchema).toBe(`z.object({ "i": z.fileOutput().optional() })`)
   })
 })
-
