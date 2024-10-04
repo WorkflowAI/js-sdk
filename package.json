@@ -8,7 +8,6 @@
   "workspaces": [
     "packages/schema",
     "packages/api",
-    "packages/code-generator",
     "packages/client"
   ],
   "devDependencies": {
