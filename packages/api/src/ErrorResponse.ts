@@ -9,16 +9,18 @@ export type ProviderErrorCode =
   | 'provider_internal_error'
   | 'provider_unavailable'
   | 'read_timeout'
+  | 'model_does_not_support_mode'
+
 
 export type ErrorCode =
   | ProviderErrorCode
   | 'object_not_found'
   | 'no_provider_supporting_model'
   | 'provider_does_not_support_model'
-  | 'model_does_not_support_mode'
   | 'invalid_run_properties'
   | 'internal_error'
   | 'bad_request'
+  | 'invalid_file'
 
 export interface WorkflowAIApiError {
   error: {

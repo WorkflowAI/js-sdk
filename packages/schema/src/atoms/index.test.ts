@@ -1,6 +1,7 @@
 import * as bufferExports from './buffer.js'
 import * as datetimeLocalExports from './datetime-local.js'
 import * as imageExports from './image.js'
+import * as fileExports from './file.js'
 import * as indexExports from './index.js'
 
 describe('index exports', () => {
@@ -21,4 +22,10 @@ describe('index exports', () => {
       expect.arrayContaining(Object.keys(imageExports)),
     )
   })
+})
+
+it('should re-export everything from file', () => {
+  expect(Object.keys(indexExports)).toEqual(
+    expect.arrayContaining(Object.keys(fileExports)),
+  )
 })

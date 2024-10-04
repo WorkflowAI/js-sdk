@@ -26,4 +26,11 @@ export const definitions: Definition[] = [
       output: 'imageOutput',
     },
   },
+  {
+    jsonSchemaDefinitionKey: 'File',
+    zodSchema: {
+      input: 'fileInput',
+      output: 'fileOutput',
+    },
+  },
 ]

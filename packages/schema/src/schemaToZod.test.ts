@@ -72,6 +72,58 @@ const INPUT_DEFINITIONS = {
     required: ['content_type', 'data'],
     type: 'object',
   },
+  File: {
+    additionalProperties: false,
+    properties: {
+      content_type: {
+        description: 'The content type of the file',
+        enum: [
+          'image/png',
+          'image/jpg',
+          'image/jpeg',
+          'image/webp',
+          'image/tiff',
+          'image/gif',
+          'application/pdf',
+          'audio/mpeg',
+          'audio/wav',
+          'audio/ogg',
+          'audio/flac',
+          'audio/aac',
+        ],
+        type: 'string',
+      },
+      data: {
+        anyOf: [
+          {
+            anyOf: [
+              {
+                contentEncoding: 'base64',
+                type: 'string',
+              },
+              {
+                pattern: '^data:[^;]*;base64,[-A-Za-z0-9+/]+={0,3}$',
+                type: 'string',
+              },
+              {
+                anyOf: [{}, {}],
+              },
+            ],
+          },
+          {
+            $ref: '#/$defs/File/properties/data/anyOf/0',
+          },
+        ],
+        description: 'The Buffer or base64 encoded data of the file',
+      },
+      name: {
+        description: 'An optional name',
+        type: 'string',
+      },
+    },
+    required: ['content_type', 'data'],
+    type: 'object',
+  },
 }
 
 const OUTPUT_DEFINITIONS = {
@@ -116,6 +168,40 @@ const OUTPUT_DEFINITIONS = {
       data: {
         contentEncoding: 'base64',
         description: 'The data of the image as Buffer',
+        type: 'string',
+      },
+      name: {
+        description: 'An optional name',
+        type: 'string',
+      },
+    },
+    required: ['content_type', 'data'],
+    type: 'object',
+  },
+  File: {
+    additionalProperties: false,
+    properties: {
+      content_type: {
+        description: 'The content type of the file',
+        enum: [
+          'image/png',
+          'image/jpg',
+          'image/jpeg',
+          'image/webp',
+          'image/tiff',
+          'image/gif',
+          'application/pdf',
+          'audio/mpeg',
+          'audio/wav',
+          'audio/ogg',
+          'audio/flac',
+          'audio/aac',
+        ],
+        type: 'string',
+      },
+      data: {
+        contentEncoding: 'base64',
+        description: 'The data of the file as Buffer',
         type: 'string',
       },
       name: {
@@ -271,3 +357,34 @@ describe('schemaToZod', () => {
     })
   })
 })
+
+describe('File', () => {
+  it('inputSchemaToZod should convert JSON schema with File definition to Zod schema', async () => {
+    const mockJsonSchema: JsonSchemaObject = {
+      type: 'object',
+      properties: {
+        i: { $ref: '#/$defs/File' },
+      },
+      $defs: {
+        ...INPUT_DEFINITIONS,
+      },
+    }
+    const zodSchema = await inputSchemaToZod(mockJsonSchema)
+    expect(zodSchema).toBe(`z.object({ "i": z.fileInput().optional() })`)
+  })
+
+  it('outputSchemaToZod should convert JSON schema with Image definition to Zod schema', async () => {
+    const mockJsonSchema: JsonSchemaObject = {
+      type: 'object',
+      properties: {
+        i: { $ref: '#/$defs/File' },
+      },
+      $defs: {
+        ...OUTPUT_DEFINITIONS,
+      },
+    }
+    const zodSchema = await outputSchemaToZod(mockJsonSchema)
+    expect(zodSchema).toBe(`z.object({ "i": z.fileOutput().optional() })`)
+  })
+})
+
