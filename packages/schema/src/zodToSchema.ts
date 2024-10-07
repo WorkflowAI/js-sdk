@@ -1,30 +1,14 @@
-import { zodToJsonSchema } from 'zod-to-json-schema'
+import { zodToJsonSchema } from "zod-to-json-schema";
 
-import { definitions } from './definitions.js'
-import { z } from './zod/index.js'
+import { z } from "./zod/index.js";
+import { definitions } from "./definitions.js";
 
-type Definitions = Record<string, z.ZodTypeAny>
-
-/**
- * Converts Zod schemas to JSON schemas.
- *
- * @param definitions - An array of schema definitions.
- * @returns An object containing input and output JSON schemas.
- */
-const { input: inputSchemaDefinitions, output: outputSchemaDefinitions } =
-  definitions.reduce<{ input: Definitions; output: Definitions }>(
-    (result, { jsonSchemaDefinitionKey, zodSchema }) => ({
-      input: {
-        ...result.input,
-        [jsonSchemaDefinitionKey]: z[zodSchema.input](),
-      },
-      output: {
-        ...result.output,
-        [jsonSchemaDefinitionKey]: z[zodSchema.output](),
-      },
-    }),
-    { input: {}, output: {} },
-  )
+type ConvertedSchema = Omit<
+  ReturnType<typeof zodToJsonSchema>,
+  "definitions"
+> & {
+  $defs?: ReturnType<typeof zodToJsonSchema>["definitions"];
+};
 
 /**
  * Converts a Zod schema to a JSON schema.
@@ -33,15 +17,23 @@ const { input: inputSchemaDefinitions, output: outputSchemaDefinitions } =
  * @param definitions - The JSON schema definitions to include.
  * @returns The converted JSON schema.
  */
-const zodToSchema = (zodSchema: z.ZodTypeAny, definitions: Definitions) => {
-  return zodToJsonSchema(zodSchema, {
-    definitionPath: '$defs',
-    target: 'openApi3',
-    definitions: {
-      ...definitions,
-    },
-  })
-}
+const zodToSchema = (zodSchema: z.ZodTypeAny) => {
+  const schema: ConvertedSchema = zodToJsonSchema(zodSchema, {
+    definitionPath: "$defs",
+    target: "openApi3",
+    definitions,
+  });
+
+  const defs = schema["$defs"];
+  if (!defs) return schema;
+
+  // Remove keys that are exposed in defintions as they will be added by the backend
+  for (const key in definitions) {
+    delete defs[key];
+  }
+
+  return schema;
+};
 
 /**
  * Converts a Zod schema to a JSON schema.
@@ -50,8 +42,8 @@ const zodToSchema = (zodSchema: z.ZodTypeAny, definitions: Definitions) => {
  * @returns The converted JSON schema.
  */
 export const inputZodToSchema = async (zodSchema: z.ZodTypeAny) => {
-  return zodToSchema(zodSchema, inputSchemaDefinitions)
-}
+  return zodToSchema(zodSchema);
+};
 
 /**
  * Converts a Zod schema to a JSON schema.
@@ -59,5 +51,5 @@ export const inputZodToSchema = async (zodSchema: z.ZodTypeAny) => {
  * @returns The converted JSON schema.
  */
 export const outputZodToSchema = async (zodSchema: z.ZodTypeAny) => {
-  return zodToSchema(zodSchema, outputSchemaDefinitions)
-}
+  return zodToSchema(zodSchema);
+};
