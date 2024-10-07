@@ -28,7 +28,7 @@ jobs:
           node-version: lts/*
           check-latest: true
           cache: npm
-          registry-url: "https://registry.npmjs.org" # Must be specified to create a .npmrc file with auth token env var (see publish action below)
+          registry-url: 'https://registry.npmjs.org' # Must be specified to create a .npmrc file with auth token env var (see publish action below)
 
       - name: Install dependencies
         run: npm ci

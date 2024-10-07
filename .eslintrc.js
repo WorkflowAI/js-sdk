@@ -6,7 +6,7 @@ module.exports = {
     'plugin:require-extensions/recommended',
     // 'prettier', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
   ],
-  ignorePatterns: [],
+  ignorePatterns: ['**/node_modules/**', '**/dist/**'],
   // parser: '@typescript-eslint/parser', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
   plugins: [
     '@typescript-eslint',

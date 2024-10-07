@@ -1,7 +1,7 @@
 import type { Config } from 'jest'
 
 const config: Config = {
-  rootDir: '..',
+  rootDir: '.',
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',

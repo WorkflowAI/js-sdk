@@ -1,3 +1,3 @@
-import { FILE } from "./file";
+import { FILE } from './file.js'
 
-export const IMAGE = FILE.describe("[Deprecated] Use file instead.");
+export const IMAGE = FILE.describe('[Deprecated] Use file instead.')

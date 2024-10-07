@@ -1,78 +1,78 @@
-import { FILE } from "./file.js";
+import { FILE } from './file.js'
 
-describe("FILE", () => {
-  it("should validate a valid FILE input object", () => {
+describe('FILE', () => {
+  it('should validate a valid FILE input object', () => {
     const validInput = {
-      name: "FILE.png",
-      content_type: "FILE/png",
-      data: "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==", // a 1x1 red dot
-    };
+      name: 'FILE.png',
+      content_type: 'FILE/png',
+      data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==', // a 1x1 red dot
+    }
 
-    expect(FILE.safeParse(validInput).success).toBe(true);
-  });
+    expect(FILE.safeParse(validInput).success).toBe(true)
+  })
 
-  it("should validate an FILE input object with url", () => {
+  it('should validate an FILE input object with url', () => {
     const validInput = {
-      url: "https://example.com/FILE.png",
-    };
+      url: 'https://example.com/FILE.png',
+    }
 
-    expect(FILE.safeParse(validInput).success).toBe(true);
-  });
+    expect(FILE.safeParse(validInput).success).toBe(true)
+  })
 
-  it("should validate an FILE input object with optional name", () => {
+  it('should validate an FILE input object with optional name', () => {
     const validInput = {
-      content_type: "FILE/jpeg",
-      data: "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==", // a 1x1 red dot
-    };
+      content_type: 'FILE/jpeg',
+      data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==', // a 1x1 red dot
+    }
 
-    expect(FILE.safeParse(validInput).success).toBe(true);
-  });
+    expect(FILE.safeParse(validInput).success).toBe(true)
+  })
 
-  it("should fail validation for missing content_type", () => {
+  it('should fail validation for missing content_type', () => {
     const invalidInput = {
-      name: "FILE.jpg",
-      data: "base64encodeddata",
-    };
+      name: 'FILE.jpg',
+      data: 'base64encodeddata',
+    }
 
-    expect(FILE.safeParse(invalidInput).success).toBe(false);
-  });
+    expect(FILE.safeParse(invalidInput).success).toBe(false)
+  })
 
-  it("should fail validation for invalid content_type", () => {
+  it('should fail validation for invalid content_type', () => {
     const invalidInput = {
-      name: "FILE.gif",
-      content_type: "FILE/svg",
-      data: "base64encodeddata",
-    };
+      name: 'FILE.gif',
+      content_type: 'FILE/svg',
+      data: 'base64encodeddata',
+    }
 
-    expect(FILE.safeParse(invalidInput).success).toBe(false);
-  });
+    expect(FILE.safeParse(invalidInput).success).toBe(false)
+  })
 
-  it("should fail validation for missing data", () => {
+  it('should fail validation for missing data', () => {
     const invalidInput = {
-      name: "FILE.jpg",
-      content_type: "FILE/jpeg",
-    };
+      name: 'FILE.jpg',
+      content_type: 'FILE/jpeg',
+    }
 
-    expect(FILE.safeParse(invalidInput).success).toBe(false);
-  });
+    expect(FILE.safeParse(invalidInput).success).toBe(false)
+  })
 
-  it("should fail validation for invalid data", () => {
+  it('should fail validation for invalid data', () => {
     const invalidInput = {
-      name: "FILE.png",
-      content_type: "FILE/png",
+      name: 'FILE.png',
+      content_type: 'FILE/png',
       data: 12345,
-    };
+    }
 
-    expect(FILE.safeParse(invalidInput).success).toBe(false);
-  });
+    expect(FILE.safeParse(invalidInput).success).toBe(false)
+  })
 
-  it("allows any string as content_type", () => {
+  it('allows any string as content_type', () => {
     const validInput = {
-      name: "FILE.png",
-      content_type: "FILE/png",
-      data: "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==", // a 1x1 red dot
-    };
+      name: 'FILE.png',
+      content_type: 'FILE/png',
+      data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==', // a 1x1 red dot
+    }
 
-    expect(FILE.safeParse(validInput).success).toBe(true);
-  });
-});
+    expect(FILE.safeParse(validInput).success).toBe(true)
+  })
+})
