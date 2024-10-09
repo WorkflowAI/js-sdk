@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 /**
  * Represents a local datetime, with a date, local time, and timezone.
@@ -24,5 +24,5 @@ export const DATETIME_LOCAL = z
     timezone: z.string().describe('The timezone of the local time.'),
   })
   .describe(
-    'This class represents a local datetime, with a datetime and a timezone.',
-  )
+    'This class represents a local datetime, with a datetime and a timezone.'
+  );

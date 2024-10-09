@@ -1,10 +1,10 @@
-import createClient, { Middleware } from 'openapi-fetch'
-const { default: createOpenapiClient } = jest.requireActual('openapi-fetch')
+import createClient, { Middleware } from 'openapi-fetch';
+import { createJsonClient, createStreamClient } from './http-clients.js';
+import { retriableFetch } from './utils/retriableFetch.js';
 
-import { createJsonClient, createStreamClient } from './http-clients.js'
-import { retriableFetch } from './utils/retriableFetch.js'
+const { default: createOpenapiClient } = jest.requireActual('openapi-fetch');
 
-const use = jest.fn()
+const use = jest.fn();
 
 jest.mock('openapi-fetch', () => ({
   __esModule: true,
@@ -13,13 +13,13 @@ jest.mock('openapi-fetch', () => ({
       ...createOpenapiClient(options),
       use,
       isOpenApiClient: true,
-    }
+    };
   }),
-}))
+}));
 
 beforeEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});
 
 describe('createJsonClient', () => {
   it('should create a JSON client', () => {
@@ -27,26 +27,26 @@ describe('createJsonClient', () => {
       url: 'https://api.example.com',
       key: 'API_KEY',
       use: [],
-    }
+    };
 
-    const client = createJsonClient(config)
+    const client = createJsonClient(config);
 
-    expect('isOpenApiClient' in client.client).toBe(true)
-    expect(client.client.GET).toBeInstanceOf(Function)
-    expect(client.client.POST).toBeInstanceOf(Function)
-    expect(client.client.PATCH).toBeInstanceOf(Function)
-    expect(client.client.PUT).toBeInstanceOf(Function)
-    expect(client.client.DELETE).toBeInstanceOf(Function)
-    expect(client.client.HEAD).toBeInstanceOf(Function)
-    expect(client.client.OPTIONS).toBeInstanceOf(Function)
-    expect(client.client.GET).toBeInstanceOf(Function)
+    expect('isOpenApiClient' in client.client).toBe(true);
+    expect(client.client.GET).toBeInstanceOf(Function);
+    expect(client.client.POST).toBeInstanceOf(Function);
+    expect(client.client.PATCH).toBeInstanceOf(Function);
+    expect(client.client.PUT).toBeInstanceOf(Function);
+    expect(client.client.DELETE).toBeInstanceOf(Function);
+    expect(client.client.HEAD).toBeInstanceOf(Function);
+    expect(client.client.OPTIONS).toBeInstanceOf(Function);
+    expect(client.client.GET).toBeInstanceOf(Function);
 
-    expect(client.GET).toBeInstanceOf(Function)
-    expect(client.POST).toBeInstanceOf(Function)
-    expect(client.DELETE).toBeInstanceOf(Function)
-    expect(client.PUT).toBeInstanceOf(Function)
-    expect(client.PATCH).toBeInstanceOf(Function)
-  })
+    expect(client.GET).toBeInstanceOf(Function);
+    expect(client.POST).toBeInstanceOf(Function);
+    expect(client.DELETE).toBeInstanceOf(Function);
+    expect(client.PUT).toBeInstanceOf(Function);
+    expect(client.PATCH).toBeInstanceOf(Function);
+  });
 
   it('should call createClient with correct options', () => {
     const config = {
@@ -56,8 +56,8 @@ describe('createJsonClient', () => {
       fetch: {
         retries: 3,
       },
-    }
-    createJsonClient(config)
+    };
+    createJsonClient(config);
     expect(createClient).toHaveBeenCalledWith({
       baseUrl: 'https://api.example.com',
       headers: {
@@ -65,23 +65,23 @@ describe('createJsonClient', () => {
       },
       fetch: retriableFetch,
       retries: 3,
-    })
-  })
+    });
+  });
 
   it('should create a JSON client with middlewares', () => {
-    const m1: Middleware = {}
-    const m2: Middleware = {}
+    const m1: Middleware = {};
+    const m2: Middleware = {};
     const config = {
       url: 'https://api.example.com',
       key: 'API_KEY',
       use: [m1, m2],
-    }
+    };
 
-    const c = createJsonClient(config)
-    expect(c.client.use).toHaveBeenCalledTimes(1)
-    expect(c.client.use).toHaveBeenCalledWith(m1, m2)
-  })
-})
+    const c = createJsonClient(config);
+    expect(c.client.use).toHaveBeenCalledTimes(1);
+    expect(c.client.use).toHaveBeenCalledWith(m1, m2);
+  });
+});
 
 describe('createStreamClient', () => {
   it('should create a stream client', () => {
@@ -89,22 +89,22 @@ describe('createStreamClient', () => {
       url: 'https://api.example.com',
       key: 'API_KEY',
       use: [],
-    }
+    };
 
-    const client = createStreamClient(config)
+    const client = createStreamClient(config);
 
-    expect('isOpenApiClient' in client.client).toBe(true)
-    expect(client.client.GET).toBeInstanceOf(Function)
-    expect(client.client.POST).toBeInstanceOf(Function)
-    expect(client.client.PATCH).toBeInstanceOf(Function)
-    expect(client.client.PUT).toBeInstanceOf(Function)
-    expect(client.client.DELETE).toBeInstanceOf(Function)
-    expect(client.client.HEAD).toBeInstanceOf(Function)
-    expect(client.client.OPTIONS).toBeInstanceOf(Function)
-    expect(client.client.GET).toBeInstanceOf(Function)
+    expect('isOpenApiClient' in client.client).toBe(true);
+    expect(client.client.GET).toBeInstanceOf(Function);
+    expect(client.client.POST).toBeInstanceOf(Function);
+    expect(client.client.PATCH).toBeInstanceOf(Function);
+    expect(client.client.PUT).toBeInstanceOf(Function);
+    expect(client.client.DELETE).toBeInstanceOf(Function);
+    expect(client.client.HEAD).toBeInstanceOf(Function);
+    expect(client.client.OPTIONS).toBeInstanceOf(Function);
+    expect(client.client.GET).toBeInstanceOf(Function);
 
-    expect(client.POST).toBeInstanceOf(Function)
-  })
+    expect(client.POST).toBeInstanceOf(Function);
+  });
 
   it('should call createClient with correct options', () => {
     const config = {
@@ -114,8 +114,8 @@ describe('createStreamClient', () => {
       fetch: {
         retries: 3,
       },
-    }
-    createStreamClient(config)
+    };
+    createStreamClient(config);
     expect(createClient).toHaveBeenCalledWith({
       baseUrl: 'https://api.example.com',
       headers: {
@@ -123,20 +123,20 @@ describe('createStreamClient', () => {
       },
       fetch: retriableFetch,
       retries: 3,
-    })
-  })
+    });
+  });
 
   it('should create a stream client with middlewares', () => {
-    const m1: Middleware = {}
-    const m2: Middleware = {}
+    const m1: Middleware = {};
+    const m2: Middleware = {};
     const config = {
       url: 'https://api.example.com',
       key: 'API_KEY',
       use: [m1, m2],
-    }
+    };
 
-    const c = createStreamClient(config)
-    expect(c.client.use).toHaveBeenCalledTimes(1)
-    expect(c.client.use).toHaveBeenCalledWith(m1, m2)
-  })
-})
+    const c = createStreamClient(config);
+    expect(c.client.use).toHaveBeenCalledTimes(1);
+    expect(c.client.use).toHaveBeenCalledWith(m1, m2);
+  });
+});

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 /**
  * Creates a new Zod schema that represents a resolved promise.
@@ -7,4 +7,4 @@ import { z } from 'zod'
  * @returns A new Zod schema that represents a resolved promise.
  */
 export const resolved = <S extends z.ZodTypeAny>(schema: S) =>
-  z.union([schema, schema.promise().transform(async (v) => await v)])
+  z.union([schema, schema.promise().transform(async (v) => await v)]);

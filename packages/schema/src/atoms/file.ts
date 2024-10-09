@@ -1,8 +1,7 @@
-import { z } from 'zod'
-
-import { BUFFER_TO_BASE64 } from './buffer.js'
-import { BASE64_DATA_URL_TO_BASE64 } from './data-url.js'
-import { resolved } from './promise.js'
+import { z } from 'zod';
+import { BUFFER_TO_BASE64 } from './buffer.js';
+import { BASE64_DATA_URL_TO_BASE64 } from './data-url.js';
+import { resolved } from './promise.js';
 
 /**
  * Represents the content types for images.
@@ -24,7 +23,7 @@ const FILE_CONTENT_TYPE = z.enum([
   'audio/mp3',
   'audio/m4a',
   'audio/m4b',
-])
+]);
 
 /**
  * Represents an image input.
@@ -50,7 +49,7 @@ export const FILE = z
         z.string().base64(),
         BASE64_DATA_URL_TO_BASE64,
         BUFFER_TO_BASE64,
-      ]),
+      ])
     )
       .describe('The Buffer or base64 encoded data of the file')
       .optional(),
@@ -59,13 +58,13 @@ export const FILE = z
   .refine(
     (data) => {
       if (data.url) {
-        return true
+        return true;
       }
-      return data.content_type !== undefined && data.data !== undefined
+      return data.content_type !== undefined && data.data !== undefined;
     },
     {
       message:
         'Either content_type and data must be provided if url is not provided',
       path: ['content_type', 'data'],
-    },
-  )
+    }
+  );

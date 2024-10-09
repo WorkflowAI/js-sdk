@@ -21,13 +21,13 @@ function attachStream<
   Stream extends (...args: Args) => Promise<S>,
 >(
   fn: Regular,
-  stream: Stream,
+  stream: Stream
 ): (...args: Args) => PromiseLike<R> & { stream: () => Promise<S> } {
   return (...args: Args) => ({
     // Proxy call to fn, execute fn only if promise is then'd/awaited
     then: (...r) => fn(...args).then(...r),
     stream: () => stream(...args),
-  })
+  });
 }
 
 /**
@@ -47,5 +47,5 @@ export function withStream<
     F,
     Awaited<ReturnType<S>>,
     S
-  >(fn, stream)
+  >(fn, stream);
 }

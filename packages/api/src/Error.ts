@@ -1,4 +1,4 @@
-import { WorkflowAIApiError } from './ErrorResponse.js'
+import { WorkflowAIApiError } from './ErrorResponse.js';
 
 /**
  * Custom error class for Workflow AI API request errors.
@@ -7,19 +7,19 @@ export class WorkflowAIApiRequestError extends Error {
   /**
    * The URL of the failed request.
    */
-  url: string
+  url: string;
   /**
    * The HTTP response status code of the failed request.
    */
-  status: number
+  status: number;
   /**
    * Additional error details that might be included in the response body.
    */
-  detail: WorkflowAIApiError
+  detail: WorkflowAIApiError;
   /**
    * The original response object of the failed request.
    */
-  response: Response
+  response: Response;
 
   /**
    * Creates a new WorkflowAIApiRequestError instance.
@@ -28,12 +28,12 @@ export class WorkflowAIApiRequestError extends Error {
    */
   constructor(response: Response, detail: WorkflowAIApiError) {
     super(
-      `Failed to request ${response.url}${detail ? ': ' + JSON.stringify(detail, null, 2) : ''}`,
-    )
+      `Failed to request ${response.url}${detail ? ': ' + JSON.stringify(detail, null, 2) : ''}`
+    );
 
-    this.detail = detail
-    this.url = response.url
-    this.status = response.status
-    this.response = response
+    this.detail = detail;
+    this.url = response.url;
+    this.status = response.status;
+    this.response = response;
   }
 }

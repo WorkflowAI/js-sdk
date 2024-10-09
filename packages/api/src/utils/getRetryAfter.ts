@@ -12,28 +12,28 @@
  */
 export function getRetryAfterDelay(
   retryAfterHeaderValue: string | null | undefined,
-  defaultRetryAfter: number,
+  defaultRetryAfter: number
 ): number {
   if (!retryAfterHeaderValue) {
-    return defaultRetryAfter
+    return defaultRetryAfter;
   }
 
-  const seconds = Number(retryAfterHeaderValue)
+  const seconds = Number(retryAfterHeaderValue);
   if (Number.isFinite(seconds)) {
-    return seconds * 1_000
+    return seconds * 1_000;
   }
 
-  const retryAt = Date.parse(retryAfterHeaderValue)
+  const retryAt = Date.parse(retryAfterHeaderValue);
   if (Number.isNaN(retryAt)) {
-    return defaultRetryAfter
+    return defaultRetryAfter;
   }
 
-  const millis = retryAt - Date.now()
+  const millis = retryAt - Date.now();
   if (millis < 0) {
-    return defaultRetryAfter
+    return defaultRetryAfter;
   }
 
-  return millis
+  return millis;
 }
 
 /**
@@ -43,7 +43,7 @@ export function getRetryAfterDelay(
  * @returns Header value
  */
 export function getRetryAfterHeader(
-  response: Response | undefined | null,
+  response: Response | undefined | null
 ): string | null | undefined {
-  return response?.headers?.get('Retry-After')
+  return response?.headers?.get('Retry-After');
 }

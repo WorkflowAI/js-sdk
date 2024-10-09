@@ -8,7 +8,7 @@ export type ProviderErrorCode =
   | 'invalid_provider_config'
   | 'provider_internal_error'
   | 'provider_unavailable'
-  | 'read_timeout'
+  | 'read_timeout';
 
 export type ErrorCode =
   | ProviderErrorCode
@@ -18,16 +18,16 @@ export type ErrorCode =
   | 'model_does_not_support_mode'
   | 'invalid_run_properties'
   | 'internal_error'
-  | 'bad_request'
+  | 'bad_request';
 
 export interface WorkflowAIApiError {
   error: {
-    details?: Record<string, unknown>
-    message?: string
-    status_code?: number
-    code?: ErrorCode
-  }
-  task_run_id?: string
+    details?: Record<string, unknown>;
+    message?: string;
+    status_code?: number;
+    code?: ErrorCode;
+  };
+  task_run_id?: string;
 }
 
 export const extractError = (respJson: unknown): WorkflowAIApiError => {
@@ -42,13 +42,13 @@ export const extractError = (respJson: unknown): WorkflowAIApiError => {
         status_code: 500,
         code: 'internal_error',
       },
-    }
+    };
   }
   if ('error' in respJson) {
-    return respJson as WorkflowAIApiError
+    return respJson as WorkflowAIApiError;
   } else if ('detail' in respJson) {
-    const detailResp = respJson as { detail?: Record<string, unknown> }
-    return { error: { details: detailResp.detail } } as WorkflowAIApiError
+    const detailResp = respJson as { detail?: Record<string, unknown> };
+    return { error: { details: detailResp.detail } } as WorkflowAIApiError;
   }
-  return {} as WorkflowAIApiError
-}
+  return {} as WorkflowAIApiError;
+};
