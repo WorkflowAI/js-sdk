@@ -5,16 +5,17 @@ const config: Config = {
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',
-      { useESM: true, tsConfig: './configs/tsconfig.base.json' },
+      { useESM: true, tsconfig: './configs/tsconfig.tests.json' },
     ],
   },
-  testRegex: 'packages/.*/src/.*\\.test\\.ts$',
+  testRegex: ['packages/.*/src/.*\\.test\\.ts$', 'tests/.*\\.test\\.ts$'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   automock: false,
   setupFiles: ['./configs/setupJest.js'],
   moduleNameMapper: {
     '(.+)\\.js': '$1',
+    '@workflowai/workflowai': '<rootDir>/packages/client/src',
   },
 }
 

@@ -11,7 +11,6 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'import',
-    'simple-import-sort',
     'unused-imports',
     'require-extensions',
   ],
@@ -20,12 +19,7 @@ module.exports = {
     'import/no-unresolved': 0,
     'import/no-duplicates': 1,
 
-    /**
-     * eslint-plugin-simple-import-sort @see https://github.com/lydell/eslint-plugin-simple-import-sort
-     */
     'sort-imports': 0, // we use eslint-plugin-import instead
-    'simple-import-sort/imports': 1,
-    'simple-import-sort/exports': 1,
 
     '@typescript-eslint/no-unused-vars': [
       'error',
@@ -40,4 +34,4 @@ module.exports = {
       },
     ],
   },
-}
+};
