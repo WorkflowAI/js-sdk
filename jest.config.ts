@@ -1,11 +1,11 @@
-import type { Config } from 'jest'
+import type { Config } from 'jest';
 
 const config: Config = {
   rootDir: '.',
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',
-      { useESM: true, tsconfig: './configs/tsconfig.tests.json' },
+      { useESM: true, tsconfig: './tests/tsconfig.json' },
     ],
   },
   testRegex: ['packages/.*/src/.*\\.test\\.ts$', 'tests/.*\\.test\\.ts$'],
@@ -17,6 +17,6 @@ const config: Config = {
     '(.+)\\.js': '$1',
     '@workflowai/workflowai': '<rootDir>/packages/client/src',
   },
-}
+};
 
-export default config
+export default config;
