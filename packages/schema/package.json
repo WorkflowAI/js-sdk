@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/schema",
-  "version": "1.4.0-alpha.0",
+  "version": "1.4.0",
   "description": "workflowAI schema helpers",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
@@ -27,10 +27,10 @@
   },
   "scripts": {
     "-------- LINTING": "",
-    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
-    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern --config ../../configs/.prettierrc.json",
-    "lint:check": "eslint --config ../../configs/eslint.config.js --cache --ext .ts ./src",
-    "lint:fix": "eslint --config ../../configs/eslint.config.js --cache --fix --ext .ts ./src",
+    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern",
+    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern",
+    "lint:check": "eslint  --cache --ext .ts ./src",
+    "lint:fix": "eslint  --cache --fix --ext .ts ./src",
     "check": "npm run lint:check && npm run prettier:check",
     "fix": "npm run lint:fix && npm run prettier:fix",
     "-------- BUILD": "",
@@ -44,7 +44,6 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "json-schema-to-zod": "^2.1.1",
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.23.1"
   }

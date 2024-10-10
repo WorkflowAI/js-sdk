@@ -1,18 +1,18 @@
-import { createJsonClient, createStreamClient } from './http-clients.js'
-import type { FetchOptions } from './index.js'
-import { customHeaders, Middleware, throwError } from './middlewares/index.js'
-import { getEnv } from './utils/getEnv.js'
-import { withStream } from './utils/withStream.js'
+import { createJsonClient, createStreamClient } from './http-clients.js';
+import type { FetchOptions } from './index.js';
+import { Middleware, customHeaders, throwError } from './middlewares/index.js';
+import { getEnv } from './utils/getEnv.js';
+import { withStream } from './utils/withStream.js';
 
 export type InitWorkflowAIApiConfig = {
-  key?: string | undefined
-  url?: string | undefined
-  use?: Middleware[]
-  fetch?: FetchOptions
-}
+  key?: string | undefined;
+  url?: string | undefined;
+  use?: Middleware[];
+  fetch?: FetchOptions;
+};
 
 export function initWorkflowAIApi(
-  config?: InitWorkflowAIApiConfig | undefined,
+  config?: InitWorkflowAIApiConfig | undefined
 ) {
   const {
     key,
@@ -23,14 +23,14 @@ export function initWorkflowAIApi(
     key: getEnv('WORKFLOWAI_API_KEY'),
     url: getEnv('WORKFLOWAI_API_URL') || 'https://api.workflowai.com',
     ...config,
-  }
+  };
 
-  middlewares.unshift(customHeaders)
+  middlewares.unshift(customHeaders);
   // Add error handing middleware AT THE END of the chain
-  middlewares.push(throwError)
+  middlewares.push(throwError);
 
-  const json = createJsonClient({ url, key, use: middlewares, fetch })
-  const stream = createStreamClient({ url, key, use: middlewares, fetch })
+  const json = createJsonClient({ url, key, use: middlewares, fetch });
+  const stream = createStreamClient({ url, key, use: middlewares, fetch });
 
   return {
     examples: {
@@ -63,25 +63,25 @@ export function initWorkflowAIApi(
         create: json.POST('/tasks/{task_id}/schemas'),
         get: json.GET('/tasks/{task_id}/schemas/{task_schema_id}'),
         generateInput: json.POST(
-          '/tasks/{task_id}/schemas/{task_schema_id}/input',
+          '/tasks/{task_id}/schemas/{task_schema_id}/input'
         ),
         getPythonCode: json.GET(
-          '/tasks/{task_id}/schemas/{task_schema_id}/python',
+          '/tasks/{task_id}/schemas/{task_schema_id}/python'
         ),
         iterate: json.POST('/tasks/schemas/iterate'),
         run: withStream(
           json.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
-          stream.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
+          stream.POST('/tasks/{task_id}/schemas/{task_schema_id}/run')
         ),
 
         groups: {
           list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/groups'),
           create: json.POST('/tasks/{task_id}/schemas/{task_schema_id}/groups'),
           get: json.GET(
-            '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}',
+            '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}'
           ),
           update: json.PATCH(
-            '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}',
+            '/tasks/{task_id}/schemas/{task_schema_id}/groups/{group_id}'
           ),
         },
 
@@ -93,13 +93,13 @@ export function initWorkflowAIApi(
         examples: {
           list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/examples'),
           create: json.POST(
-            '/tasks/{task_id}/schemas/{task_schema_id}/examples',
+            '/tasks/{task_id}/schemas/{task_schema_id}/examples'
           ),
         },
 
         benchmarks: {
           list: json.GET(
-            '/tasks/{task_id}/schemas/{task_schema_id}/benchmarks',
+            '/tasks/{task_id}/schemas/{task_schema_id}/benchmarks'
           ),
         },
 
@@ -107,55 +107,55 @@ export function initWorkflowAIApi(
           list: json.GET('/tasks/{task_id}/schemas/{task_schema_id}/datasets'),
           examples: {
             list: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/examples',
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/examples'
             ),
           },
           inputs: {
             list: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/inputs',
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/inputs'
             ),
           },
           runs: {
             list: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/runs',
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/runs'
             ),
           },
           groups: {
             list: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups',
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups'
             ),
             get: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/{group_id}',
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/{group_id}'
             ),
           },
           benchmarks: {
             create: json.POST(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/benchmarks',
+              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/benchmarks'
             ),
           },
         },
 
         evaluators: {
           list: json.GET(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators'
           ),
           create: json.POST(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators'
           ),
           generateInstructions: json.POST(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-instructions',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-instructions'
           ),
           generateFieldEvaluations: json.POST(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-field-evaluations',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/suggested-field-evaluations'
           ),
           get: json.GET(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}'
           ),
           delete: json.DELETE(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}'
           ),
           replace: json.PUT(
-            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}',
+            '/tasks/{task_id}/schemas/{task_schema_id}/evaluators/{evaluator_id}'
           ),
         },
       },
@@ -175,7 +175,7 @@ export function initWorkflowAIApi(
         },
       },
     },
-  }
+  };
 }
 
-export type WorkflowAIApi = ReturnType<typeof initWorkflowAIApi>
+export type WorkflowAIApi = ReturnType<typeof initWorkflowAIApi>;

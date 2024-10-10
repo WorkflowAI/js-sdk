@@ -1,22 +1,15 @@
-import { definitions } from './definitions.js'
-import * as extensions from './zod/extensions.js'
-import { z } from './zod/index.js'
+import { definitions } from './definitions.js';
+import * as extensions from './zod/extensions.js';
 
 describe('definitions', () => {
-  definitions.forEach((definition) => {
-    it(`${definition.jsonSchemaDefinitionKey} should have a string jsonSchemaDefinitionKey`, () => {
-      expect(typeof definition.jsonSchemaDefinitionKey).toBe('string')
-    })
+  it('is exhaustive', () => {
+    const defValues = Object.values(definitions);
+    const extValues = Object.values(extensions);
 
-    it(`${definition.jsonSchemaDefinitionKey} should have valid zodSchema input and output`, () => {
-      expect(
-        definition.zodSchema.input in extensions &&
-          definition.zodSchema.input in z,
-      ).toBe(true)
-      expect(
-        definition.zodSchema.output in extensions &&
-          definition.zodSchema.output in z,
-      ).toBe(true)
-    })
-  })
-})
+    expect(defValues.length).toBe(extValues.length);
+
+    defValues.forEach((defValue, index) => {
+      expect(defValue).toBe(extValues[index]());
+    });
+  });
+});

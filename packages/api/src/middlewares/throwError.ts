@@ -1,5 +1,18 @@
-import { WorkflowAIApiRequestError } from '../Error.js'
-import { extractError } from '../ErrorResponse.js'
+import { WorkflowAIApiRequestError } from '../Error.js';
+import { extractError } from '../ErrorResponse.js';
+
+function parseOrThrow(res: Response, txt: string): unknown {
+  try {
+    return JSON.parse(txt);
+  } catch (_: unknown) {
+    throw new WorkflowAIApiRequestError(res, {
+      error: {
+        message: txt,
+        status_code: res.status,
+      },
+    });
+  }
+}
 
 /**
  * Middleware function that throws a WorkflowAIApiRequestError if the response is not ok.
@@ -8,21 +21,11 @@ import { extractError } from '../ErrorResponse.js'
  */
 export const throwError = {
   async onResponse(res: Response) {
-    let resp = {}
     if (!res.ok) {
-      try {
-        resp = await res.json()
-      } catch (err) {
-        console.error('Failed to parse error response:', err)
-        resp = {
-          error: {
-            message: 'Failed to parse response',
-            status_code: res.status,
-          },
-        }
-      }
-      throw new WorkflowAIApiRequestError(res, extractError(resp))
+      const txt = await res.text();
+      const errorBody = parseOrThrow(res, txt);
+      throw new WorkflowAIApiRequestError(res, extractError(errorBody));
     }
-    return res
+    return res;
   },
-}
+};

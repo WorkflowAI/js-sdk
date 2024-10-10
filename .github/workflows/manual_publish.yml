@@ -5,12 +5,12 @@ on:
     inputs:
       tag:
         type: string
-        default: "next"
-        description: "NPM tag to publish to"
+        default: 'next'
+        description: 'NPM tag to publish to'
       branch:
         type: string
-        default: "main"
-        description: "Branch to publish from"
+        default: 'main'
+        description: 'Branch to publish from'
 
 permissions:
   contents: read
@@ -29,5 +29,5 @@ jobs:
     secrets: inherit
     with:
       tag: ${{ inputs.tag }}
-      expectedVersion: ""
+      expectedVersion: ''
       branch: ${{ inputs.branch }}

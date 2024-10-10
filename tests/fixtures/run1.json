@@ -1,0 +1,90 @@
+{
+    "id": "b650f038-e54e-41cf-9934-f57713fb9402",
+    "task_id": "animal-classification",
+    "task_schema_id": 4,
+    "task_input": {
+        "animal": "platypus"
+    },
+    "task_input_hash": "1c7cc7ecbb6550c44d8e953cb5bb8295",
+    "task_input_preview": "animal: \"platypus\"",
+    "task_output": {
+        "is_cute": true,
+        "is_dangerous": true,
+        "explanation_of_reasoning": "Plat plat"
+    },
+    "task_output_hash": "2d7707f1d39818d6f2dd2c12d2a62222",
+    "task_output_preview": "is_cute: true, is_dangerous: true, explanation_of_reasoning: \"The platypus ",
+    "group": {
+        "id": "3a5e6b1411133e874ba1c57d87a11b39",
+        "iteration": 32,
+        "properties": {
+            "model": "gpt-4o-2024-08-06",
+            "provider": "openai",
+            "temperature": 0,
+            "instructions": "Given an input containing the name of an animal, classify it as cute and/or dangerous.\n\nProvide a boolean value for 'is_cute' and 'is_dangerous', and include an 'explanation_of_reasoning' to justify your classification.\n\nConsider factors such as the animal's appearance, behavior, and potential threat to humans when making your assessment.\n\nBe objective and base your classification on general perceptions and facts about the animal.\n\nAnimals that can carry diseases and pass them to humans should be considered dangerous even if they are not otherwise capable of causing physical harm\n\n",
+            "max_tokens": null,
+            "runner_name": "WorkflowAI",
+            "runner_version": "v0.1.0",
+            "few_shot": null,
+            "template_name": "v1",
+            "task_variant_id": "f8c338aeaf608993c8d5319afb8bf40b"
+        },
+        "tags": [
+            "model=gpt-4o-2024-08-06",
+            "provider=openai",
+            "temperature=0"
+        ],
+        "aliases": null,
+        "is_external": null,
+        "is_favorite": null,
+        "notes": null,
+        "similarity_hash": "",
+        "benchmark_for_datasets": null,
+        "favorited_by": null,
+        "created_by": null,
+        "deployed_by": null
+    },
+    "status": "success",
+    "error": null,
+    "start_time": "2024-09-30T12:03:45.122000Z",
+    "end_time": "2024-09-30T12:03:46.434000Z",
+    "duration_seconds": 1.311426,
+    "cost_usd": 0.0024200000000000003,
+    "created_at": "2024-09-30T12:03:46.434000Z",
+    "updated_at": "2024-09-30T12:03:46.434000Z",
+    "example_id": null,
+    "corrections": null,
+    "parent_task_ids": null,
+    "scores": null,
+    "labels": null,
+    "metadata": {
+        "workflowai.runBy": "model|openai:gpt-4o-2024-08-06"
+    },
+    "llm_completions": [
+        {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Your goal is to generate a valid output based on the input data.\n\nThe task instructions are:\nGiven an input containing the name of an animal, classify it as cute and/or dangerous.\n\nProvide a boolean value for 'is_cute' and 'is_dangerous', and include an 'explanation_of_reasoning' to justify your classification.\n\nConsider factors such as the animal's appearance, behavior, and potential threat to humans when making your assessment.\n\nBe objective and base your classification on general perceptions and facts about the animal.\n\nAnimals that can carry diseases and pass them to humans should be considered dangerous even if they are not otherwise capable of causing physical harm\n\n\n\nThe input that will be passed in the user message is a json following the schema:\n```json\n{\n  \"description\": \"Schema for inputting an animal to classify it as cute or dangerous\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"animal\": {\n      \"description\": \"The name of the animal to classify\",\n      \"examples\": [\n        \"lion\",\n        \"rabbit\",\n        \"shark\"\n      ],\n      \"type\": \"string\"\n    }\n  },\n  \"$defs\": {}\n}\n```\n\nAs a genius expert, your task is to understand the content and provide the parsed objects in json that match the following json_schema:\n```json\n{\n  \"description\": \"Schema for the classification result of the animal\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_cute\": {\n      \"description\": \"Indicates if the animal is cute\",\n      \"examples\": [\n        true,\n        false\n      ],\n      \"type\": \"boolean\"\n    },\n    \"is_dangerous\": {\n      \"description\": \"Indicates if the animal is dangerous\",\n      \"examples\": [\n        true,\n        false\n      ],\n      \"type\": \"boolean\"\n    },\n    \"explanation_of_reasoning\": {\n      \"type\": \"string\"\n    }\n  },\n  \"$defs\": {}\n}\n```\n\nMake sure to return an instance of the JSON, not the schema itself"
+                },
+                {
+                    "role": "user",
+                    "content": "Input data:\n```json\n{\n  \"animal\": \"platypus\"\n}\n```"
+                }
+            ],
+            "response": "{\n  \"is_cute\": true,\n  \"is_dangerous\": true,\n  \"explanation_of_reasoning\": \"The platypus is often considered cute due to its unique and quirky appearance, with a duck-bill, webbed feet, and beaver-like tail. However, it is also dangerous because the male platypus has venomous spurs on its hind legs that can deliver a painful sting to humans. Additionally, the platypus can carry diseases such as leptospirosis, which can be transmitted to humans. Therefore, while it is visually appealing, it poses a potential threat to humans.\"\n}",
+            "usage": {
+                "completion_token_count": 129,
+                "completion_cost_usd": 0.0012900000000000001,
+                "prompt_token_count": 452,
+                "prompt_token_count_cached": null,
+                "prompt_cost_usd": 0.0011300000000000001,
+                "model_context_window_size": null
+            }
+        }
+    ],
+    "config_id": null,
+    "dataset_benchmark_ids": null,
+    "is_free": null,
+    "author_tenant": null
+}

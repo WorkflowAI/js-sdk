@@ -1,46 +1,47 @@
-import assert from "node:assert";
-import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import argv from "minimist";
+import assert from 'node:assert'
+import { spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import argv from 'minimist'
 
 const semverRegex =
-  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
 
 try {
-  const __filename = fileURLToPath(import.meta.url);
-  const rootDir = join(dirname(__filename), "../..");
+  const __filename = fileURLToPath(import.meta.url)
+  const rootDir = join(dirname(__filename), '../..')
 
   // We'll tag published package version differently depending on which branch this action is triggered from
   const { tag } = argv(process.argv.slice(2)) as {
-    _: string[];
-    tag?: string;
-  };
+    _: string[]
+    tag?: string
+  }
 
   // Read project package.json to get list of workspaces IN ORDER
   // Order is important to publish, because packages depend on each other
   const projectPackageSpecs = JSON.parse(
-    readFileSync(join(rootDir, "package.json"), "utf-8")
-  ) as { workspaces: string[] };
+    readFileSync(join(rootDir, 'package.json'), 'utf-8'),
+  ) as { workspaces: string[] }
 
   for (const workspacePath of projectPackageSpecs.workspaces) {
     const localPackageJsonFilePath = join(
       rootDir,
       workspacePath,
-      "package.json"
-    );
+      'package.json',
+    )
 
     // Read local package.json
     const localPackageSpecs = JSON.parse(
-      readFileSync(localPackageJsonFilePath, "utf-8")
-    ) as { name: string; version: string };
+      readFileSync(localPackageJsonFilePath, 'utf-8'),
+    ) as { name: string; version: string }
 
-    if (tag == "latest" && !semverRegex.test(localPackageSpecs.version)) {
+    if (tag == 'latest' && !semverRegex.test(localPackageSpecs.version)) {
       console.error(
-        `Skipping ${localPackageSpecs.name}@${localPackageSpecs.version} because it doesn't look like a valid semver version`
-      );
-      process.exit(1);
+        `Skipping ${localPackageSpecs.name}@${localPackageSpecs.version} because it doesn't look like a valid semver version`,
+      )
+      process.exit(1)
     }
 
     // Find published package versions
@@ -64,21 +65,21 @@ try {
     // // Publish only if version doesn't already exist
     // if (!npmVersions.includes(localPackageSpecs.version)) {
     // Version had not been published yet, so do it!
-    const npmArgs = ["pub", `-w=${localPackageSpecs.name}`, "--loglevel=error"];
-    if (!!tag) {
-      npmArgs.push(`--tag=${tag}`);
+    const npmArgs = ['pub', `-w=${localPackageSpecs.name}`, '--loglevel=error']
+    if (tag) {
+      npmArgs.push(`--tag=${tag}`)
     }
-    const publishCmd = spawnSync("npm", npmArgs);
+    const publishCmd = spawnSync('npm', npmArgs)
 
-    assert(!publishCmd.error, publishCmd.error);
+    assert(!publishCmd.error, publishCmd.error)
     assert(
       !publishCmd.stderr.toString(),
-      `Failed to publish ${localPackageSpecs.name}@${localPackageSpecs.version}: ${publishCmd.stderr.toString()}`
-    );
+      `Failed to publish ${localPackageSpecs.name}@${localPackageSpecs.version}: ${publishCmd.stderr.toString()}`,
+    )
 
     console.log(
-      `Published ${localPackageSpecs.name}@${localPackageSpecs.version} to NPM with tag "${tag}"`
-    );
+      `Published ${localPackageSpecs.name}@${localPackageSpecs.version} to NPM with tag "${tag}"`,
+    )
     // TODO: maybe remove the tag update ? For now we just publish the version
     // } else if (npmTags[tag] !== localPackageSpecs.version) {
     //   // Version has been published, so just make sure the correct tag is applied to it, if it's not already
@@ -106,6 +107,6 @@ try {
     // }
   }
 } catch (error) {
-  console.error(error);
-  throw error;
+  console.error(error)
+  throw error
 }

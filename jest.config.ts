@@ -1,21 +1,22 @@
-import type { Config } from 'jest'
+import type { Config } from 'jest';
 
 const config: Config = {
-  rootDir: '..',
+  rootDir: '.',
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',
-      { useESM: true, tsConfig: './configs/tsconfig.base.json' },
+      { useESM: true, tsconfig: './tests/tsconfig.json' },
     ],
   },
-  testRegex: 'packages/.*/src/.*\\.test\\.ts$',
+  testRegex: ['packages/.*/src/.*\\.test\\.ts$', 'tests/.*\\.test\\.ts$'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   automock: false,
   setupFiles: ['./configs/setupJest.js'],
   moduleNameMapper: {
     '(.+)\\.js': '$1',
+    '@workflowai/workflowai': '<rootDir>/packages/client/src',
   },
-}
+};
 
-export default config
+export default config;

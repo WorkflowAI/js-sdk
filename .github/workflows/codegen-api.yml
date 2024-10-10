@@ -5,7 +5,7 @@ on:
     inputs:
       branch:
         type: choice
-        description: "Branch/environment to generate API code for"
+        description: 'Branch/environment to generate API code for'
         required: true
         options:
           - main

@@ -3,8 +3,8 @@ export type DeepPartial<T> = {
     ? DeepPartial<U>[]
     : T[P] extends object | undefined
       ? DeepPartial<T[P]>
-      : T[P]
-}
+      : T[P];
+};
 
 export type AsyncIteratorValue<I> =
-  I extends AsyncIterableIterator<infer V> ? V : never
+  I extends AsyncIterableIterator<infer V> ? V : never;

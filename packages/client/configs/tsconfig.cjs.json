@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "./tsconfig.base.json",
-    "../../../configs/tsconfig.cjs.json"
-  ],
+  "extends": ["./tsconfig.base.json", "../../../configs/tsconfig.cjs.json"],
   "compilerOptions": {
     "outDir": "../dist/cjs"
   }
