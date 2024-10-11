@@ -1,7 +1,7 @@
 {
   "name": "@workflowai/workspaces",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Collection of TS/JS libraries, private and public, for workflowAI.",
   "author": "workflowAI",
   "homepage": "https://workflowai.ai",
