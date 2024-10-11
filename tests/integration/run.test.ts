@@ -16,33 +16,29 @@ beforeEach(() => {
 });
 
 const workflowAI = new WorkflowAI({ api: { key: 'hello' } });
-let run: Awaited<ReturnType<typeof workflowAI.useTask>>['run'];
+const { run } = workflowAI.useTask(
+  {
+    taskId: 'animal-classification',
+    schema: {
+      id: 4,
+      input: z.object({
+        animal: z.string().optional(),
+      }),
+      output: z.object({
+        is_cute: z.boolean().optional(),
+        is_dangerous: z.boolean().optional(),
+        explanation_of_reasoning: z.string().optional(),
+      }),
+    },
+  },
+  {
+    group: {
+      iteration: 43,
+    },
+  }
+);
 
 describe('run', () => {
-  beforeEach(async () => {
-    ({ run } = await workflowAI.useTask(
-      {
-        taskId: 'animal-classification',
-        schema: {
-          id: 4,
-          input: z.object({
-            animal: z.string().optional(),
-          }),
-          output: z.object({
-            is_cute: z.boolean().optional(),
-            is_dangerous: z.boolean().optional(),
-            explanation_of_reasoning: z.string().optional(),
-          }),
-        },
-      },
-      {
-        group: {
-          iteration: 43,
-        },
-      }
-    ));
-  });
-
   it('runs a task', async () => {
     const run1Fixture = await readFile('./tests/fixtures/run1.json', 'utf-8');
     mockFetch.mockResponseOnce(run1Fixture);
