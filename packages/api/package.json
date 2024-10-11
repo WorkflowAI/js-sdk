@@ -1,6 +1,6 @@
 {
   "name": "@workflowai/api",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "WorkflowAI typed API client",
   "author": "WorkflowAI",
   "homepage": "https://workflowai.com",
