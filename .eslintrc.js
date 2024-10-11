@@ -33,5 +33,17 @@ module.exports = {
         ignoreRestSiblings: true,
       },
     ],
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            // Prevent importing from the src directory
+            // THis is to avoid importing directly accross packages
+            group: ['**/src/*'],
+          },
+        ],
+      },
+    ],
   },
 };

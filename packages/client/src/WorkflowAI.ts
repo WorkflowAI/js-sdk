@@ -7,8 +7,8 @@ import {
   initWorkflowAIApi,
   wrapAsyncIterator,
 } from '@workflowai/api';
+import { extractError } from '@workflowai/api';
 import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema';
-import { extractError } from '../../api/src/ErrorResponse.js';
 import {
   GroupReference,
   isGroupReference,
