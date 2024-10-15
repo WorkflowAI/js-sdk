@@ -16,33 +16,29 @@ beforeEach(() => {
 });
 
 const workflowAI = new WorkflowAI({ api: { key: 'hello' } });
-let run: Awaited<ReturnType<typeof workflowAI.useTask>>['run'];
+const { run } = workflowAI.useTask(
+  {
+    taskId: 'animal-classification',
+    schema: {
+      id: 4,
+      input: z.object({
+        animal: z.string().optional(),
+      }),
+      output: z.object({
+        is_cute: z.boolean().optional(),
+        is_dangerous: z.boolean().optional(),
+        explanation_of_reasoning: z.string().optional(),
+      }),
+    },
+  },
+  {
+    group: {
+      iteration: 43,
+    },
+  }
+);
 
 describe('run', () => {
-  beforeEach(async () => {
-    ({ run } = await workflowAI.useTask(
-      {
-        taskId: 'animal-classification',
-        schema: {
-          id: 4,
-          input: z.object({
-            animal: z.string().optional(),
-          }),
-          output: z.object({
-            is_cute: z.boolean().optional(),
-            is_dangerous: z.boolean().optional(),
-            explanation_of_reasoning: z.string().optional(),
-          }),
-        },
-      },
-      {
-        group: {
-          iteration: 43,
-        },
-      }
-    ));
-  });
-
   it('runs a task', async () => {
     const run1Fixture = await readFile('./tests/fixtures/run1.json', 'utf-8');
     mockFetch.mockResponseOnce(run1Fixture);
@@ -53,6 +49,10 @@ describe('run', () => {
       is_dangerous: true,
       explanation_of_reasoning: 'Plat plat',
     });
+
+    expect(result.data.group.properties.model).toEqual('gpt-4o-2024-08-06');
+    expect(result.data.cost_usd).toEqual(0.0024200000000000003);
+    expect(result.data.duration_seconds).toEqual(1.311426);
 
     expect(mockFetch.mock.calls.length).toEqual(1);
     const req = mockFetch.mock.calls[0][0] as Request;

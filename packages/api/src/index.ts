@@ -10,3 +10,5 @@ export type Paths = openapi.paths;
 export type Schemas = openapi.components['schemas'];
 export type Operations = openapi.operations;
 export type FetchOptions = RequestRetryInit;
+
+export * from './types.js';

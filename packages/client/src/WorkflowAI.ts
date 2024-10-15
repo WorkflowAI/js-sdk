@@ -1,6 +1,7 @@
 import {
   type FetchOptions,
   InitWorkflowAIApiConfig,
+  RawTaskRun,
   Schemas,
   type WorkflowAIApi,
   WorkflowAIApiRequestError,
@@ -14,17 +15,16 @@ import {
   isGroupReference,
   sanitizeGroupReference,
 } from './Group.js';
-import {
+import type {
   ImportRunFn,
-  type InputSchema,
-  type OutputSchema,
+  InputSchema,
+  OutputSchema,
   RunFn,
-  type TaskDefinition,
-  type TaskRunResult,
-  type TaskRunStreamEvent,
-  type TaskRunStreamResult,
-  type UseTaskResult,
-  hasSchemaId,
+  TaskDefinition,
+  TaskRunResult,
+  TaskRunStreamEvent,
+  TaskRunStreamResult,
+  UseTaskResult,
 } from './Task.js';
 
 export type WorkflowAIConfig = {
@@ -64,13 +64,14 @@ export class WorkflowAI {
     }
   }
 
+  // TODO: this is deprecated and no longer needed
   protected async upsertTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS, true>
-  ): Promise<TaskDefinition<IS, OS, false>> {
+    taskDef: TaskDefinition<IS, OS>
+  ): Promise<TaskDefinition<IS, OS>> {
     const { data, error, response } = await this.api.tasks.upsert({
       body: {
         task_id: taskDef.taskId,
-        name: taskDef.taskName || taskDef.taskId,
+        name: taskDef.taskId,
         // @ts-expect-error The generated API types are messed up
         input_schema: await inputZodToSchema(taskDef.schema.input),
         // @ts-expect-error The generated API types are messed up
@@ -85,7 +86,6 @@ export class WorkflowAI {
     return {
       ...taskDef,
       taskId: data.task_id!,
-      taskName: data.name,
       schema: {
         ...taskDef.schema,
         id: data.task_schema_id!,
@@ -94,12 +94,12 @@ export class WorkflowAI {
   }
 
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS, false>,
+    taskDef: TaskDefinition<IS, OS>,
     input: IS,
     options: RunTaskOptions<false>
   ): Promise<TaskRunResult<OS>>;
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS, false>,
+    taskDef: TaskDefinition<IS, OS>,
     input: IS,
     options: RunTaskOptions<true>
   ): Promise<TaskRunStreamResult<OS>>;
@@ -108,7 +108,7 @@ export class WorkflowAI {
     OS extends OutputSchema,
     S extends true | false = false,
   >(
-    taskDef: TaskDefinition<IS, OS, false>,
+    taskDef: TaskDefinition<IS, OS>,
     input: IS,
     { group, stream, labels, metadata, useCache, fetch }: RunTaskOptions<S>
   ) {
@@ -173,10 +173,12 @@ export class WorkflowAI {
         throw new WorkflowAIApiRequestError(response, extractError(error));
       }
 
+      const output = await taskDef.schema.output.parseAsync(data.task_output);
+
       return {
-        data,
+        data: data as RawTaskRun,
         response,
-        output: await taskDef.schema.output.parseAsync(data.task_output),
+        output,
       } as TaskRunResult<OS>;
     }
   }
@@ -185,7 +187,7 @@ export class WorkflowAI {
     IS extends InputSchema,
     OS extends OutputSchema,
   >(
-    taskDef: TaskDefinition<IS, OS, false>,
+    taskDef: TaskDefinition<IS, OS>,
     input: IS,
     output: OS,
     options: ImportTaskRunOptions
@@ -217,18 +219,12 @@ export class WorkflowAI {
     return { data, response };
   }
 
-  public async useTask<IS extends InputSchema, OS extends OutputSchema>(
-    _taskDef: TaskDefinition<IS, OS, true>,
+  public useTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS>,
     defaultOptions?: Partial<RunTaskOptions>
-  ): Promise<UseTaskResult<IS, OS>> {
-    let taskDef: TaskDefinition<IS, OS>;
-
-    // Make sure we have a schema ID, either passed or by upserting the task
-    if (hasSchemaId(_taskDef)) {
-      taskDef = _taskDef;
-    } else if (_taskDef.taskName) {
-      taskDef = await this.upsertTask(_taskDef);
-    } else {
+  ): UseTaskResult<IS, OS> {
+    // Make sure we have a schema ID and it's not 0
+    if (!taskDef.schema.id) {
       throw new Error(
         'Invalid task definition to compile: missing task schema id or task name'
       );
