@@ -1,6 +1,7 @@
 import {
   type FetchOptions,
   InitWorkflowAIApiConfig,
+  RawTaskRun,
   Schemas,
   type WorkflowAIApi,
   WorkflowAIApiRequestError,
@@ -172,10 +173,12 @@ export class WorkflowAI {
         throw new WorkflowAIApiRequestError(response, extractError(error));
       }
 
+      const output = await taskDef.schema.output.parseAsync(data.task_output);
+
       return {
-        data,
+        data: data as RawTaskRun,
         response,
-        output: await taskDef.schema.output.parseAsync(data.task_output),
+        output,
       } as TaskRunResult<OS>;
     }
   }

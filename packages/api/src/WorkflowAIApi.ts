@@ -65,9 +65,6 @@ export function initWorkflowAIApi(
         generateInput: json.POST(
           '/tasks/{task_id}/schemas/{task_schema_id}/input'
         ),
-        getPythonCode: json.GET(
-          '/tasks/{task_id}/schemas/{task_schema_id}/python'
-        ),
         iterate: json.POST('/tasks/schemas/iterate'),
         run: withStream(
           json.POST('/tasks/{task_id}/schemas/{task_schema_id}/run'),
@@ -118,19 +115,6 @@ export function initWorkflowAIApi(
           runs: {
             list: json.GET(
               '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/runs'
-            ),
-          },
-          groups: {
-            list: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups'
-            ),
-            get: json.GET(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/groups/{group_id}'
-            ),
-          },
-          benchmarks: {
-            create: json.POST(
-              '/tasks/{task_id}/schemas/{task_schema_id}/datasets/{dataset_id}/benchmarks'
             ),
           },
         },

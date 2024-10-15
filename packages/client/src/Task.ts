@@ -1,4 +1,4 @@
-import type { WorkflowAIApi } from '@workflowai/api';
+import type { RawTaskRun, WorkflowAIApi } from '@workflowai/api';
 import type { z } from '@workflowai/schema';
 import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
@@ -18,10 +18,11 @@ export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
   schema: TaskSchema<IS, OS>;
 };
 
-export type TaskRunResult<OS extends OutputSchema> = Pick<
-  Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['run']>>,
-  'data' | 'response'
-> & {
+export type TaskRunResult<OS extends OutputSchema> = {
+  data: RawTaskRun;
+  response: Awaited<
+    ReturnType<WorkflowAIApi['tasks']['schemas']['run']>
+  >['response'];
   output: TaskOutput<OS>;
 };
 
