@@ -1,2 +1,2 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('jest-fetch-mock').enableMocks()
+require('jest-fetch-mock').enableMocks();

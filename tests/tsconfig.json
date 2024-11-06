@@ -1,13 +1,4 @@
 {
-  "extends": "../configs/tsconfig.base.json",
-  "include": [
-    "**/*.test.ts"
-  ],
-  "compilerOptions": {
-    "paths": {
-      "@workflowai/workflowai": [
-        "../packages/client/src"
-      ]
-    }
-  },
+  "extends": "../tsconfig.json",
+  "include": ["**/*.test.ts"]
 }

@@ -1,5 +1,8 @@
-import { WorkflowAIApiRequestError } from '@workflowai/api';
-import { WorkflowAI, z } from '@workflowai/workflowai';
+import {
+  WorkflowAI,
+  WorkflowAIApiRequestError,
+  z,
+} from '@workflowai/workflowai';
 import mockFetch from 'jest-fetch-mock';
 import { readFile } from 'fs/promises';
 
@@ -15,7 +18,9 @@ beforeEach(() => {
   mockFetch.resetMocks();
 });
 
-const workflowAI = new WorkflowAI({ api: { key: 'hello' } });
+const workflowAI = new WorkflowAI({
+  api: { url: 'https://run.workflowai.com', key: 'hello' },
+});
 const { run } = workflowAI.useTask(
   {
     taskId: 'animal-classification',
@@ -57,7 +62,7 @@ describe('run', () => {
     expect(mockFetch.mock.calls.length).toEqual(1);
     const req = mockFetch.mock.calls[0][0] as Request;
     expect(req.url).toEqual(
-      'https://api.workflowai.com/tasks/animal-classification/schemas/4/run'
+      'https://run.workflowai.com/tasks/animal-classification/schemas/4/run'
     );
     expect(req.method).toEqual('POST');
     expect(req.headers.get('Authorization')).toEqual('Bearer hello');

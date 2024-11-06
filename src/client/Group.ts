@@ -1,5 +1,5 @@
-import { Schemas } from '@workflowai/api';
 import type { XOR } from 'ts-xor';
+import { Schemas } from '@/api/index.js';
 
 type NotNullValue<T> = T extends null ? never : T;
 type NotNullProperties<T extends Record<string, unknown>> = Required<{

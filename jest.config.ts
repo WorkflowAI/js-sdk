@@ -8,14 +8,16 @@ const config: Config = {
       { useESM: true, tsconfig: './tests/tsconfig.json' },
     ],
   },
-  testRegex: ['packages/.*/src/.*\\.test\\.ts$', 'tests/.*\\.test\\.ts$'],
+  testRegex: ['src/.*\\.test\\.ts$', 'tests/.*\\.test\\.ts$'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   automock: false,
   setupFiles: ['./configs/setupJest.js'],
   moduleNameMapper: {
     '(.+)\\.js': '$1',
-    '@workflowai/workflowai': '<rootDir>/packages/client/src',
+    '@workflowai/workflowai': '<rootDir>/src',
+    '@/api': '<rootDir>/src/api',
+    '@/schema': '<rootDir>/src/schema',
   },
 };
 
