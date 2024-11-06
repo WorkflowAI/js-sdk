@@ -1,6 +1,7 @@
-import type { RawTaskRun, WorkflowAIApi } from '@/api/index.js';
-import type { z } from '@/schema/index.js';
-import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI.js';
+import type { WorkflowAIApi } from '@/api/api.js';
+import type { RunResponse } from '@/api/types.js';
+import type { z } from '@/schema/zod/zod.js';
+import type { RunTaskOptions } from './WorkflowAI.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
 
 type TaskId = string;
@@ -19,10 +20,8 @@ export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
 };
 
 export type TaskRunResult<OS extends OutputSchema> = {
-  data: RawTaskRun;
-  response: Awaited<
-    ReturnType<WorkflowAIApi['tasks']['schemas']['run']>
-  >['response'];
+  data: RunResponse;
+  response: Response;
   output: TaskOutput<OS>;
 };
 
@@ -58,25 +57,16 @@ export type RunFn<
   stream: () => Promise<TaskRunStreamResult<OS>>;
 };
 
-export type ImportRunFn<IS extends InputSchema, OS extends OutputSchema> = (
-  input: TaskInput<IS>,
-  output: TaskOutput<OS>,
-  options?: Partial<ImportTaskRunOptions>
-) => Promise<
-  Pick<
-    Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['runs']['import']>>,
-    'data' | 'response'
-  >
->;
-
 export type UseTaskResult<
   IS extends InputSchema,
   OS extends OutputSchema,
   Stream extends true | false = false,
 > = {
   run: RunFn<IS, OS, Stream>;
-  importRun: ImportRunFn<IS, OS>;
+  // importRun: ImportRunFn<IS, OS>;
 };
+
+// Convenience methods to allow doing TaskInput<T> and TaskOutput<T> on a variety of types
 
 export type TaskInput<T> = T extends InputSchema
   ? z.input<T>
@@ -86,13 +76,11 @@ export type TaskInput<T> = T extends InputSchema
       ? TaskInput<IS>
       : T extends RunFn<infer IS, infer _OS>
         ? TaskInput<IS>
-        : T extends ImportRunFn<infer IS, infer _OS>
+        : T extends UseTaskResult<infer IS, infer _OS>['run']
           ? TaskInput<IS>
-          : T extends UseTaskResult<infer IS, infer _OS>['run']
-            ? TaskInput<IS>
-            : T extends UseTaskResult<infer IS, infer _OS>['importRun']
-              ? TaskInput<IS>
-              : never;
+          : // : T extends UseTaskResult<infer IS, infer _OS>['importRun']
+            //   ? TaskInput<IS>
+            never;
 
 export type TaskOutput<T> = T extends OutputSchema
   ? z.output<T>
@@ -102,10 +90,8 @@ export type TaskOutput<T> = T extends OutputSchema
       ? TaskOutput<OS>
       : T extends RunFn<infer _IS, infer OS>
         ? TaskOutput<OS>
-        : T extends ImportRunFn<infer _IS, infer OS>
+        : T extends UseTaskResult<infer _IS, infer OS>['run']
           ? TaskOutput<OS>
-          : T extends UseTaskResult<infer _IS, infer OS>['run']
-            ? TaskOutput<OS>
-            : T extends UseTaskResult<infer _IS, infer OS>['importRun']
-              ? TaskOutput<OS>
-              : never;
+          : // : T extends UseTaskResult<infer _IS, infer OS>['importRun']
+            //   ? TaskOutput<OS>
+            never;

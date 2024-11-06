@@ -1,9 +1,9 @@
-import { ErrorCode, WorkflowAIApiError } from './ErrorResponse.js';
+import { ErrorCode, WorkflowAIApiError } from './errorResponse.js';
 
 /**
  * Custom error class for Workflow AI API request errors.
  */
-export class WorkflowAIApiRequestError extends Error {
+export class WorkflowAIError extends Error {
   /**
    * The URL of the failed request.
    */
@@ -27,7 +27,7 @@ export class WorkflowAIApiRequestError extends Error {
   errorCode: ErrorCode | undefined;
 
   /**
-   * Creates a new WorkflowAIApiRequestError instance.
+   * Creates a new WorkflowAIError instance.
    * @param response The response object of the failed request.
    * @param detail Additional error details that might be included in the response body.
    */

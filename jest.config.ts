@@ -14,10 +14,9 @@ const config: Config = {
   automock: false,
   setupFiles: ['./configs/setupJest.js'],
   moduleNameMapper: {
-    '(.+)\\.js': '$1',
     '@workflowai/workflowai': '<rootDir>/src',
-    '@/api': '<rootDir>/src/api',
-    '@/schema': '<rootDir>/src/schema',
+    '@/(.+)\\.js': '<rootDir>/src/$1',
+    '(.+)\\.js': '$1',
   },
 };
 

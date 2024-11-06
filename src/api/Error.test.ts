@@ -1,25 +1,22 @@
-import { WorkflowAIApiRequestError } from './Error.js';
-import { WorkflowAIApiError, extractError } from './ErrorResponse.js';
+import { WorkflowAIError } from './error.js';
+import { WorkflowAIApiError, extractError } from './errorResponse.js';
 
-describe('WorkflowAIApiRequestError', () => {
+describe('WorkflowAIError', () => {
   test('should create a new instance with response and detail', () => {
     const response = new Response();
     const detail = extractError({ message: 'Error details' });
-    const error = new WorkflowAIApiRequestError(response, detail);
+    const error = new WorkflowAIError(response, detail);
 
-    expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
+    expect(error).toBeInstanceOf(WorkflowAIError);
     expect(error.response).toBe(response);
     expect(error.detail).toBe(detail);
   });
 
   test('should create a new instance with response only', () => {
     const response = new Response();
-    const error = new WorkflowAIApiRequestError(
-      response,
-      {} as WorkflowAIApiError
-    );
+    const error = new WorkflowAIError(response, {} as WorkflowAIApiError);
 
-    expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
+    expect(error).toBeInstanceOf(WorkflowAIError);
     expect(error.response).toBe(response);
     expect(error.detail).toEqual({});
   });
@@ -27,10 +24,7 @@ describe('WorkflowAIApiRequestError', () => {
   test('should have the correct URL and status', () => {
     const response = new Response(null, { status: 500 });
     const status = 500;
-    const error = new WorkflowAIApiRequestError(
-      response,
-      {} as WorkflowAIApiError
-    );
+    const error = new WorkflowAIError(response, {} as WorkflowAIApiError);
 
     expect(error.status).toBe(status);
   });

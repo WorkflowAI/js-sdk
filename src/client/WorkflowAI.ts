@@ -1,50 +1,40 @@
-import { extractError } from '@/api';
 import {
-  type FetchOptions,
   InitWorkflowAIApiConfig,
-  RawTaskRun,
-  Schemas,
   type WorkflowAIApi,
-  WorkflowAIApiRequestError,
   initWorkflowAIApi,
-  wrapAsyncIterator,
-} from '@/api';
-import { inputZodToSchema, outputZodToSchema, z } from '@/schema';
+} from '@/api/api.js';
+import { WorkflowAIError } from '@/api/error.js';
+import { extractError } from '@/api/errorResponse.js';
 import {
-  GroupReference,
-  isGroupReference,
-  sanitizeGroupReference,
-} from './Group.js';
+  FetchOptions,
+  RunRequest,
+  RunResponse,
+  VersionReference,
+} from '@/api/types.js';
+import { wrapAsyncIterator } from '@/api/utils/wrapAsyncIterator.js';
+import { z } from '@/schema/zod/zod.js';
 import type {
-  ImportRunFn,
   InputSchema,
   OutputSchema,
   RunFn,
   TaskDefinition,
+  TaskOutput,
   TaskRunResult,
   TaskRunStreamEvent,
   TaskRunStreamResult,
   UseTaskResult,
-} from './Task.js';
+} from './task.js';
 
 export type WorkflowAIConfig = {
   api?: WorkflowAIApi | InitWorkflowAIApiConfig;
 };
 
 export type RunTaskOptions<Stream extends true | false = false> = {
-  group: GroupReference;
-  useCache?: Schemas['RunRequest']['use_cache'];
-  labels?: Schemas['RunRequest']['labels'];
-  metadata?: Schemas['RunRequest']['metadata'];
+  version: VersionReference;
+  useCache?: RunRequest['use_cache'];
+  metadata?: RunRequest['metadata'];
   stream?: Stream;
   fetch?: FetchOptions;
-};
-
-export type ImportTaskRunOptions = Omit<
-  Schemas['CreateTaskRunRequest'],
-  'task_input' | 'task_output' | 'group'
-> & {
-  group: GroupReference;
 };
 
 export class WorkflowAI {
@@ -64,35 +54,6 @@ export class WorkflowAI {
     }
   }
 
-  // TODO: this is deprecated and no longer needed
-  protected async upsertTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS>
-  ): Promise<TaskDefinition<IS, OS>> {
-    const { data, error, response } = await this.api.tasks.upsert({
-      body: {
-        task_id: taskDef.taskId,
-        name: taskDef.taskId,
-        // @ts-expect-error The generated API types are messed up
-        input_schema: await inputZodToSchema(taskDef.schema.input),
-        // @ts-expect-error The generated API types are messed up
-        output_schema: await outputZodToSchema(taskDef.schema.output),
-      },
-    });
-
-    if (!data) {
-      throw new WorkflowAIApiRequestError(response, extractError(error));
-    }
-
-    return {
-      ...taskDef,
-      taskId: data.task_id!,
-      schema: {
-        ...taskDef.schema,
-        id: data.task_schema_id!,
-      },
-    };
-  }
-
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS>,
     input: IS,
@@ -107,117 +68,112 @@ export class WorkflowAI {
     IS extends InputSchema,
     OS extends OutputSchema,
     S extends true | false = false,
-  >(
-    taskDef: TaskDefinition<IS, OS>,
-    input: IS,
-    { group, stream, labels, metadata, useCache, fetch }: RunTaskOptions<S>
-  ) {
+  >(taskDef: TaskDefinition<IS, OS>, input: IS, options: RunTaskOptions<S>) {
+    // TODO: surround with try catch to print pretty error
+    const validatedInput = await taskDef.schema.input.parseAsync(input);
+
+    const { version, stream, metadata, useCache, fetch } = options;
     // Prepare a run call, but nothing is executed yet
     const run = this.api.tasks.schemas.run({
       params: {
         path: {
+          tenant: '_', // special tenant that matches the one in the token
           task_id: taskDef.taskId.toLowerCase(),
           task_schema_id: taskDef.schema.id,
         },
       },
       body: {
-        task_input: await taskDef.schema.input.parseAsync(input),
-        group: sanitizeGroupReference(group),
+        task_input: validatedInput,
+        version,
         stream,
-        labels,
         metadata,
         use_cache: useCache || 'when_available',
       },
       ...fetch,
     });
 
-    if (stream) {
-      // Streaming response, we receive partial results
-
-      const { response, stream: rawStream } = await run.stream();
-
-      return {
-        response,
-        // Return an async iterator for easy consumption
-        stream: wrapAsyncIterator(
-          rawStream,
-          // Transform the server-sent events data to the expected outputs
-          // conforming to the schema (as best as possible)
-          async ({ data }): Promise<TaskRunStreamEvent<OS>> => {
-            // Allows us to make a deep partial version of the schema, whatever the schema looks like
-            const partialWrap = z.object({ partial: taskDef.schema.output });
-            const [parsed, partialParsed] = await Promise.all([
-              // We do a `safeParse` to avoid throwing, since it's expected that during
-              // streaming of partial results we'll have data that does not conform to schema
-              data && taskDef.schema.output.safeParseAsync(data.task_output),
-              data &&
-                (
-                  partialWrap.deepPartial() as typeof partialWrap
-                ).safeParseAsync({
-                  partial: data.task_output,
-                }),
-            ]);
-
-            return {
-              data,
-              output: parsed?.data,
-              partialOutput: partialParsed?.data?.partial,
-            };
-          }
-        ),
-      };
-    } else {
-      // Non-streaming version, await the run to actually send the request
+    if (!stream) {
       const { data, error, response } = await run;
       if (!data) {
-        throw new WorkflowAIApiRequestError(response, extractError(error));
+        throw new WorkflowAIError(response, extractError(error));
       }
 
-      const output = await taskDef.schema.output.parseAsync(data.task_output);
+      const output: TaskOutput<OS> = await taskDef.schema.output.parseAsync(
+        data.task_output
+      );
 
-      return {
-        data: data as RawTaskRun,
-        response,
-        output,
-      } as TaskRunResult<OS>;
-    }
-  }
-
-  protected async importTaskRun<
-    IS extends InputSchema,
-    OS extends OutputSchema,
-  >(
-    taskDef: TaskDefinition<IS, OS>,
-    input: IS,
-    output: OS,
-    options: ImportTaskRunOptions
-  ) {
-    const [task_input, task_output] = await Promise.all([
-      taskDef.schema.input.parseAsync(input),
-      taskDef.schema.output.parseAsync(output),
-    ]);
-
-    const { data, response, error } = await this.api.tasks.schemas.runs.import({
-      params: {
-        path: {
-          task_id: taskDef.taskId.toLowerCase(),
-          task_schema_id: taskDef.schema.id,
-        },
-      },
-      body: {
-        ...options,
-        group: sanitizeGroupReference(options.group),
-        task_input,
-        task_output,
-      },
-    });
-
-    if (!data) {
-      throw new WorkflowAIApiRequestError(response, extractError(error));
+      return { data: data as RunResponse, response, output };
     }
 
-    return { data, response };
+    // Streaming response, we receive partial results
+
+    const { response, stream: rawStream } = await run.stream();
+
+    return {
+      response,
+      // Return an async iterator for easy consumption
+      stream: wrapAsyncIterator(
+        rawStream,
+        // Transform the server-sent events data to the expected outputs
+        // conforming to the schema (as best as possible)
+        async ({ data }): Promise<TaskRunStreamEvent<OS>> => {
+          // Allows us to make a deep partial version of the schema, whatever the schema looks like
+          const partialWrap = z.object({ partial: taskDef.schema.output });
+          const [parsed, partialParsed] = await Promise.all([
+            // We do a `safeParse` to avoid throwing, since it's expected that during
+            // streaming of partial results we'll have data that does not conform to schema
+            data && taskDef.schema.output.safeParseAsync(data.task_output),
+            data &&
+              (partialWrap.deepPartial() as typeof partialWrap).safeParseAsync({
+                partial: data.task_output,
+              }),
+          ]);
+
+          return {
+            data,
+            output: parsed?.data,
+            partialOutput: partialParsed?.data?.partial,
+          };
+        }
+      ),
+    };
   }
+
+  // protected async importTaskRun<
+  //   IS extends InputSchema,
+  //   OS extends OutputSchema,
+  // >(
+  //   taskDef: TaskDefinition<IS, OS>,
+  //   input: IS,
+  //   output: OS,
+  //   options: ImportTaskRunOptions
+  // ) {
+  //   const [task_input, task_output] = await Promise.all([
+  //     taskDef.schema.input.parseAsync(input),
+  //     taskDef.schema.output.parseAsync(output),
+  //   ]);
+
+  //   const { data, response, error } = await this.api.tasks.schemas.runs.import({
+  //     params: {
+  //       path: {
+  //         task_id: taskDef.taskId.toLowerCase(),
+  //         task_schema_id: taskDef.schema.id,
+  //       },
+  //     },
+  //     body: {
+  //       ...options,
+  //       group: sanitizeGroupReference(options.group),
+  //       task_input,
+  //       task_output,
+  //     },
+  //   });
+
+  //   if (!data) {
+  //     throw new WorkflowAIError(response, extractError(error));
+  //   }
+
+  //   return { data, response };
+  // }
 
   public useTask<IS extends InputSchema, OS extends OutputSchema>(
     taskDef: TaskDefinition<IS, OS>,
@@ -267,26 +223,8 @@ export class WorkflowAI {
       };
     };
 
-    const importRun: ImportRunFn<IS, OS> = async (
-      input,
-      output,
-      overrideOptions
-    ) => {
-      const { group, ...options } = {
-        ...defaultOptions,
-        ...overrideOptions,
-      };
-
-      if (!isGroupReference(group)) {
-        throw new Error('Group configuration is required to import a task run');
-      }
-
-      return this.importTaskRun(taskDef, input, output, { ...options, group });
-    };
-
     return {
       run,
-      importRun,
     };
   }
 }

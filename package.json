@@ -63,7 +63,7 @@
   },
   "scripts": {
     "-------- CODEGEN": "",
-    "codegen:openapi": "openapi-typescript $WORKFLOWAI_API_URL/openapi.json -o ./src/generated/openapi.ts",
+    "codegen:openapi": "openapi-typescript ${WORKFLOWAI_API_URL:-https://run.workflowai.dev}/openapi.json -o ./src/api/generated/openapi.ts",
     "codegen": "npm run codegen:openapi && npm run fix",
     "-------- LINTING": "",
     "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern",

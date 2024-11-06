@@ -1,4 +1,4 @@
-import { WorkflowAIApiRequestError } from '../Error.js';
+import { WorkflowAIError } from '../error.js';
 import { throwError } from './throwError.js';
 
 describe('throwError middleware', () => {
@@ -6,26 +6,26 @@ describe('throwError middleware', () => {
     expect(throwError.onResponse).toBeDefined();
   });
 
-  it('should throw WorkflowAIApiRequestError if response is 500', async () => {
+  it('should throw WorkflowAIError if response is 500', async () => {
     const response = new Response(null, {
       status: 500,
       statusText: 'Internal Server Error',
     });
 
     await expect(throwError.onResponse?.(response)).rejects.toThrow(
-      WorkflowAIApiRequestError
+      WorkflowAIError
     );
   });
 
-  it('should not throw WorkflowAIApiRequestError if response status is 200', async () => {
+  it('should not throw WorkflowAIError if response status is 200', async () => {
     const response = new Response(null, { status: 200, statusText: 'OK' });
 
     await expect(throwError.onResponse?.(response)).resolves.not.toThrow(
-      WorkflowAIApiRequestError
+      WorkflowAIError
     );
   });
 
-  it('should throw WorkflowAIApiRequestError with correct error message', async () => {
+  it('should throw WorkflowAIError with correct error message', async () => {
     const response = new Response(
       JSON.stringify({
         detail: {
@@ -43,7 +43,7 @@ describe('throwError middleware', () => {
       await throwError.onResponse?.(response);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
+      expect(error).toBeInstanceOf(WorkflowAIError);
       expect(error.message).toBe(
         `Failed to request ${response.url}: unknown error`
       );
@@ -53,7 +53,7 @@ describe('throwError middleware', () => {
     }
   });
 
-  it('should throw WorkflowAIApiRequestError with correct error message for run errors', async () => {
+  it('should throw WorkflowAIError with correct error message for run errors', async () => {
     const response = new Response(
       JSON.stringify({
         error: {
@@ -85,8 +85,8 @@ describe('throwError middleware', () => {
       await throwError.onResponse?.(response);
       expect(true).toBe(false);
     } catch (error: unknown) {
-      expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
-      if (!(error instanceof WorkflowAIApiRequestError)) {
+      expect(error).toBeInstanceOf(WorkflowAIError);
+      if (!(error instanceof WorkflowAIError)) {
         expect(true).toBe(false);
         return;
       }
@@ -100,7 +100,7 @@ describe('throwError middleware', () => {
     }
   });
 
-  it('should throw WorkflowAIApiRequestError with no error message if body is invalid', async () => {
+  it('should throw WorkflowAIError with no error message if body is invalid', async () => {
     const response = new Response(`blablabla`, {
       status: 500,
       statusText: 'Internal Server Error',
@@ -110,7 +110,7 @@ describe('throwError middleware', () => {
       await throwError.onResponse?.(response);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
+      expect(error).toBeInstanceOf(WorkflowAIError);
       expect(error.message).toBe(
         `Failed to request ${response.url}: unknown error`
       );
