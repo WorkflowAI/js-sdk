@@ -1,5 +1,5 @@
-import type { RawTaskRun, WorkflowAIApi } from '@workflowai/api';
-import type { z } from '@workflowai/schema';
+import type { RawTaskRun, WorkflowAIApi } from '@/api/index.js';
+import type { z } from '@/schema/index.js';
 import type { ImportTaskRunOptions, RunTaskOptions } from './WorkflowAI.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
 

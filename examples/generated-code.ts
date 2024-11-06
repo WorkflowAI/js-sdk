@@ -1,4 +1,4 @@
-import { TaskInput, WorkflowAI, z } from '@workflowai/workflowai'
+import { TaskInput, WorkflowAI, z } from '@workflowai/workflowai';
 
 // Code generated from API docs
 
@@ -12,13 +12,13 @@ const workflowAI = new WorkflowAI({
     // optional, defaults to process.env.WORKFLOWAI_API_KEY
     key: '[your key here]',
   },
-})
+});
 
 /**
  * Initialize your task
  */
 
-const { run: getCelebrityLastName } = await workflowAI.useTask(
+const { run: getCelebrityLastName } = workflowAI.useTask(
   {
     taskId: 'get-celebrity-last-name',
     schema: {
@@ -35,8 +35,8 @@ const { run: getCelebrityLastName } = await workflowAI.useTask(
     group: {
       iteration: 6,
     },
-  },
-)
+  }
+);
 
 /**
  * Run your task
@@ -44,8 +44,8 @@ const { run: getCelebrityLastName } = await workflowAI.useTask(
 
 const input: TaskInput<typeof getCelebrityLastName> = {
   first_name: 'Thierry',
-}
+};
 
-const { output } = await getCelebrityLastName(input)
+const { output } = await getCelebrityLastName(input);
 
-console.log(output)
+console.log(output);

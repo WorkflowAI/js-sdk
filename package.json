@@ -1,20 +1,43 @@
 {
-  "name": "@workflowai/workspaces",
-  "private": true,
+  "name": "@workflowai/workflowai",
   "version": "1.4.3",
-  "description": "Collection of TS/JS libraries, private and public, for workflowAI.",
-  "author": "workflowAI",
-  "homepage": "https://workflowai.ai",
-  "workspaces": [
-    "packages/schema",
-    "packages/api",
-    "packages/client"
+  "description": "WorkflowAI TS SDK",
+  "author": "WorkflowAI",
+  "homepage": "https://workflowai.com",
+  "keywords": [
+    "workflowai",
+    "ai",
+    "llm"
   ],
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.13"
+  },
+  "dependencies": {
+    "fetch-event-stream": "^0.1.5",
+    "fetch-retry": "^6.0.0",
+    "openapi-fetch": "^0.9.8",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.1"
+  },
   "devDependencies": {
     "@actions/core": "^1.10.1",
     "@jest/globals": "^29.4.3",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/jest": "^29.2.2",
+    "@types/json-schema": "^7.0.15",
     "@types/minimist": "^1.2.5",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
@@ -30,6 +53,7 @@
     "lint-staged": "^15.2.10",
     "minimist": "^1.2.8",
     "nodemon": "^3.1.4",
+    "openapi-typescript": "^6.7.6",
     "prettier": "^3.3.2",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
@@ -38,17 +62,27 @@
     "typescript": "^5.5.2"
   },
   "scripts": {
-    "codegen": "npm run codegen --workspaces --if-present",
-    "check": "npm run check --workspaces --if-present",
-    "fix": "npm run fix --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "test:watch": "npm run test:ts-jest --watch",
-    "test": "npm run test:ts-jest --",
-    "test:ts-jest": "npx jest",
-    "set-version": "tsx bin/set-version.ts",
-    "check-version": "tsx bin/check-version.ts",
+    "-------- CODEGEN": "",
+    "codegen:openapi": "openapi-typescript $WORKFLOWAI_API_URL/openapi.json -o ./src/generated/openapi.ts",
+    "codegen": "npm run codegen:openapi && npm run fix",
+    "-------- LINTING": "",
+    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern",
+    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern",
+    "lint:check": "eslint --cache --ext .ts ./src",
+    "lint:fix": "eslint --cache --fix --ext .ts ./src",
+    "check": "npm run lint:check && npm run prettier:check",
+    "fix": "npm run lint:fix && npm run prettier:fix",
+    "test": "jest",
     "lint-staged": "lint-staged",
-    "prepare": "husky"
+    "-------- BUILD": "",
+    "clean": "rm -rf dist/*",
+    "build:types": "tsc -p ./configs/tsconfig.types.json",
+    "build:cjs": "tsc -p ./configs/tsconfig.cjs.json && tsx ./configs/postcjs.ts",
+    "build:esm": "tsc -p ./configs/tsconfig.esm.json && tsx ./configs/postesm.ts",
+    "build:test": "tsc -p ./configs/tsconfig.test.json",
+    "build": "npm run clean && npm run build:types && npm run build:cjs && npm run build:esm",
+    "dry": "npm run build && npm pub --dry-run",
+    "prepublishOnly": "npm run build"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [

@@ -1,3 +1,4 @@
+import { extractError } from '@/api';
 import {
   type FetchOptions,
   InitWorkflowAIApiConfig,
@@ -7,9 +8,8 @@ import {
   WorkflowAIApiRequestError,
   initWorkflowAIApi,
   wrapAsyncIterator,
-} from '@workflowai/api';
-import { extractError } from '@workflowai/api';
-import { inputZodToSchema, outputZodToSchema, z } from '@workflowai/schema';
+} from '@/api';
+import { inputZodToSchema, outputZodToSchema, z } from '@/schema';
 import {
   GroupReference,
   isGroupReference,
