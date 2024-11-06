@@ -12,7 +12,7 @@ import {
   VersionReference,
 } from '@/api/types.js';
 import { wrapAsyncIterator } from '@/api/utils/wrapAsyncIterator.js';
-import { z } from '@/schema/zod/zod.js';
+import { ZodTypeAny, z } from '@/schema/zod/zod.js';
 import type {
   InputSchema,
   OutputSchema,
@@ -35,7 +35,36 @@ export type RunTaskOptions<Stream extends true | false = false> = {
   metadata?: RunRequest['metadata'];
   stream?: Stream;
   fetch?: FetchOptions;
+  privateFields?: ('task_input' | 'task_output' | string)[];
 };
+
+function optionsToRunRequest(
+  input: Record<string, never>,
+  options: Omit<RunTaskOptions<true | false>, 'fetch'>
+): RunRequest {
+  const { version, stream, metadata, useCache, privateFields } = options;
+
+  return {
+    task_input: input,
+    version,
+    stream,
+    metadata,
+    use_cache: useCache || 'when_available',
+    private_fields: privateFields,
+  };
+}
+
+function paramsFromTaskDefinition(
+  taskDef: TaskDefinition<ZodTypeAny, ZodTypeAny>
+) {
+  return {
+    path: {
+      tenant: '_',
+      task_id: taskDef.taskId.toLowerCase(),
+      task_schema_id: taskDef.schema.id,
+    },
+  };
+}
 
 export class WorkflowAI {
   protected api: WorkflowAIApi;
@@ -72,27 +101,15 @@ export class WorkflowAI {
     // TODO: surround with try catch to print pretty error
     const validatedInput = await taskDef.schema.input.parseAsync(input);
 
-    const { version, stream, metadata, useCache, fetch } = options;
+    const body = optionsToRunRequest(validatedInput, options);
     // Prepare a run call, but nothing is executed yet
     const run = this.api.tasks.schemas.run({
-      params: {
-        path: {
-          tenant: '_', // special tenant that matches the one in the token
-          task_id: taskDef.taskId.toLowerCase(),
-          task_schema_id: taskDef.schema.id,
-        },
-      },
-      body: {
-        task_input: validatedInput,
-        version,
-        stream,
-        metadata,
-        use_cache: useCache || 'when_available',
-      },
-      ...fetch,
+      params: paramsFromTaskDefinition(taskDef),
+      body,
+      ...options.fetch,
     });
 
-    if (!stream) {
+    if (!options.stream) {
       const { data, error, response } = await run;
       if (!data) {
         throw new WorkflowAIError(response, extractError(error));
