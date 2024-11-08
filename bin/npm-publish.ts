@@ -10,7 +10,7 @@ const semverRegex =
 
 try {
   const __filename = fileURLToPath(import.meta.url);
-  const rootDir = join(dirname(__filename), '../..');
+  const rootDir = join(dirname(__filename), '..');
 
   // We'll tag published package version differently depending on which branch this action is triggered from
   const { tag } = argv(process.argv.slice(2)) as {
@@ -50,7 +50,7 @@ try {
   // // Publish only if version doesn't already exist
   // if (!npmVersions.includes(localPackageSpecs.version)) {
   // Version had not been published yet, so do it!
-  const npmArgs = ['pub', `-w=${localPackageSpecs.name}`, '--loglevel=error'];
+  const npmArgs = ['pub', '--loglevel=error'];
   if (tag) {
     npmArgs.push(`--tag=${tag}`);
   }
