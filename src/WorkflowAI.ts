@@ -2,17 +2,17 @@ import {
   InitWorkflowAIApiConfig,
   type WorkflowAIApi,
   initWorkflowAIApi,
-} from '@/api/api.js';
-import { WorkflowAIError } from '@/api/error.js';
-import { extractError } from '@/api/errorResponse.js';
+} from './api/api.js';
+import { WorkflowAIError } from './api/error.js';
+import { extractError } from './api/errorResponse.js';
 import {
   FetchOptions,
   RunRequest,
   RunResponse,
   VersionReference,
-} from '@/api/types.js';
-import { wrapAsyncIterator } from '@/api/utils/wrapAsyncIterator.js';
-import { ZodTypeAny, z } from '@/schema/zod/zod.js';
+} from './api/types.js';
+import { wrapAsyncIterator } from './api/utils/wrapAsyncIterator.js';
+import { ZodTypeAny, z } from './schema/zod/zod.js';
 import type {
   InputSchema,
   OutputSchema,

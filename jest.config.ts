@@ -15,7 +15,6 @@ const config: Config = {
   setupFiles: ['./configs/setupJest.js'],
   moduleNameMapper: {
     '@workflowai/workflowai': '<rootDir>/src',
-    '@/(.+)\\.js': '<rootDir>/src/$1',
     '(.+)\\.js': '$1',
   },
 };

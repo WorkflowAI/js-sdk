@@ -1,7 +1,7 @@
-import type { WorkflowAIApi } from '@/api/api.js';
-import type { RunResponse } from '@/api/types.js';
-import type { z } from '@/schema/zod/zod.js';
 import type { RunTaskOptions } from './WorkflowAI.js';
+import type { WorkflowAIApi } from './api/api.js';
+import type { RunResponse } from './api/types.js';
+import type { z } from './schema/zod/zod.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
 
 type TaskId = string;
