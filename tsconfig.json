@@ -18,8 +18,7 @@
     "allowJs": true,
     "baseUrl": "./src",
     "paths": {
-      "@workflowai/workflowai": ["."],
-      "@/*": ["./*"]
+      "@workflowai/workflowai": ["."]
     }
   },
   "include": ["./src/**/*.ts"],

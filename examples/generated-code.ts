@@ -32,9 +32,7 @@ const { run: getCelebrityLastName } = workflowAI.useTask(
     },
   },
   {
-    group: {
-      iteration: 6,
-    },
+    version: 6,
   }
 );
 

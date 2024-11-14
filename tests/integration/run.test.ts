@@ -1,8 +1,4 @@
-import {
-  WorkflowAI,
-  WorkflowAIApiRequestError,
-  z,
-} from '@workflowai/workflowai';
+import { WorkflowAI, WorkflowAIError, z } from '@workflowai/workflowai';
 import mockFetch from 'jest-fetch-mock';
 import { readFile } from 'fs/promises';
 
@@ -37,9 +33,7 @@ const { run } = workflowAI.useTask(
     },
   },
   {
-    group: {
-      iteration: 43,
-    },
+    version: 43,
   }
 );
 
@@ -55,22 +49,20 @@ describe('run', () => {
       explanation_of_reasoning: 'Plat plat',
     });
 
-    expect(result.data.group.properties.model).toEqual('gpt-4o-2024-08-06');
+    expect(result.data.version.properties.model).toEqual('gpt-4o-2024-08-06');
     expect(result.data.cost_usd).toEqual(0.0024200000000000003);
     expect(result.data.duration_seconds).toEqual(1.311426);
 
     expect(mockFetch.mock.calls.length).toEqual(1);
     const req = mockFetch.mock.calls[0][0] as Request;
     expect(req.url).toEqual(
-      'https://run.workflowai.com/tasks/animal-classification/schemas/4/run'
+      'https://run.workflowai.com/v1/_/tasks/animal-classification/schemas/4/run'
     );
     expect(req.method).toEqual('POST');
     expect(req.headers.get('Authorization')).toEqual('Bearer hello');
     const body = await req.json();
     expect(body).toEqual({
-      group: {
-        iteration: 43,
-      },
+      version: 43,
       stream: false,
       task_input: {
         animal: 'platypus',
@@ -99,8 +91,8 @@ describe('run', () => {
       // If we get here, the test failed
       expect(true).toBe(false);
     } catch (error: unknown) {
-      expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
-      if (!(error instanceof WorkflowAIApiRequestError)) {
+      expect(error).toBeInstanceOf(WorkflowAIError);
+      if (!(error instanceof WorkflowAIError)) {
         expect(true).toBe(false);
         return;
       }
@@ -116,8 +108,8 @@ describe('run', () => {
       // If we get here, the test failed
       expect(true).toBe(false);
     } catch (error: unknown) {
-      expect(error).toBeInstanceOf(WorkflowAIApiRequestError);
-      if (!(error instanceof WorkflowAIApiRequestError)) {
+      expect(error).toBeInstanceOf(WorkflowAIError);
+      if (!(error instanceof WorkflowAIError)) {
         expect(true).toBe(false);
         return;
       }

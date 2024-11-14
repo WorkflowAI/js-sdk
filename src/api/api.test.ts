@@ -1,8 +1,12 @@
 import { expect, test } from '@jest/globals';
 import { z } from 'zod';
-import { initWorkflowAIApi } from './WorkflowAIApi.js';
+import { initWorkflowAIApi } from './api.js';
 import * as createClients from './http-clients.js';
-import { Middleware, customHeaders, throwError } from './middlewares/index.js';
+import {
+  Middleware,
+  customHeaders,
+  throwError,
+} from './middlewares/customHeaders.js';
 import * as getEnv from './utils/getEnv.js';
 
 beforeAll(() => {
@@ -80,12 +84,12 @@ describe('WorkflowAIApi', () => {
     expect(getEnv.getEnv).toHaveBeenCalledWith('WORKFLOWAI_API_URL');
     expect(createClients.createJsonClient).toHaveBeenCalledWith({
       key: undefined,
-      url: 'https://api.workflowai.com',
+      url: 'https://run.workflowai.com',
       use: [customHeaders, throwError],
     });
     expect(createClients.createStreamClient).toHaveBeenCalledWith({
       key: undefined,
-      url: 'https://api.workflowai.com',
+      url: 'https://run.workflowai.com',
       use: [customHeaders, throwError],
     });
   });

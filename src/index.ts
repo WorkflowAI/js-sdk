@@ -1,4 +1,4 @@
-export type { TaskInput, TaskOutput } from './client/Task.js';
-export * from './client/WorkflowAI.js';
-export { z } from './schema/index.js';
-export { WorkflowAIApiRequestError } from './api/index.js';
+export type { TaskInput, TaskOutput } from './task.js';
+export * from './WorkflowAI.js';
+export * as z from './schema/zod/zod.js';
+export { WorkflowAIError } from './api/error.js';
