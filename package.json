@@ -77,6 +77,7 @@
     "test:unit": "jest --projects configs/jest.default.config.ts",
     "test:e2e": "jest tests/e2e",
     "lint-staged": "lint-staged",
+    "check-version": "tsx ./bin/check-version.ts",
     "-------- BUILD": "",
     "clean": "rm -rf dist/*",
     "build:types": "tsc -p ./configs/tsconfig.types.json",
