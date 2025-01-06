@@ -1,3 +1,4 @@
+import { DeepPartial } from 'utils.js';
 import {
   InitWorkflowAIApiConfig,
   type WorkflowAIApi,
@@ -12,12 +13,10 @@ import {
   VersionReference,
 } from './api/types.js';
 import { wrapAsyncIterator } from './api/utils/wrapAsyncIterator.js';
-import { ZodTypeAny, z } from './schema/zod/zod.js';
 import type {
-  InputSchema,
-  OutputSchema,
   RunFn,
   TaskDefinition,
+  TaskInput,
   TaskOutput,
   TaskRunResult,
   TaskRunStreamEvent,
@@ -39,13 +38,13 @@ export type RunTaskOptions<Stream extends true | false = false> = {
 };
 
 function optionsToRunRequest(
-  input: Record<string, never>,
+  input: TaskInput,
   options: Omit<RunTaskOptions<true | false>, 'fetch'>
 ): RunRequest {
   const { version, stream, metadata, useCache, privateFields } = options;
 
   return {
-    task_input: input,
+    task_input: input as Record<string, never>,
     version,
     stream,
     metadata,
@@ -54,14 +53,12 @@ function optionsToRunRequest(
   };
 }
 
-function paramsFromTaskDefinition(
-  taskDef: TaskDefinition<ZodTypeAny, ZodTypeAny>
-) {
+function paramsFromTaskDefinition(taskDef: TaskDefinition) {
   return {
     path: {
       tenant: '_',
       task_id: taskDef.taskId.toLowerCase(),
-      task_schema_id: taskDef.schema.id,
+      task_schema_id: taskDef.schemaId,
     },
   };
 }
@@ -83,25 +80,22 @@ export class WorkflowAI {
     }
   }
 
-  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS>,
-    input: IS,
+  protected async runTask<I extends TaskInput, O extends TaskOutput>(
+    taskDef: TaskDefinition,
+    input: I,
     options: RunTaskOptions<false>
-  ): Promise<TaskRunResult<OS>>;
-  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS>,
-    input: IS,
+  ): Promise<TaskRunResult<O>>;
+  protected async runTask<I extends TaskInput, O extends TaskOutput>(
+    taskDef: TaskDefinition,
+    input: I,
     options: RunTaskOptions<true>
-  ): Promise<TaskRunStreamResult<OS>>;
-  protected async runTask<
-    IS extends InputSchema,
-    OS extends OutputSchema,
-    S extends true | false = false,
-  >(taskDef: TaskDefinition<IS, OS>, input: IS, options: RunTaskOptions<S>) {
-    // TODO: surround with try catch to print pretty error
-    const validatedInput = await taskDef.schema.input.parseAsync(input);
-
-    const body = optionsToRunRequest(validatedInput, options);
+  ): Promise<TaskRunStreamResult<O>>;
+  protected async runTask<I extends TaskInput, S extends true | false = false>(
+    taskDef: TaskDefinition,
+    input: I,
+    options: RunTaskOptions<S>
+  ) {
+    const body = optionsToRunRequest(input, options);
     // Prepare a run call, but nothing is executed yet
     const run = this.api.tasks.schemas.run({
       params: paramsFromTaskDefinition(taskDef),
@@ -115,9 +109,7 @@ export class WorkflowAI {
         throw new WorkflowAIError(response, extractError(error));
       }
 
-      const output: TaskOutput<OS> = await taskDef.schema.output.parseAsync(
-        data.task_output
-      );
+      const output = data.task_output as TaskOutput;
 
       return { data: data as RunResponse, response, output };
     }
@@ -133,23 +125,10 @@ export class WorkflowAI {
         rawStream,
         // Transform the server-sent events data to the expected outputs
         // conforming to the schema (as best as possible)
-        async ({ data }): Promise<TaskRunStreamEvent<OS>> => {
-          // Allows us to make a deep partial version of the schema, whatever the schema looks like
-          const partialWrap = z.object({ partial: taskDef.schema.output });
-          const [parsed, partialParsed] = await Promise.all([
-            // We do a `safeParse` to avoid throwing, since it's expected that during
-            // streaming of partial results we'll have data that does not conform to schema
-            data && taskDef.schema.output.safeParseAsync(data.task_output),
-            data &&
-              (partialWrap.deepPartial() as typeof partialWrap).safeParseAsync({
-                partial: data.task_output,
-              }),
-          ]);
-
+        async ({ data }): Promise<TaskRunStreamEvent<TaskOutput>> => {
           return {
             data,
-            output: parsed?.data,
-            partialOutput: partialParsed?.data?.partial,
+            output: data?.task_output as DeepPartial<TaskOutput>,
           };
         }
       ),
@@ -192,18 +171,18 @@ export class WorkflowAI {
   //   return { data, response };
   // }
 
-  public useTask<IS extends InputSchema, OS extends OutputSchema>(
-    taskDef: TaskDefinition<IS, OS>,
-    defaultOptions?: Partial<RunTaskOptions>
-  ): UseTaskResult<IS, OS> {
+  public useTask<I extends TaskInput, O extends TaskOutput>(
+    taskDef: TaskDefinition & Partial<RunTaskOptions>
+  ): UseTaskResult<I, O> {
     // Make sure we have a schema ID and it's not 0
-    if (!taskDef.schema.id) {
+    if (!taskDef.schemaId) {
       throw new Error(
         'Invalid task definition to compile: missing task schema id or task name'
       );
     }
+    const { taskId, schemaId, ...defaultOptions } = taskDef;
 
-    const run: RunFn<IS, OS> = (input, overrideOptions) => {
+    const run: RunFn<I, O> = (input, overrideOptions) => {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
@@ -213,11 +192,11 @@ export class WorkflowAI {
         },
       } as RunTaskOptions;
 
-      let runPromise: Promise<TaskRunResult<OS>>;
+      let runPromise: Promise<TaskRunResult<O>>;
 
       const getRunPromise = () => {
         if (!runPromise) {
-          runPromise = this.runTask<IS, OS>(taskDef, input, {
+          runPromise = this.runTask<I, O>(taskDef, input, {
             ...options,
             stream: false,
           });
@@ -233,7 +212,7 @@ export class WorkflowAI {
         catch: (...r) => getRunPromise().catch(...r),
         finally: (...r) => getRunPromise().finally(...r),
         stream: () =>
-          this.runTask<IS, OS>(taskDef, input, {
+          this.runTask<I, O>(taskDef, input, {
             ...options,
             stream: true,
           }),

@@ -1,39 +1,37 @@
-import { TaskInput, TaskOutput, WorkflowAI, z } from '@workflowai/workflowai';
+import { TaskInput, TaskOutput, WorkflowAI } from '@workflowai/workflowai';
 import 'dotenv/config';
+import { DeepPartial } from 'utils';
 
 const workflowAI = new WorkflowAI();
 
+interface BookCharacterTaskInput extends TaskInput {
+  book_title: string;
+}
+
+interface Character {
+  name: string;
+  goals: string[];
+  weaknesses: string[];
+  outcome: string;
+}
+
+interface BookCharacterTaskOutput extends TaskOutput {
+  characters: Character[];
+}
+
 // Initialize Your Task
-const { run: analyzeBookCharacters } = workflowAI.useTask(
-  {
-    taskId: 'analyze-book-characters',
-    schema: {
-      id: 1,
-      input: z.object({
-        book_title: z.string().optional(),
-      }),
-      output: z.object({
-        characters: z
-          .array(
-            z.object({
-              name: z.string().optional(),
-              goals: z.array(z.string()).optional(),
-              weaknesses: z.array(z.string()).optional(),
-              outcome: z.string().optional(),
-            })
-          )
-          .optional(),
-      }),
-    },
-  },
-  {
-    version: 'production',
-  }
-);
+const { run: analyzeBookCharacters } = workflowAI.useTask<
+  BookCharacterTaskInput,
+  BookCharacterTaskOutput
+>({
+  taskId: 'analyze-book-characters',
+  schemaId: 1,
+  version: 'production',
+});
 
 describe('analyzeBookCharacter', () => {
   it('runs', async () => {
-    const input: TaskInput<typeof analyzeBookCharacters> = {
+    const input: BookCharacterTaskInput = {
       book_title: 'The Shadow of the Wind',
     };
     const {
@@ -47,17 +45,15 @@ describe('analyzeBookCharacter', () => {
     expect(version.properties.model).toBeDefined();
   }, 30000);
 
-  type BookCharacterTaskOutput = TaskOutput<typeof analyzeBookCharacters>;
-
   it('streams', async () => {
-    const input: TaskInput<typeof analyzeBookCharacters> = {
+    const input: BookCharacterTaskInput = {
       book_title: 'The Shadow of the Wind',
     };
     const { stream } = await analyzeBookCharacters(input, {
       useCache: 'never',
     }).stream();
 
-    const chunks: BookCharacterTaskOutput[] = [];
+    const chunks: DeepPartial<BookCharacterTaskOutput>[] = [];
     for await (const chunk of stream) {
       if (chunk.output) {
         chunks.push(chunk.output);
