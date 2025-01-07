@@ -15,7 +15,8 @@ beforeEach(() => {
 });
 
 const workflowAI = new WorkflowAI({
-  api: { url: 'https://run.workflowai.com', key: 'hello' },
+  url: 'https://run.workflowai.com',
+  key: 'hello',
 });
 
 type AnimalClassificationInput = {

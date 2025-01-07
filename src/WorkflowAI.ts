@@ -24,9 +24,7 @@ import type {
   UseTaskResult,
 } from './task.js';
 
-export type WorkflowAIConfig = {
-  api?: WorkflowAIApi | InitWorkflowAIApiConfig;
-};
+export type WorkflowAIConfig = InitWorkflowAIApiConfig;
 
 export type RunTaskOptions<Stream extends true | false = false> = {
   version: VersionReference;
@@ -66,18 +64,10 @@ function paramsFromTaskDefinition(taskDef: TaskDefinition) {
 export class WorkflowAI {
   protected api: WorkflowAIApi;
 
-  constructor(config?: WorkflowAIConfig) {
-    const { api: apiConfig } = {
-      ...config,
-    };
-
-    if (apiConfig && 'tasks' in apiConfig) {
-      this.api = apiConfig;
-    } else {
-      this.api = initWorkflowAIApi({
-        ...apiConfig,
-      });
-    }
+  constructor(apiConfig?: WorkflowAIConfig) {
+    this.api = initWorkflowAIApi({
+      ...apiConfig,
+    });
   }
 
   protected async runTask<I extends TaskInput, O extends TaskOutput>(

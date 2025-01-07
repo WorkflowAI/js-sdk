@@ -25,7 +25,9 @@ export interface File {
   data?: string;
 }
 
-export interface LocalDatetime {
+export type Image = File;
+
+export interface DatetimeLocal {
   // The date of the local datetime
   date: string;
   // The time of the local datetime without timezone info

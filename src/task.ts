@@ -9,8 +9,8 @@ type SchemaId = number;
 export type InputSchema = Record<string, unknown>;
 export type OutputSchema = Record<string, unknown>;
 
-export type TaskInput = Record<string, unknown>;
-export type TaskOutput = Record<string, unknown>;
+export type TaskInput = object;
+export type TaskOutput = object;
 
 export type TaskDefinition = {
   taskId: TaskId;
