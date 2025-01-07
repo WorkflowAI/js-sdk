@@ -13,9 +13,10 @@ try {
   const rootDir = join(dirname(__filename), '..');
 
   // We'll tag published package version differently depending on which branch this action is triggered from
-  const { tag } = argv(process.argv.slice(2)) as {
+  const { tag, otp } = argv(process.argv.slice(2)) as {
     _: string[];
     tag?: string;
+    otp?: string;
   };
 
   const localPackageSpecs = JSON.parse(
@@ -53,6 +54,9 @@ try {
   const npmArgs = ['pub', '--loglevel=error'];
   if (tag) {
     npmArgs.push(`--tag=${tag}`);
+  }
+  if (otp) {
+    npmArgs.push(`--otp=${otp}`);
   }
   const publishCmd = spawnSync('npm', npmArgs);
 
