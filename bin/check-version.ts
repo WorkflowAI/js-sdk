@@ -21,6 +21,26 @@ if (expectedVersion.startsWith('v')) {
   expectedVersion = expectedVersion.slice(1);
 }
 
+const versionFileContents = readFileSync(
+  join(rootDir, 'src/version.ts'),
+  'utf-8'
+);
+const valueFromVersionFile = versionFileContents.match(
+  /export const PACKAGE_VERSION = '(.*)';/
+)?.[1];
+
+if (!valueFromVersionFile) {
+  console.error('Version file does not contain a valid version');
+  process.exit(1);
+}
+
+if (valueFromVersionFile !== expectedVersion) {
+  console.error(
+    `Version file contains a different version: ${valueFromVersionFile}`
+  );
+  process.exit(1);
+}
+
 const allVersionsMatch = mainPackageJson.version === expectedVersion;
 
 // Check version for each workspace

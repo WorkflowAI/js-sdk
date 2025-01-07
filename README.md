@@ -1,12 +1,5 @@
-# WorkflowAI TS/JS libraries
-
-This repo hosts the different TS/JS libraries for workflowAI.
+# WorkflowAI
 
 ## Usage
 
-### Deployment
-
-```sh
-# Setting a version
-npm run set-version 1.4.0-alpha.0
-```
+Create a task on workflowai.com then visit the code page to get the code to use in your project.

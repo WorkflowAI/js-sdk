@@ -1,28 +1,26 @@
 import type { RunTaskOptions } from './WorkflowAI.js';
 import type { WorkflowAIApi } from './api/api.js';
 import type { RunResponse } from './api/types.js';
-import type { z } from './schema/zod/zod.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
 
 type TaskId = string;
-export type InputSchema = z.ZodTypeAny;
-export type OutputSchema = z.ZodTypeAny;
+type SchemaId = number;
 
-type TaskSchema<IS extends InputSchema, OS extends OutputSchema> = {
-  input: IS;
-  output: OS;
-  id: number;
-};
+export type InputSchema = Record<string, unknown>;
+export type OutputSchema = Record<string, unknown>;
 
-export type TaskDefinition<IS extends InputSchema, OS extends OutputSchema> = {
+export type TaskInput = object;
+export type TaskOutput = object;
+
+export type TaskDefinition = {
   taskId: TaskId;
-  schema: TaskSchema<IS, OS>;
+  schemaId: SchemaId;
 };
 
-export type TaskRunResult<OS extends OutputSchema> = {
+export type TaskRunResult<O extends TaskOutput> = {
   data: RunResponse;
   response: Response;
-  output: TaskOutput<OS>;
+  output: O;
 };
 
 // Raw async iterator that the API client returns for streaming a task run
@@ -32,66 +30,34 @@ type RawTaskRunStreamResult = Awaited<
   >
 >;
 
-export type TaskRunStreamEvent<OS extends OutputSchema> = AsyncIteratorValue<
+export type TaskRunStreamEvent<O extends TaskOutput> = AsyncIteratorValue<
   RawTaskRunStreamResult['stream']
 > & {
-  output: TaskOutput<OS> | undefined;
-  partialOutput: DeepPartial<TaskOutput<OS>> | undefined;
+  output: DeepPartial<O> | undefined;
 };
 
-export type TaskRunStreamResult<OS extends OutputSchema> = Pick<
+export type TaskRunStreamResult<O extends TaskOutput> = Pick<
   RawTaskRunStreamResult,
   'response'
 > & {
-  stream: AsyncIterableIterator<TaskRunStreamEvent<OS>>;
+  stream: AsyncIterableIterator<TaskRunStreamEvent<O>>;
 };
 
 export type RunFn<
-  IS extends InputSchema,
-  OS extends OutputSchema,
+  I extends TaskInput,
+  O extends TaskOutput,
   Stream extends true | false = false,
 > = (
-  input: TaskInput<IS>,
+  input: I,
   options?: Partial<RunTaskOptions<Stream>>
-) => Promise<TaskRunResult<OS>> & {
-  stream: () => Promise<TaskRunStreamResult<OS>>;
+) => Promise<TaskRunResult<O>> & {
+  stream: () => Promise<TaskRunStreamResult<O>>;
 };
 
 export type UseTaskResult<
-  IS extends InputSchema,
-  OS extends OutputSchema,
+  I extends TaskInput,
+  O extends TaskOutput,
   Stream extends true | false = false,
 > = {
-  run: RunFn<IS, OS, Stream>;
-  // importRun: ImportRunFn<IS, OS>;
+  run: RunFn<I, O, Stream>;
 };
-
-// Convenience methods to allow doing TaskInput<T> and TaskOutput<T> on a variety of types
-
-export type TaskInput<T> = T extends InputSchema
-  ? z.input<T>
-  : T extends TaskDefinition<infer IS, infer _OS>
-    ? TaskInput<IS>
-    : T extends UseTaskResult<infer IS, infer _OS>
-      ? TaskInput<IS>
-      : T extends RunFn<infer IS, infer _OS>
-        ? TaskInput<IS>
-        : T extends UseTaskResult<infer IS, infer _OS>['run']
-          ? TaskInput<IS>
-          : // : T extends UseTaskResult<infer IS, infer _OS>['importRun']
-            //   ? TaskInput<IS>
-            never;
-
-export type TaskOutput<T> = T extends OutputSchema
-  ? z.output<T>
-  : T extends TaskDefinition<infer _IS, infer OS>
-    ? TaskOutput<OS>
-    : T extends UseTaskResult<infer _IS, infer OS>
-      ? TaskOutput<OS>
-      : T extends RunFn<infer _IS, infer OS>
-        ? TaskOutput<OS>
-        : T extends UseTaskResult<infer _IS, infer OS>['run']
-          ? TaskOutput<OS>
-          : // : T extends UseTaskResult<infer _IS, infer OS>['importRun']
-            //   ? TaskOutput<OS>
-            never;

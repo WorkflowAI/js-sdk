@@ -1,4 +1,4 @@
-import { WorkflowAI, WorkflowAIError, z } from '@workflowai/workflowai';
+import { WorkflowAI, WorkflowAIError } from '@workflowai/workflowai';
 import mockFetch from 'jest-fetch-mock';
 import { readFile } from 'fs/promises';
 
@@ -15,27 +15,28 @@ beforeEach(() => {
 });
 
 const workflowAI = new WorkflowAI({
-  api: { url: 'https://run.workflowai.com', key: 'hello' },
+  url: 'https://run.workflowai.com',
+  key: 'hello',
 });
-const { run } = workflowAI.useTask(
-  {
-    taskId: 'animal-classification',
-    schema: {
-      id: 4,
-      input: z.object({
-        animal: z.string().optional(),
-      }),
-      output: z.object({
-        is_cute: z.boolean().optional(),
-        is_dangerous: z.boolean().optional(),
-        explanation_of_reasoning: z.string().optional(),
-      }),
-    },
-  },
-  {
-    version: 43,
-  }
-);
+
+type AnimalClassificationInput = {
+  animal: string;
+};
+
+type AnimalClassificationOutput = {
+  is_cute: boolean;
+  is_dangerous: boolean;
+  explanation_of_reasoning: string;
+};
+
+const { run } = workflowAI.useTask<
+  AnimalClassificationInput,
+  AnimalClassificationOutput
+>({
+  taskId: 'animal-classification',
+  schemaId: 4,
+  version: 43,
+});
 
 describe('run', () => {
   it('runs a task', async () => {
