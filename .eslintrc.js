@@ -40,10 +40,20 @@ module.exports = {
           {
             // Prevent importing from the src directory
             // THis is to avoid importing directly accross packages
-            group: ['**/src/*'],
+            // Also avoid loading libraries that are not available in the browser
+            group: ['**/src/*', 'node:*', 'fs', 'crypto'],
           },
         ],
       },
     ],
   },
+  overrides: [
+    {
+      files: ['bin/*', 'configs/*'],
+      rules: {
+        'no-console': 'off',
+        'no-restricted-imports': 'off',
+      },
+    },
+  ],
 };
