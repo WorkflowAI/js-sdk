@@ -33,6 +33,7 @@ const { run: getCelebrityLastName } = workflowAI.useTask(
   },
   {
     version: 6,
+    useCache: 'always',
   }
 );
 

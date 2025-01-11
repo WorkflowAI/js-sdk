@@ -62,7 +62,12 @@ export interface components {
       stream?: boolean;
       /**
        * Use Cache
-       * @default auto
+       * @default always
+       *
+       * always - When cache is available, cached result is returned and model is not called. Otherwise, model is called.
+       * auto - When cache is available and temperature is 0, cached result is returned and model is not called. Otherwise, model is called.
+       * never - Model is always called.
+       *
        * @enum {string}
        */
       use_cache?: 'auto' | 'always' | 'never';
