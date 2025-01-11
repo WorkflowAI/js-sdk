@@ -62,10 +62,10 @@ export interface components {
       stream?: boolean;
       /**
        * Use Cache
-       * @default when_available
+       * @default auto
        * @enum {string}
        */
-      use_cache?: 'when_available' | 'only' | 'never';
+      use_cache?: 'auto' | 'always' | 'never';
       /**
        * Metadata
        * @description Additional metadata to store with the task run.
