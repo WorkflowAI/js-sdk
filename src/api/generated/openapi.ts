@@ -62,10 +62,17 @@ export interface components {
       stream?: boolean;
       /**
        * Use Cache
-       * @default when_available
+       * @default auto
+       *
+       * - "auto" (default): if a previous run exists with the same version and input, and if
+       * the temperature is 0, the cached output is returned
+       * - "always": the cached output is returned when available, regardless
+       * of the temperature value
+       * - "never": the cache is never used
+       *
        * @enum {string}
        */
-      use_cache?: 'when_available' | 'only' | 'never';
+      use_cache?: 'auto' | 'always' | 'never';
       /**
        * Metadata
        * @description Additional metadata to store with the task run.
