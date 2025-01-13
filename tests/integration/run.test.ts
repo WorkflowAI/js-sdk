@@ -68,7 +68,7 @@ describe('run', () => {
       task_input: {
         animal: 'platypus',
       },
-      use_cache: 'always',
+      use_cache: 'auto',
     });
   });
 

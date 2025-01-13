@@ -46,7 +46,7 @@ function optionsToRunRequest(
     version,
     stream,
     metadata,
-    use_cache: useCache || 'always',
+    use_cache: useCache || 'auto',
     private_fields: privateFields,
   };
 }
