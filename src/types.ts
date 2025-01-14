@@ -1,3 +1,17 @@
+import type { FetchOptions, RunRequest, VersionReference } from 'api/types';
+
+export type AgentId = string;
+export type SchemaId = number;
+
+export type RunOptions<Stream extends true | false = false> = {
+  version: VersionReference;
+  useCache?: RunRequest['use_cache'];
+  metadata?: RunRequest['metadata'];
+  stream?: Stream;
+  fetch?: FetchOptions;
+  privateFields?: ('task_input' | 'task_output' | string)[];
+};
+
 export type FileContentType =
   | 'image/png'
   | 'image/jpg'

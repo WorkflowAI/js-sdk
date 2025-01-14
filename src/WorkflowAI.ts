@@ -1,3 +1,13 @@
+import {
+  Agent,
+  AgentDefinition,
+  AgentInput,
+  AgentOutput,
+  RunResult,
+  RunStreamEvent,
+  RunStreamResult,
+} from 'agent.js';
+import { RunOptions } from 'types.js';
 import { DeepPartial } from 'utils.js';
 import {
   InitWorkflowAIApiConfig,
@@ -6,17 +16,14 @@ import {
 } from './api/api.js';
 import { WorkflowAIError } from './api/error.js';
 import { extractError } from './api/errorResponse.js';
-import {
-  FetchOptions,
-  RunRequest,
-  RunResponse,
-  VersionReference,
-} from './api/types.js';
+import type { RunRequest, RunResponse } from './api/types.js';
 import { wrapAsyncIterator } from './api/utils/wrapAsyncIterator.js';
+import { z } from './schema/zod/zod.js';
 import type {
+  InputSchema,
+  OutputSchema,
   RunFn,
   TaskDefinition,
-  TaskInput,
   TaskOutput,
   TaskRunResult,
   TaskRunStreamEvent,
@@ -26,23 +33,14 @@ import type {
 
 export type WorkflowAIConfig = InitWorkflowAIApiConfig;
 
-export type RunTaskOptions<Stream extends true | false = false> = {
-  version: VersionReference;
-  useCache?: RunRequest['use_cache'];
-  metadata?: RunRequest['metadata'];
-  stream?: Stream;
-  fetch?: FetchOptions;
-  privateFields?: ('task_input' | 'task_output' | string)[];
-};
-
 function optionsToRunRequest(
-  input: TaskInput,
-  options: Omit<RunTaskOptions<true | false>, 'fetch'>
+  input: Record<string, never>,
+  options: Omit<RunOptions<true | false>, 'fetch'>
 ): RunRequest {
   const { version, stream, metadata, useCache, privateFields } = options;
 
   return {
-    task_input: input as Record<string, never>,
+    task_input: input,
     version,
     stream,
     metadata,
@@ -51,44 +49,45 @@ function optionsToRunRequest(
   };
 }
 
-function paramsFromTaskDefinition(taskDef: TaskDefinition) {
-  return {
-    path: {
-      tenant: '_',
-      task_id: taskDef.taskId.toLowerCase(),
-      task_schema_id: taskDef.schemaId,
-    },
-  };
-}
-
 export class WorkflowAI {
   protected api: WorkflowAIApi;
 
-  constructor(apiConfig?: WorkflowAIConfig) {
+  constructor(config?: WorkflowAIConfig | { api: WorkflowAIConfig }) {
+    // Old constructors used to be { api: WorkflowAIConfig }
+    const c = config && 'api' in config ? config.api : config;
     this.api = initWorkflowAIApi({
-      ...apiConfig,
+      ...(c ?? {}),
     });
   }
 
-  protected async runTask<I extends TaskInput, O extends TaskOutput>(
-    taskDef: TaskDefinition,
-    input: I,
-    options: RunTaskOptions<false>
-  ): Promise<TaskRunResult<O>>;
-  protected async runTask<I extends TaskInput, O extends TaskOutput>(
-    taskDef: TaskDefinition,
-    input: I,
-    options: RunTaskOptions<true>
-  ): Promise<TaskRunStreamResult<O>>;
-  protected async runTask<I extends TaskInput, S extends true | false = false>(
-    taskDef: TaskDefinition,
-    input: I,
-    options: RunTaskOptions<S>
-  ) {
-    const body = optionsToRunRequest(input, options);
+  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS>,
+    input: IS,
+    options: RunOptions<false>
+  ): Promise<TaskRunResult<OS>>;
+  protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS>,
+    input: IS,
+    options: RunOptions<true>
+  ): Promise<TaskRunStreamResult<OS>>;
+  protected async runTask<
+    IS extends InputSchema,
+    OS extends OutputSchema,
+    S extends true | false = false,
+  >(taskDef: TaskDefinition<IS, OS>, input: IS, options: RunOptions<S>) {
+    // TODO: surround with try catch to print pretty error
+    const validatedInput = await taskDef.schema.input.parseAsync(input);
+
+    const body = optionsToRunRequest(validatedInput, options);
     // Prepare a run call, but nothing is executed yet
     const run = this.api.tasks.schemas.run({
-      params: paramsFromTaskDefinition(taskDef),
+      params: {
+        path: {
+          tenant: '_',
+          task_id: taskDef.taskId.toLowerCase(),
+          task_schema_id: taskDef.schema.id,
+        },
+      },
       body,
       ...options.fetch,
     });
@@ -99,7 +98,9 @@ export class WorkflowAI {
         throw new WorkflowAIError(response, extractError(error));
       }
 
-      const output = data.task_output as TaskOutput;
+      const output: TaskOutput<OS> = await taskDef.schema.output.parseAsync(
+        data.task_output
+      );
 
       return { data: data as RunResponse, response, output };
     }
@@ -115,64 +116,41 @@ export class WorkflowAI {
         rawStream,
         // Transform the server-sent events data to the expected outputs
         // conforming to the schema (as best as possible)
-        async ({ data }): Promise<TaskRunStreamEvent<TaskOutput>> => {
+        async ({ data }): Promise<TaskRunStreamEvent<OS>> => {
+          // Allows us to make a deep partial version of the schema, whatever the schema looks like
+          const partialWrap = z.object({ partial: taskDef.schema.output });
+          const [parsed, partialParsed] = await Promise.all([
+            // We do a `safeParse` to avoid throwing, since it's expected that during
+            // streaming of partial results we'll have data that does not conform to schema
+            data && taskDef.schema.output.safeParseAsync(data.task_output),
+            data &&
+              (partialWrap.deepPartial() as typeof partialWrap).safeParseAsync({
+                partial: data.task_output,
+              }),
+          ]);
+
           return {
             data,
-            output: data?.task_output as DeepPartial<TaskOutput>,
+            output: parsed?.data,
+            partialOutput: partialParsed?.data?.partial,
           };
         }
       ),
     };
   }
 
-  // protected async importTaskRun<
-  //   IS extends InputSchema,
-  //   OS extends OutputSchema,
-  // >(
-  //   taskDef: TaskDefinition<IS, OS>,
-  //   input: IS,
-  //   output: OS,
-  //   options: ImportTaskRunOptions
-  // ) {
-  //   const [task_input, task_output] = await Promise.all([
-  //     taskDef.schema.input.parseAsync(input),
-  //     taskDef.schema.output.parseAsync(output),
-  //   ]);
-
-  //   const { data, response, error } = await this.api.tasks.schemas.runs.import({
-  //     params: {
-  //       path: {
-  //         task_id: taskDef.taskId.toLowerCase(),
-  //         task_schema_id: taskDef.schema.id,
-  //       },
-  //     },
-  //     body: {
-  //       ...options,
-  //       group: sanitizeGroupReference(options.group),
-  //       task_input,
-  //       task_output,
-  //     },
-  //   });
-
-  //   if (!data) {
-  //     throw new WorkflowAIError(response, extractError(error));
-  //   }
-
-  //   return { data, response };
-  // }
-
-  public useTask<I extends TaskInput, O extends TaskOutput>(
-    taskDef: TaskDefinition & Partial<RunTaskOptions>
-  ): UseTaskResult<I, O> {
+  public useTask<IS extends InputSchema, OS extends OutputSchema>(
+    taskDef: TaskDefinition<IS, OS>,
+    defaultOptions?: Partial<RunOptions>
+  ): UseTaskResult<IS, OS> {
     // Make sure we have a schema ID and it's not 0
-    if (!taskDef.schemaId) {
+    if (!taskDef.schema.id) {
       throw new Error(
         'Invalid task definition to compile: missing task schema id or task name'
       );
     }
-    const { taskId, schemaId, ...defaultOptions } = taskDef;
 
-    const run: RunFn<I, O> = (input, overrideOptions) => {
+    const run: RunFn<IS, OS> = (input, overrideOptions) => {
       const options = {
         ...defaultOptions,
         ...overrideOptions,
@@ -180,13 +158,13 @@ export class WorkflowAI {
           ...defaultOptions?.fetch,
           ...overrideOptions?.fetch,
         },
-      } as RunTaskOptions;
+      } as RunOptions;
 
-      let runPromise: Promise<TaskRunResult<O>>;
+      let runPromise: Promise<TaskRunResult<OS>>;
 
       const getRunPromise = () => {
         if (!runPromise) {
-          runPromise = this.runTask<I, O>(taskDef, input, {
+          runPromise = this.runTask<IS, OS>(taskDef, input, {
             ...options,
             stream: false,
           });
@@ -202,7 +180,7 @@ export class WorkflowAI {
         catch: (...r) => getRunPromise().catch(...r),
         finally: (...r) => getRunPromise().finally(...r),
         stream: () =>
-          this.runTask<I, O>(taskDef, input, {
+          this.runTask<IS, OS>(taskDef, input, {
             ...options,
             stream: true,
           }),
@@ -212,5 +190,116 @@ export class WorkflowAI {
     return {
       run,
     };
+  }
+
+  protected async runAgent<I extends AgentInput, O extends AgentOutput>(
+    taskDef: AgentDefinition,
+    input: I,
+    options: RunOptions<false>
+  ): Promise<RunResult<O>>;
+  protected async runAgent<I extends AgentInput, O extends AgentOutput>(
+    taskDef: AgentDefinition,
+    input: I,
+    options: RunOptions<true>
+  ): Promise<RunStreamResult<O>>;
+  protected async runAgent<
+    I extends AgentInput,
+    O extends AgentOutput,
+    S extends true | false = false,
+  >(taskDef: AgentDefinition, input: I, options: RunOptions<S>) {
+    const body = optionsToRunRequest(input as Record<string, never>, options);
+    // Prepare a run call, but nothing is executed yet
+    const run = this.api.tasks.schemas.run({
+      params: {
+        path: {
+          tenant: '_',
+          task_id: taskDef.id.toLowerCase(),
+          task_schema_id: taskDef.schemaId,
+        },
+      },
+      body,
+      ...options.fetch,
+    });
+
+    if (!options.stream) {
+      const { data, error, response } = await run;
+      if (!data) {
+        throw new WorkflowAIError(response, extractError(error));
+      }
+
+      const output = data.task_output as AgentOutput;
+
+      return { data: data as RunResponse, response, output };
+    }
+
+    // Streaming response, we receive partial results
+
+    const { response, stream: rawStream } = await run.stream();
+
+    return {
+      response,
+      // Return an async iterator for easy consumption
+      stream: wrapAsyncIterator(
+        rawStream,
+        // Transform the server-sent events data to the expected outputs
+        // conforming to the schema (as best as possible)
+        async ({ data }): Promise<RunStreamEvent<O>> => {
+          return {
+            data,
+            output: data?.task_output as DeepPartial<O>,
+          };
+        }
+      ),
+    };
+  }
+
+  public agent<I extends AgentInput, O extends AgentOutput>(
+    taskDef: AgentDefinition & Partial<RunOptions>
+  ): Agent<I, O> {
+    // Make sure we have a schema ID and it's not 0
+    if (!taskDef.schemaId || !taskDef.id) {
+      throw new Error(
+        'Invalid task definition to compile: missing task id or schema id'
+      );
+    }
+    const { id, schemaId, ...defaultOptions } = taskDef;
+
+    const run: Agent<I, O> = (input, overrideOptions) => {
+      const options = {
+        ...defaultOptions,
+        ...overrideOptions,
+        fetch: {
+          ...defaultOptions?.fetch,
+          ...overrideOptions?.fetch,
+        },
+      } as RunOptions;
+
+      let runPromise: Promise<RunResult<O>>;
+
+      const getRunPromise = () => {
+        if (!runPromise) {
+          runPromise = this.runAgent<I, O>(taskDef, input, {
+            ...options,
+            stream: false,
+          });
+        }
+        return runPromise;
+      };
+
+      return {
+        get [Symbol.toStringTag]() {
+          return Promise.resolve()[Symbol.toStringTag];
+        },
+        then: (...r) => getRunPromise().then(...r),
+        catch: (...r) => getRunPromise().catch(...r),
+        finally: (...r) => getRunPromise().finally(...r),
+        stream: () =>
+          this.runAgent<I, O>(taskDef, input, {
+            ...options,
+            stream: true,
+          }),
+      };
+    };
+    return run;
   }
 }
