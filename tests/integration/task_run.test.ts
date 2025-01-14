@@ -1,6 +1,9 @@
-import { WorkflowAI, WorkflowAIError } from '@workflowai/workflowai';
+import { WorkflowAI, WorkflowAIError, z } from '@workflowai/workflowai';
 import mockFetch from 'jest-fetch-mock';
-import { readFile } from 'fs/promises';
+// eslint-disable-next-line no-restricted-imports
+import { readFile } from 'node:fs/promises';
+
+// Old way to run tasks, makes sure it's backwards compatible
 
 beforeAll(() => {
   mockFetch.enableMocks();
@@ -15,30 +18,30 @@ beforeEach(() => {
 });
 
 const workflowAI = new WorkflowAI({
-  url: 'https://run.workflowai.com',
-  key: 'hello',
-});
-
-type AnimalClassificationInput = {
-  animal: string;
-};
-
-type AnimalClassificationOutput = {
-  is_cute: boolean;
-  is_dangerous: boolean;
-  explanation_of_reasoning: string;
-};
-
-const { run } = workflowAI.useTask<
-  AnimalClassificationInput,
-  AnimalClassificationOutput
->({
-  taskId: 'animal-classification',
-  schemaId: 4,
-  version: 43,
+  api: { url: 'https://run.workflowai.com', key: 'hello' },
 });
 
 describe('run', () => {
+  const { run } = workflowAI.useTask(
+    {
+      taskId: 'animal-classification',
+      schema: {
+        id: 4,
+        input: z.object({
+          animal: z.string().optional(),
+        }),
+        output: z.object({
+          is_cute: z.boolean().optional(),
+          is_dangerous: z.boolean().optional(),
+          explanation_of_reasoning: z.string().optional(),
+        }),
+      },
+    },
+    {
+      version: 43,
+    }
+  );
+
   it('runs a task', async () => {
     const run1Fixture = await readFile('./tests/fixtures/run1.json', 'utf-8');
     mockFetch.mockResponseOnce(run1Fixture);

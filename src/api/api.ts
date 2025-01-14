@@ -37,6 +37,10 @@ export function initWorkflowAIApi(
   const stream = createStreamClient({ url, key, use: middlewares, fetch });
 
   return {
+    client: {
+      json,
+      stream,
+    },
     tasks: {
       schemas: {
         run: withStream(
