@@ -9,9 +9,9 @@ const workflowAI = new WorkflowAI({
   key: 'test',
 });
 
-describe('useTask', () => {
+describe('agent', () => {
   it('should return a run function', () => {
-    const task = workflowAI.useTask<TaskInput1, TaskInput1>({
+    const task = workflowAI.agent<TaskInput1, TaskInput1>({
       taskId: 'bla',
       schemaId: 2,
     });

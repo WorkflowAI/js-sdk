@@ -1,10 +1,10 @@
-import { TaskInput, TaskOutput, WorkflowAI } from '@workflowai/workflowai';
+import { Input, Output, WorkflowAI } from '@workflowai/workflowai';
 import 'dotenv/config';
 import { DeepPartial } from 'utils';
 
 const workflowAI = new WorkflowAI();
 
-interface BookCharacterTaskInput extends TaskInput {
+interface BookCharacterTaskInput extends Input {
   book_title: string;
 }
 
@@ -15,12 +15,12 @@ interface Character {
   outcome: string;
 }
 
-interface BookCharacterTaskOutput extends TaskOutput {
+interface BookCharacterTaskOutput extends Output {
   characters: Character[];
 }
 
-// Initialize Your Task
-const { run: analyzeBookCharacters } = workflowAI.useTask<
+// Initialize Your Agent
+const { run: analyzeBookCharacters } = workflowAI.agent<
   BookCharacterTaskInput,
   BookCharacterTaskOutput
 >({

@@ -4,8 +4,8 @@
  */
 
 export interface paths {
-  '/v1/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/run': {
-    /** Run Task */
+  '/v1/{tenant}/agents/{task_id}/schemas/{task_schema_id}/run': {
+    /** Run Agent */
     post: operations['run_task_v1__tenant__tasks__task_id__schemas__task_schema_id__run_post'];
   };
 }
@@ -34,9 +34,9 @@ export interface components {
     };
     /** FewShotExample */
     FewShotExample: {
-      /** Task Input */
+      /** Agent Input */
       task_input: Record<string, never>;
-      /** Task Output */
+      /** Agent Output */
       task_output: Record<string, never>;
     };
     /** HTTPValidationError */
@@ -46,7 +46,7 @@ export interface components {
     };
     /** RunRequest */
     RunRequest: {
-      /** Task Input */
+      /** Agent Input */
       task_input: Record<string, never>;
       /** Version */
       version: number | string | components['schemas']['TaskGroupProperties'];
@@ -149,7 +149,7 @@ export type $defs = Record<string, never>;
 export type external = Record<string, never>;
 
 export interface operations {
-  /** Run Task */
+  /** Run Agent */
   run_task_v1__tenant__tasks__task_id__schemas__task_schema_id__run_post: {
     parameters: {
       path: {
@@ -170,7 +170,7 @@ export interface operations {
           'application/json': {
             /** Id */
             id: string;
-            /** Task Output */
+            /** Agent Output */
             task_output: Record<string, never>;
             version: $defs['Version'];
             /** Duration Seconds */
@@ -198,9 +198,9 @@ export interface operations {
               };
               /** FewShotExample */
               FewShotExample: {
-                /** Task Input */
+                /** Agent Input */
                 task_input: Record<string, never>;
-                /** Task Output */
+                /** Agent Output */
                 task_output: Record<string, never>;
               };
               /**
@@ -281,16 +281,16 @@ export interface operations {
               };
               /** FewShotExample */
               FewShotExample: {
-                /** Task Input */
+                /** Agent Input */
                 task_input: Record<string, never>;
-                /** Task Output */
+                /** Agent Output */
                 task_output: Record<string, never>;
               };
               /** RunResponse */
               RunResponse: {
                 /** Id */
                 id: string;
-                /** Task Output */
+                /** Agent Output */
                 task_output: Record<string, never>;
                 version: $defs['Version'];
                 /** Duration Seconds */
@@ -305,7 +305,7 @@ export interface operations {
               RunResponseStreamChunk: {
                 /** Id */
                 id: string;
-                /** Task Output */
+                /** Agent Output */
                 task_output: Record<string, never>;
               };
               /**

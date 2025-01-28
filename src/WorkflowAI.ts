@@ -15,18 +15,18 @@ import {
 import { wrapAsyncIterator } from './api/utils/wrapAsyncIterator.js';
 import type {
   RunFn,
-  TaskDefinition,
-  TaskInput,
-  TaskOutput,
-  TaskRunResult,
-  TaskRunStreamEvent,
-  TaskRunStreamResult,
-  UseTaskResult,
+  Definition,
+  Input,
+  Output,
+  RunResult,
+  RunStreamEvent,
+  RunStreamResult,
+  AgentResult,
 } from './task.js';
 
 export type WorkflowAIConfig = InitWorkflowAIApiConfig;
 
-export type RunTaskOptions<Stream extends true | false = false> = {
+export type RunOptions<Stream extends true | false = false> = {
   version: VersionReference;
   useCache?: RunRequest['use_cache'];
   metadata?: RunRequest['metadata'];
@@ -36,8 +36,8 @@ export type RunTaskOptions<Stream extends true | false = false> = {
 };
 
 function optionsToRunRequest(
-  input: TaskInput,
-  options: Omit<RunTaskOptions<true | false>, 'fetch'>
+  input: Input,
+  options: Omit<RunOptions<true | false>, 'fetch'>
 ): RunRequest {
   const { version, stream, metadata, useCache, privateFields } = options;
 
@@ -51,7 +51,7 @@ function optionsToRunRequest(
   };
 }
 
-function paramsFromTaskDefinition(taskDef: TaskDefinition) {
+function paramsFromTaskDefinition(taskDef: Definition) {
   return {
     path: {
       tenant: '_',
@@ -70,24 +70,24 @@ export class WorkflowAI {
     });
   }
 
-  protected async runTask<I extends TaskInput, O extends TaskOutput>(
-    taskDef: TaskDefinition,
+  protected async runTask<I extends Input, O extends Output>(
+    taskDef: Definition,
     input: I,
-    options: RunTaskOptions<false>
-  ): Promise<TaskRunResult<O>>;
-  protected async runTask<I extends TaskInput, O extends TaskOutput>(
-    taskDef: TaskDefinition,
+    options: RunOptions<false>
+  ): Promise<RunResult<O>>;
+  protected async runTask<I extends Input, O extends Output>(
+    taskDef: Definition,
     input: I,
-    options: RunTaskOptions<true>
-  ): Promise<TaskRunStreamResult<O>>;
-  protected async runTask<I extends TaskInput, S extends true | false = false>(
-    taskDef: TaskDefinition,
+    options: RunOptions<true>
+  ): Promise<RunStreamResult<O>>;
+  protected async runTask<I extends Input, S extends true | false = false>(
+    taskDef: Definition,
     input: I,
-    options: RunTaskOptions<S>
+    options: RunOptions<S>
   ) {
     const body = optionsToRunRequest(input, options);
     // Prepare a run call, but nothing is executed yet
-    const run = this.api.tasks.schemas.run({
+    const run = this.api.agents.schemas.run({
       params: paramsFromTaskDefinition(taskDef),
       body,
       ...options.fetch,
@@ -99,7 +99,7 @@ export class WorkflowAI {
         throw new WorkflowAIError(response, extractError(error));
       }
 
-      const output = data.task_output as TaskOutput;
+      const output = data.task_output as Output;
 
       return { data: data as RunResponse, response, output };
     }
@@ -115,10 +115,10 @@ export class WorkflowAI {
         rawStream,
         // Transform the server-sent events data to the expected outputs
         // conforming to the schema (as best as possible)
-        async ({ data }): Promise<TaskRunStreamEvent<TaskOutput>> => {
+        async ({ data }): Promise<RunStreamEvent<Output>> => {
           return {
             data,
-            output: data?.task_output as DeepPartial<TaskOutput>,
+            output: data?.task_output as DeepPartial<Output>,
           };
         }
       ),
@@ -129,7 +129,7 @@ export class WorkflowAI {
   //   IS extends InputSchema,
   //   OS extends OutputSchema,
   // >(
-  //   taskDef: TaskDefinition<IS, OS>,
+  //   taskDef: Definition<IS, OS>,
   //   input: IS,
   //   output: OS,
   //   options: ImportTaskRunOptions
@@ -161,9 +161,9 @@ export class WorkflowAI {
   //   return { data, response };
   // }
 
-  public useTask<I extends TaskInput, O extends TaskOutput>(
-    taskDef: TaskDefinition & Partial<RunTaskOptions>
-  ): UseTaskResult<I, O> {
+  public agent<I extends Input, O extends Output>(
+    taskDef: Definition & Partial<RunOptions>
+  ): AgentResult<I, O> {
     // Make sure we have a schema ID and it's not 0
     if (!taskDef.schemaId) {
       throw new Error(
@@ -180,9 +180,9 @@ export class WorkflowAI {
           ...defaultOptions?.fetch,
           ...overrideOptions?.fetch,
         },
-      } as RunTaskOptions;
+      } as RunOptions;
 
-      let runPromise: Promise<TaskRunResult<O>>;
+      let runPromise: Promise<RunResult<O>>;
 
       const getRunPromise = () => {
         if (!runPromise) {

@@ -29,7 +29,7 @@ type AnimalClassificationOutput = {
   explanation_of_reasoning: string;
 };
 
-const { run } = workflowAI.useTask<
+const { run } = workflowAI.agent<
   AnimalClassificationInput,
   AnimalClassificationOutput
 >({

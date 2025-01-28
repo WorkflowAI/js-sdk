@@ -1,4 +1,4 @@
-import { TaskInput, WorkflowAI, z } from '@workflowai/workflowai';
+import { Input, WorkflowAI, z } from '@workflowai/workflowai';
 
 // Code generated from API docs
 
@@ -18,7 +18,7 @@ const workflowAI = new WorkflowAI({
  * Initialize your task
  */
 
-const { run: getCelebrityLastName } = workflowAI.useTask(
+const { run: getCelebrityLastName } = workflowAI.agent(
   {
     taskId: 'get-celebrity-last-name',
     schema: {
@@ -40,7 +40,7 @@ const { run: getCelebrityLastName } = workflowAI.useTask(
  * Run your task
  */
 
-const input: TaskInput<typeof getCelebrityLastName> = {
+const input: Input<typeof getCelebrityLastName> = {
   first_name: 'Thierry',
 };
 

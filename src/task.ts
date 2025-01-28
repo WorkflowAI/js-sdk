@@ -1,4 +1,4 @@
-import type { RunTaskOptions } from './WorkflowAI.js';
+import type { RunOptions } from './WorkflowAI.js';
 import type { WorkflowAIApi } from './api/api.js';
 import type { RunResponse } from './api/types.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
@@ -9,54 +9,54 @@ type SchemaId = number;
 export type InputSchema = Record<string, unknown>;
 export type OutputSchema = Record<string, unknown>;
 
-export type TaskInput = object;
-export type TaskOutput = object;
+export type Input = object;
+export type Output = object;
 
-export type TaskDefinition = {
+export type Definition = {
   taskId: TaskId;
   schemaId: SchemaId;
 };
 
-export type TaskRunResult<O extends TaskOutput> = {
+export type RunResult<O extends Output> = {
   data: RunResponse;
   response: Response;
   output: O;
 };
 
 // Raw async iterator that the API client returns for streaming a task run
-type RawTaskRunStreamResult = Awaited<
+type RawRunStreamResult = Awaited<
   ReturnType<
-    Awaited<ReturnType<WorkflowAIApi['tasks']['schemas']['run']>['stream']>
+    Awaited<ReturnType<WorkflowAIApi['agents']['schemas']['run']>['stream']>
   >
 >;
 
-export type TaskRunStreamEvent<O extends TaskOutput> = AsyncIteratorValue<
-  RawTaskRunStreamResult['stream']
+export type RunStreamEvent<O extends Output> = AsyncIteratorValue<
+  RawRunStreamResult['stream']
 > & {
   output: DeepPartial<O> | undefined;
 };
 
-export type TaskRunStreamResult<O extends TaskOutput> = Pick<
-  RawTaskRunStreamResult,
+export type RunStreamResult<O extends Output> = Pick<
+  RawRunStreamResult,
   'response'
 > & {
-  stream: AsyncIterableIterator<TaskRunStreamEvent<O>>;
+  stream: AsyncIterableIterator<RunStreamEvent<O>>;
 };
 
 export type RunFn<
-  I extends TaskInput,
-  O extends TaskOutput,
+  I extends Input,
+  O extends Output,
   Stream extends true | false = false,
 > = (
   input: I,
-  options?: Partial<RunTaskOptions<Stream>>
-) => Promise<TaskRunResult<O>> & {
-  stream: () => Promise<TaskRunStreamResult<O>>;
+  options?: Partial<RunOptions<Stream>>
+) => Promise<RunResult<O>> & {
+  stream: () => Promise<RunStreamResult<O>>;
 };
 
-export type UseTaskResult<
-  I extends TaskInput,
-  O extends TaskOutput,
+export type AgentResult<
+  I extends Input,
+  O extends Output,
   Stream extends true | false = false,
 > = {
   run: RunFn<I, O, Stream>;
