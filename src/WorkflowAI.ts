@@ -14,14 +14,14 @@ import {
 } from './api/types.js';
 import { wrapAsyncIterator } from './api/utils/wrapAsyncIterator.js';
 import type {
-  RunFn,
+  AgentResult,
   Definition,
   Input,
   Output,
+  RunFn,
   RunResult,
   RunStreamEvent,
   RunStreamResult,
-  AgentResult,
 } from './task.js';
 
 export type WorkflowAIConfig = InitWorkflowAIApiConfig;
