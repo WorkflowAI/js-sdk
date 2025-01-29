@@ -49,8 +49,9 @@ describe('run', () => {
       is_dangerous: true,
       explanation_of_reasoning: 'Plat plat',
     });
-
-    expect(result.data.version.properties.model).toEqual('gpt-4o-2024-08-06');
+    if (result.data.version) {
+      expect(result.data.version.properties.model).toEqual('gpt-4o-2024-08-06');
+    }
     expect(result.data.cost_usd).toEqual(0.0024200000000000003);
     expect(result.data.duration_seconds).toEqual(1.311426);
 

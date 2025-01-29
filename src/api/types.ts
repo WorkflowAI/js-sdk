@@ -23,7 +23,7 @@ export type RunResponse = Omit<
 > & {
   version: {
     properties: VersionProperties;
-  };
+  } | null;
 };
 
 /**

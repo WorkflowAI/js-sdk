@@ -42,7 +42,9 @@ describe('analyzeBookCharacter', () => {
     expect(output).toBeDefined();
     expect(duration_seconds).toBeGreaterThan(0);
     expect(cost_usd).toBeGreaterThan(0);
-    expect(version.properties.model).toBeDefined();
+    if (version) {
+      expect(version.properties.model).toBeDefined();
+    }
   }, 30000);
 
   it('streams', async () => {

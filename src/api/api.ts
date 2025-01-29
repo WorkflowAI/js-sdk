@@ -41,10 +41,10 @@ export function initWorkflowAIApi(
       schemas: {
         run: withStream(
           json.POST(
-            '/v1/{tenant}/agents/{task_id}/schemas/{task_schema_id}/run'
+            '/v1/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/run'
           ),
           stream.POST(
-            '/v1/{tenant}/agents/{task_id}/schemas/{task_schema_id}/run'
+            '/v1/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/run'
           )
         ),
       },
