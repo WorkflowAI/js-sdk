@@ -213,4 +213,13 @@ export class WorkflowAI {
       run,
     };
   }
+
+  /**
+   * @deprecated Use agent() instead
+   */
+      public useTask<I extends Input, O extends Output>(
+        taskDef: Definition & Partial<RunOptions>
+      ): AgentResult<I, O> {
+        return this.agent<I, O>(taskDef);
+      }
 }

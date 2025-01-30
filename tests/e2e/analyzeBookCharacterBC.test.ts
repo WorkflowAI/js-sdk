@@ -1,10 +1,10 @@
-import { Input, Output, WorkflowAI } from '@workflowai/workflowai';
+import { TaskInput, TaskOutput, WorkflowAI } from '@workflowai/workflowai';
 import 'dotenv/config';
 import { DeepPartial } from 'utils';
 
 const workflowAI = new WorkflowAI();
 
-interface BookCharacterInput extends Input {
+interface BookCharacterTaskInput extends TaskInput {
   book_title: string;
 }
 
@@ -15,14 +15,14 @@ interface Character {
   outcome: string;
 }
 
-interface BookCharacterOutput extends Output {
+interface BookCharacterTaskOutput extends TaskOutput {
   characters: Character[];
 }
 
 // Initialize Your Agent
-const { run: analyzeBookCharacters } = workflowAI.agent<
-  BookCharacterInput,
-  BookCharacterOutput
+const { run: analyzeBookCharacters } = workflowAI.useTask<
+  BookCharacterTaskInput,
+  BookCharacterTaskOutput
 >({
   taskId: 'analyze-book-characters',
   schemaId: 1,
@@ -31,7 +31,7 @@ const { run: analyzeBookCharacters } = workflowAI.agent<
 
 describe('analyzeBookCharacter', () => {
   it('runs', async () => {
-    const input: BookCharacterInput = {
+    const input: BookCharacterTaskInput = {
       book_title: 'The Shadow of the Wind',
     };
     const {
@@ -48,14 +48,14 @@ describe('analyzeBookCharacter', () => {
   }, 30000);
 
   it('streams', async () => {
-    const input: BookCharacterInput = {
+    const input: BookCharacterTaskInput = {
       book_title: 'The Shadow of the Wind',
     };
     const { stream } = await analyzeBookCharacters(input, {
       useCache: 'never',
     }).stream();
 
-    const chunks: DeepPartial<BookCharacterOutput>[] = [];
+    const chunks: DeepPartial<BookCharacterTaskOutput>[] = [];
     for await (const chunk of stream) {
       if (chunk.output) {
         chunks.push(chunk.output);
