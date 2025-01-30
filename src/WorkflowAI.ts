@@ -1,8 +1,8 @@
 import {
   Agent,
   AgentDefinition,
-  AgentInput,
-  AgentOutput,
+  Input,  
+  Output,
   RunResult,
   RunStreamEvent,
   RunStreamResult,
@@ -192,19 +192,19 @@ export class WorkflowAI {
     };
   }
 
-  protected async runAgent<I extends AgentInput, O extends AgentOutput>(
+  protected async runAgent<I extends Input, O extends Output>(
     taskDef: AgentDefinition,
     input: I,
     options: RunOptions<false>
   ): Promise<RunResult<O>>;
-  protected async runAgent<I extends AgentInput, O extends AgentOutput>(
+  protected async runAgent<I extends Input, O extends Output>(
     taskDef: AgentDefinition,
     input: I,
     options: RunOptions<true>
   ): Promise<RunStreamResult<O>>;
   protected async runAgent<
-    I extends AgentInput,
-    O extends AgentOutput,
+    I extends Input,
+    O extends Output,
     S extends true | false = false,
   >(taskDef: AgentDefinition, input: I, options: RunOptions<S>) {
     const body = optionsToRunRequest(input as Record<string, never>, options);
@@ -227,7 +227,7 @@ export class WorkflowAI {
         throw new WorkflowAIError(response, extractError(error));
       }
 
-      const output = data.task_output as AgentOutput;
+      const output = data.task_output as Output;
 
       return { data: data as RunResponse, response, output };
     }
@@ -253,7 +253,7 @@ export class WorkflowAI {
     };
   }
 
-  public agent<I extends AgentInput, O extends AgentOutput>(
+  public agent<I extends Input, O extends Output>(
     taskDef: AgentDefinition & Partial<RunOptions>
   ): Agent<I, O> {
     // Make sure we have a schema ID and it's not 0
