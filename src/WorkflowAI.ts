@@ -1,7 +1,7 @@
 import {
   Agent,
   AgentDefinition,
-  Input,  
+  Input,
   Output,
   RunResult,
   RunStreamEvent,
