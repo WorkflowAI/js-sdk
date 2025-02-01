@@ -33,7 +33,7 @@ export class WorkflowAIError extends Error {
    */
   constructor(response: Response, detail: WorkflowAIApiError | undefined) {
     super(
-      `Failed to request ${response.url}: ${detail?.error?.code ?? 'unknown error'}`
+      `Failed to request ${response.url}: ${detail?.error?.code ?? detail?.error?.details ?? 'unknown error'}`
     );
 
     this.detail = detail;

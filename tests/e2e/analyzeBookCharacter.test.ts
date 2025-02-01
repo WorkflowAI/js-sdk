@@ -182,7 +182,7 @@ describe('analyzeBookCharacter', () => {
         },
       },
       {
-        version: 20,
+        version: 'dev',
       }
     );
     const input: TaskInput<typeof analyzeBookCharacters> = {
@@ -190,14 +190,13 @@ describe('analyzeBookCharacter', () => {
     };
     try {
       await analyzeBookCharacters(input, { useCache: 'never' });
+      fail('Expected an error to be thrown');
     } catch (error: unknown) {
-      expect(error).toBeInstanceOf(WorkflowAIError);
       if (!(error instanceof WorkflowAIError)) {
-        expect(true).toBe(false);
-        return;
+        fail(`Expected an error to be thrown ${error}`);
       }
       expect(error.errorCode).toBe('version_not_found');
-      expect(error.detail).toBe('Version not found');
+      expect(error.detail?.error.message).toContain('No version deployed to dev for agent \'analyze-book-characters\' and schema \'1\'.');
     }
   }, 30000);
 });
