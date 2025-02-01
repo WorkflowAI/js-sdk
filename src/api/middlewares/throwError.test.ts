@@ -45,7 +45,7 @@ describe('throwError middleware', () => {
     } catch (error: any) {
       expect(error).toBeInstanceOf(WorkflowAIError);
       expect(error.message).toBe(
-        `Failed to request ${response.url}: unknown error`
+        `Failed to request ${response.url}: Something went wrong`
       );
       expect(error.url).toBe(response.url);
       expect(error.status).toBe(response.status);
