@@ -102,6 +102,58 @@ describe('run', () => {
     }
   });
 
+  it('correctly handles detailed error schemas', async () => {
+    mockFetch.mockResponseOnce(
+      JSON.stringify({
+        error: {
+          code: 'schema_not_found',
+          message: 'Invalid request',
+          status_code: 404,
+          details: {
+            whatever: 'whatever',
+          },
+        },
+      }),
+      { status: 404 }
+    );
+
+    try {
+      await run({ animal: 'platypus' });
+      // If we get here, the test failed
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(WorkflowAIError);
+      if (!(error instanceof WorkflowAIError)) {
+        expect(true).toBe(false);
+        return;
+      }
+      expect(error.errorCode).toBe('schema_not_found');
+    }
+  });
+
+  it('correctly handles detailed error authentication', async () => {
+    mockFetch.mockResponseOnce(
+      JSON.stringify({
+        error: {
+          details: 'Invalid jwt',
+        },
+      }),
+      { status: 401 }
+    );
+    try {
+      await run({ animal: 'platypus' });
+      // If we get here, the test failed
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(WorkflowAIError);
+      if (!(error instanceof WorkflowAIError)) {
+        expect(true).toBe(false);
+        return;
+      }
+      expect(error.message).toContain('Invalid jwt');
+    }
+  });
+
   it('correctly handles unknown errors', async () => {
     mockFetch.mockResponseOnce('Internal Error', { status: 500 });
 
