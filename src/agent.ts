@@ -3,15 +3,15 @@ import type { RunResponse } from './api/types.js';
 import type { AgentId, RunOptions, SchemaId } from './types.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
 
-export type AgentInput = object;
-export type AgentOutput = object;
+export type Input = object;
+export type Output = object;
 
 export type AgentDefinition = {
   id: AgentId;
   schemaId: SchemaId;
 };
 
-export type RunResult<O extends AgentOutput> = {
+export type RunResult<O extends Output> = {
   data: RunResponse;
   response: Response;
   output: O;
@@ -24,13 +24,13 @@ type RawRunStreamResult = Awaited<
   >
 >;
 
-export type RunStreamEvent<O extends AgentOutput> = AsyncIteratorValue<
+export type RunStreamEvent<O extends Output> = AsyncIteratorValue<
   RawRunStreamResult['stream']
 > & {
   output: DeepPartial<O> | undefined;
 };
 
-export type RunStreamResult<O extends AgentOutput> = Pick<
+export type RunStreamResult<O extends Output> = Pick<
   RawRunStreamResult,
   'response'
 > & {
@@ -38,8 +38,8 @@ export type RunStreamResult<O extends AgentOutput> = Pick<
 };
 
 export type Agent<
-  I extends AgentInput,
-  O extends AgentOutput,
+  I extends Input,
+  O extends Output,
   Stream extends true | false = false,
 > = (
   input: I,

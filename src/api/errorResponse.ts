@@ -9,7 +9,14 @@ export type ProviderErrorCode =
   | 'rate_limit'
   | 'read_timeout'
   | 'server_overloaded'
-  | 'unknown_provider_error';
+  | 'unknown_provider_error'
+  | 'invalid_file'
+  | 'max_tool_call_iteration'
+  | 'structured_generation_error'
+  | 'content_moderation'
+  | 'task_banned'
+  | 'timeout'
+  | 'agent_run_failed';
 
 export type ErrorCode =
   | ProviderErrorCode
@@ -20,7 +27,19 @@ export type ErrorCode =
   | 'model_does_not_support_mode'
   | 'no_provider_supporting_model'
   | 'object_not_found'
-  | 'provider_does_not_support_model';
+  | 'provider_does_not_support_model'
+  | 'version_not_found'
+  | 'agent_not_found'
+  | 'agent_input_not_found'
+  | 'agent_run_not_found'
+  | 'example_not_found'
+  | 'schema_not_found'
+  | 'score_not_found'
+  | 'evaluator_not_found'
+  | 'organization_not_found'
+  | 'config_not_found'
+  | 'entity_too_large'
+  | 'unsupported_json_schema';
 
 export interface WorkflowAIApiError {
   error: {

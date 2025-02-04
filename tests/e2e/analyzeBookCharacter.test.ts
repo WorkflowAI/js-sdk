@@ -1,4 +1,4 @@
-import { TaskInput, TaskOutput, WorkflowAI, z } from '@workflowai/workflowai';
+import { TaskInput, TaskOutput, WorkflowAI, WorkflowAIError, z } from '@workflowai/workflowai';
 import 'dotenv/config';
 import { DeepPartial } from 'utils';
 
@@ -156,5 +156,89 @@ describe('analyzeBookCharacter', () => {
     }
 
     expect(chunks.length).toBeGreaterThan(1);
+  }, 30000);
+
+  it('handles errors', async () => {
+    const { run: analyzeBookCharacters } = workflowAI.useTask(
+      {
+        taskId: 'analyze-book-characters',
+        schema: {
+          id: 1,
+          input: z.object({
+            book_title: z.string().optional(),
+          }),
+          output: z.object({
+            characters: z
+              .array(
+                z.object({
+                  name: z.string().optional(),
+                  goals: z.array(z.string()).optional(),
+                  weaknesses: z.array(z.string()).optional(),
+                  outcome: z.string().optional(),
+                })
+              )
+              .optional(),
+          }),
+        },
+      },
+      {
+        version: 'dev',
+      }
+    );
+    const input: TaskInput<typeof analyzeBookCharacters> = {
+      book_title: 'The Shadow of the Wind',
+    };
+    try {
+      await analyzeBookCharacters(input, { useCache: 'never' });
+      fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      if (!(error instanceof WorkflowAIError)) {
+        fail(`Expected an error to be thrown ${error}`);
+      }
+      expect(error.errorCode).toBe('version_not_found');
+      expect(error.detail?.error.message).toContain('No version deployed to dev for agent \'analyze-book-characters\' and schema \'1\'.');
+    }
+  }, 30000);
+
+  it('handles invalid auth errors', async () => {
+    const workflowAI = new WorkflowAI({ api: { key: 'invalid' } });
+    const { run: analyzeBookCharacters } = workflowAI.useTask(
+      {
+        taskId: 'analyze-book-characters',
+        schema: {
+          id: 1,
+          input: z.object({
+            book_title: z.string().optional(),
+          }),
+          output: z.object({
+            characters: z
+              .array(
+                z.object({
+                  name: z.string().optional(),
+                  goals: z.array(z.string()).optional(),
+                  weaknesses: z.array(z.string()).optional(),
+                  outcome: z.string().optional(),
+                })
+              )
+              .optional(),
+          }),
+        },
+      },
+      {
+        version: 'dev',
+      }
+    );
+    const input: TaskInput<typeof analyzeBookCharacters> = {
+      book_title: 'The Shadow of the Wind',
+    };
+    try {
+      await analyzeBookCharacters(input, { useCache: 'never' });
+      fail('Expected an error to be thrown');
+    } catch (error: unknown) {
+      if (!(error instanceof WorkflowAIError)) {
+        fail(`Expected an error to be thrown ${error}`);
+      }
+      expect(error.detail?.error?.details).toBe('Invalid jwt');
+    }
   }, 30000);
 });
