@@ -1,5 +1,20 @@
-# WorkflowAI
+# Javascript / Typescript SDK for WorkflowAI
 
-## Usage
+[![WorkflowAI](./examples/assets/readme-header.png)](https://workflowai.com)
 
-Create a task on workflowai.com then visit the code page to get the code to use in your project.
+[![npm version](https://img.shields.io/npm/v/@workflowai/workflowai.svg)](https://www.npmjs.com/package/@workflowai/workflowai)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+## WorkflowAI
+
+[WorkflowAI](https://workflowai.com) is a low-code tool for product managers and software engineers
+that makes it easier to ship features powered by AI.
+
+## Get Started
+
+1. Go to [workflowai.com](https://workflowai.com).
+2. Enter your company URL, and get suggestions of AI-powered features for your product.
+3. Build your first AI features in a few minutes.
+4. Then go to the **Code** section to copy the code generated for Typescript.
+
+[![Code Section](./examples/assets/code-section.png)](https://workflowai.com/docs/agents/get-capital-info/1/code)
