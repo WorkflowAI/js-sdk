@@ -42,10 +42,10 @@
   "scripts": {
     "check": "npm run check --workspaces --if-present",
     "fix": "npm run fix --workspaces --if-present",
-    "test": "npm run test:ts-jest --",
     "build": "npm run build --workspaces --if-present",
     "lint-staged": "lint-staged",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:unit": "npm run test:unit --workspaces --if-present"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [

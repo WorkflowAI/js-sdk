@@ -63,7 +63,12 @@ try {
   // // Publish only if version doesn't already exist
   // if (!npmVersions.includes(localPackageSpecs.version)) {
   // Version had not been published yet, so do it!
-  const npmArgs = ['pub', '--loglevel=error'];
+  const npmArgs = [
+    'pub',
+    '--loglevel=error',
+    '--workspace',
+    `@workflowai/${packageName}`,
+  ];
   if (tag) {
     npmArgs.push(`--tag=${tag}`);
   }
