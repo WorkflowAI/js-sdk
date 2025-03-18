@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@workflowai/react": ["."]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

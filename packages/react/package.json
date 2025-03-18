@@ -1,0 +1,42 @@
+{
+  "name": "@workflowai/react",
+  "version": "0.1.0",
+  "description": "React components for WorkflowAI",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "homepage": "https://workflowai.com",
+  "keywords": [
+    "workflowai",
+    "ai",
+    "llm",
+    "agent",
+    "react",
+    "components"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.13"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "devDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}

@@ -1,0 +1,62 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.WorkflowAIFeedbackModal {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  & .title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  & .content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  & .description {
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  & .caption {
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  & .input_container {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  & .feedback_input {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+  }
+
+  & .buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  & .cancel_button {
+    background-color: var(--workflowai-feedback-modal-cancel-bg, #f3f4f6);
+    color: var(--workflowai-feedback-modal-cancel-text, #1f2937);
+  }
+
+  & .spinner {
+    animation: spin 1s linear infinite;
+  }
+}
