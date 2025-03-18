@@ -11,6 +11,10 @@ on:
         type: string
         default: 'main'
         description: 'Branch to publish from'
+      package:
+        type: string
+        default: 'workflowai'
+        description: 'Package to publish'
 
 permissions:
   contents: read
@@ -31,3 +35,4 @@ jobs:
       tag: ${{ inputs.tag }}
       expectedVersion: ''
       branch: ${{ inputs.branch }}
+      package: ${{ inputs.package }}

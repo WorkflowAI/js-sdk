@@ -9,15 +9,27 @@ const semverRegex =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 
 try {
+  // @ts-expect-error import.meta is only supported for certain modes
   const __filename = fileURLToPath(import.meta.url);
-  const rootDir = join(dirname(__filename), '..');
+  const workspaceDir = join(dirname(__filename), '..');
 
   // We'll tag published package version differently depending on which branch this action is triggered from
-  const { tag, otp } = argv(process.argv.slice(2)) as {
+  const {
+    tag,
+    otp,
+    package: packageName,
+  } = argv(process.argv.slice(2)) as {
     _: string[];
     tag?: string;
     otp?: string;
+    package?: string;
   };
+
+  if (!packageName) {
+    console.log('Package name is required');
+    process.exit(1);
+  }
+  const rootDir = join(workspaceDir, 'packages', packageName);
 
   const localPackageSpecs = JSON.parse(
     readFileSync(join(rootDir, 'package.json'), 'utf-8')

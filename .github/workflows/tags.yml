@@ -3,21 +3,32 @@ name: tags
 on:
   push:
     tags:
-      - 'v*'
+      - '*@*'
 
 permissions:
   contents: read
   id-token: write
+
+env:
+  TAG_NAME: ${{ github.ref_name }}
 
 jobs:
   quality:
     uses: ./.github/workflows/.quality.yml
     secrets: inherit
 
+  splits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set package and version
+        run: |
+          echo "PACKAGE=${TAG_NAME%%@*}" >> $GITHUB_ENV
+          echo "VERSION=${TAG_NAME#*@}" >> $GITHUB_ENV
   publish:
     needs: quality
     uses: ./.github/workflows/.publish.yml
     secrets: inherit
     with:
       tag: latest
-      expectedVersion: ${{ github.ref_name }}
+      expectedVersion: ${{ env.VERSION }}
+      package: ${{ env.PACKAGE }}
