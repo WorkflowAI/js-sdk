@@ -44,7 +44,7 @@
     "check": "npm run lint:check && npm run prettier:check",
     "fix": "npm run lint:fix && npm run prettier:fix",
     "test": "jest",
-    "test:unit": "jest --projects jest.config.ts",
+    "test:unit": "jest --projects ../../configs/jest.unit.config.ts",
     "test:e2e": "jest tests/e2e",
     "lint-staged": "lint-staged",
     "check-version": "tsx ./bin/check-version.ts",
@@ -54,7 +54,6 @@
     "build:types": "tsc -p ../../configs/tsconfig.types.json --outDir ./dist/types",
     "build:cjs": "tsc -p ../../configs/tsconfig.cjs.json --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
     "build:esm": "tsc -p ../../configs/tsconfig.esm.json --outDir ./dist/esm && tsx ../../configs/postesm.ts",
-    "build:test": "tsc -p ../../configs/tsconfig.test.json",
     "build": "npm run clean && npm run prebuild && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
     "prepublishOnly": "npm run build"

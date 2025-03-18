@@ -37,6 +37,8 @@
     "@types/react-dom": "^18.2.0"
   },
   "scripts": {
-    "build": "tsc"
+    "build:types": "tsc -p ../../configs/tsconfig.types.json --outDir ./dist/types",
+    "build:cjs": "tsc -p ../../configs/tsconfig.cjs.json --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
+    "build:esm": "tsc -p ../../configs/tsconfig.esm.json --outDir ./dist/esm && tsx ../../configs/postesm.ts"
   }
 }

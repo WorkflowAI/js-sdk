@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "es6", "es7", "esnext", "dom"],
+    "lib": ["es5", "es6", "es7", "esnext", "dom", "dom.iterable"],
     "target": "es2018",
     "removeComments": false,
     "esModuleInterop": true,
@@ -16,10 +16,8 @@
     "downlevelIteration": true,
     "isolatedModules": true,
     "allowJs": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@workflowai/workflowai": ["."]
-    }
+    "jsx": "react-jsx",
+    "baseUrl": "./src"
   },
   "exclude": ["node_modules"]
 }

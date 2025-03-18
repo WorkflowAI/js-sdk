@@ -2,6 +2,7 @@ import { WorkflowAI, WorkflowAIError } from '@workflowai/workflowai';
 import mockFetch from 'jest-fetch-mock';
 // eslint-disable-next-line no-restricted-imports
 import { readFile } from 'node:fs/promises';
+import { fixturePath } from '../fixtures/fixture.js';
 
 beforeAll(() => {
   mockFetch.enableMocks();
@@ -41,7 +42,7 @@ const run = workflowAI.agent<
 
 describe('run', () => {
   it('runs a task', async () => {
-    const run1Fixture = await readFile('./tests/fixtures/run1.json', 'utf-8');
+    const run1Fixture = await readFile(fixturePath('run1.json'), 'utf-8');
     mockFetch.mockResponseOnce(run1Fixture);
 
     const result = await run({ animal: 'platypus' });

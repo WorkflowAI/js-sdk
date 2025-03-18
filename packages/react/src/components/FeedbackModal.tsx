@@ -1,6 +1,6 @@
-import { sendFeedback } from 'lib/send_feedback';
 import { useCallback, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { sendFeedback } from '../lib/send_feedback.js';
 import styles from './FeedbackModal.module.css';
 import { Loader } from './Loader.js';
 
