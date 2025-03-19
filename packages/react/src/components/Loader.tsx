@@ -7,9 +7,9 @@ export function Loader({ className }: { className?: string }) {
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      stroke-width='2'
-      stroke-linecap='round'
-      stroke-linejoin='round'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
     >
       <path d='M12 2v4' />
       <path d='m16.2 7.8 2.9-2.9' />

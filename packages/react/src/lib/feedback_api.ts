@@ -1,4 +1,5 @@
 import { WORKFLOW_AI_API_URL } from './consts.js';
+import { cachedFetch } from './simpleFetch.js';
 
 export type FeedbackOutcome = 'positive' | 'negative';
 
@@ -34,4 +35,24 @@ export async function sendFeedback(req: {
   if (!response.ok) {
     throw new Error('Failed to send feedback');
   }
+}
+
+type GetFeedbackResponse = {
+  outcome: FeedbackOutcome | null;
+};
+
+export async function getFeedback(req: {
+  feedbackToken: string;
+  userID?: string;
+}) {
+  const { feedbackToken, userID } = req;
+  const queryParams = new URLSearchParams();
+  queryParams.set('feedback_token', feedbackToken);
+  if (userID) {
+    queryParams.set('user_id', userID);
+  }
+  const data = await cachedFetch<GetFeedbackResponse>(
+    `${WORKFLOW_AI_API_URL}/v1/feedback?${queryParams.toString()}`
+  );
+  return data.outcome ?? undefined;
 }

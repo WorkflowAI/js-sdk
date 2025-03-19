@@ -4,4 +4,4 @@ export {
   FeedbackModalContainer,
   openFeedbackModal,
 } from './components/FeedbackModal.js';
-export { sendFeedback } from './lib/send_feedback.js';
+export { sendFeedback } from './lib/feedback_api.js';

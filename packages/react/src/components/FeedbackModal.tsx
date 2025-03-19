@@ -1,7 +1,7 @@
 import { CSSProperties, useCallback, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { cls } from '../lib/cls.js';
-import { sendFeedback } from '../lib/send_feedback.js';
+import { sendFeedback } from '../lib/feedback_api.js';
 import { Check } from './Check.js';
 import styles from './FeedbackModal.module.css';
 import { Loader } from './Loader.js';
@@ -129,10 +129,11 @@ export interface FeedbackModalContainerProps
   feedbackToken: string;
   userID?: string;
   outcome: 'positive' | 'negative';
+  onSubmitted?: (outcome: 'positive' | 'negative') => void;
 }
 
 export function FeedbackModalContainer(props: FeedbackModalContainerProps) {
-  const { outcome, userID, feedbackToken, ...rest } = props;
+  const { outcome, userID, feedbackToken, onSubmitted, ...rest } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -147,13 +148,14 @@ export function FeedbackModalContainer(props: FeedbackModalContainerProps) {
           outcome,
         });
         setIsCompleted(true);
+        onSubmitted?.(outcome);
       } catch (error) {
         console.error(error);
       } finally {
         setIsLoading(false);
       }
     },
-    [userID, feedbackToken, outcome]
+    [userID, feedbackToken, outcome, onSubmitted]
   );
 
   return (
@@ -172,17 +174,25 @@ export function openFeedbackModal(args: {
   userID?: string;
   feedbackToken: string;
   outcome: 'positive' | 'negative';
+  onSubmitted?: (outcome: 'positive' | 'negative') => void;
 }) {
   // Create a container for the modal
   const modalContainer = document.createElement('div');
   document.body.appendChild(modalContainer);
 
   const root = createRoot(modalContainer);
+  const { onSubmitted, ...rest } = args;
 
   // Handler to unmount and remove the modal from the DOM
   const handleClose = () => {
     root.unmount();
   };
 
-  root.render(<FeedbackModalContainer {...args} onCancel={handleClose} />);
+  root.render(
+    <FeedbackModalContainer
+      {...rest}
+      onCancel={handleClose}
+      onSubmitted={onSubmitted}
+    />
+  );
 }

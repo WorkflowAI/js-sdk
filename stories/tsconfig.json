@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@workflowai/react": ["../packages/react/src"]
+      "@workflowai/react": ["../packages/react/src"],
+      "@workflowai/react/components/*": ["../packages/react/src/components/*"]
     }
   }
 }
