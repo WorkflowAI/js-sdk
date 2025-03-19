@@ -4,7 +4,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:require-extensions/recommended',
-    // 'prettier', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
+    'plugin:storybook/recommended',
   ],
   ignorePatterns: ['**/node_modules/**', '**/dist/**'],
   // parser: '@typescript-eslint/parser', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
