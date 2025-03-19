@@ -1,0 +1,61 @@
+{
+  "name": "@workflowai/workflowai",
+  "version": "1.6.4",
+  "description": "WorkflowAI JS SDK",
+  "author": "WorkflowAI",
+  "homepage": "https://workflowai.com",
+  "keywords": [
+    "workflowai",
+    "ai",
+    "llm",
+    "agent"
+  ],
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.13"
+  },
+  "dependencies": {
+    "fetch-event-stream": "^0.1.5",
+    "fetch-retry": "^6.0.0",
+    "openapi-fetch": "^0.9.8",
+    "zod": "^3.23.8"
+  },
+  "scripts": {
+    "-------- CODEGEN": "",
+    "codegen:openapi": "openapi-typescript ${WORKFLOWAI_API_URL:-https://run.workflowai.dev}/openapi.json -o ./src/api/generated/openapi.ts",
+    "codegen": "npm run codegen:openapi && npm run fix",
+    "-------- LINTING": "",
+    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern",
+    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern",
+    "lint:check": "eslint --cache --ext .ts ./src",
+    "lint:fix": "eslint --cache --fix --ext .ts ./src",
+    "check": "npm run lint:check && npm run prettier:check",
+    "fix": "npm run lint:fix && npm run prettier:fix",
+    "test": "jest",
+    "test:unit": "jest --projects ../../configs/jest.unit.config.ts",
+    "test:e2e": "jest tests/e2e",
+    "lint-staged": "lint-staged",
+    "check-version": "tsx ./bin/check-version.ts",
+    "-------- BUILD": "",
+    "clean": "rm -rf dist/*",
+    "prebuild": "tsx ../../configs/prebuild.ts",
+    "build:types": "tsc -p ./tsconfig.json --declaration --declarationMap --emitDeclarationOnly --outDir ./dist/types",
+    "build:cjs": "tsc -p ./tsconfig.json --module commonjs --declaration --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
+    "build:esm": "tsc -p ./tsconfig.json --module es2020 --target es2020 --outDir ./dist/esm && tsx ../../configs/postesm.ts",
+    "build": "npm run clean && npm run prebuild && npm run build:types && npm run build:cjs && npm run build:esm",
+    "dry": "npm run build && npm pub --dry-run",
+    "prepublishOnly": "npm run build"
+  }
+}

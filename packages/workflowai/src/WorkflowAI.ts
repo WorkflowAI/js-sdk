@@ -6,9 +6,7 @@ import {
   RunResult,
   RunStreamEvent,
   RunStreamResult,
-} from 'agent.js';
-import { RunOptions } from 'types.js';
-import { DeepPartial } from 'utils.js';
+} from './agent.js';
 import {
   InitWorkflowAIApiConfig,
   type WorkflowAIApi,
@@ -30,6 +28,8 @@ import type {
   TaskRunStreamResult,
   UseTaskResult,
 } from './task.js';
+import { RunOptions } from './types.js';
+import { DeepPartial } from './utils.js';
 
 export type WorkflowAIConfig = InitWorkflowAIApiConfig;
 

@@ -3,6 +3,9 @@ name: Publish
 on:
   workflow_call:
     inputs:
+      package:
+        type: string
+        required: true
       branch:
         type: string
         default: ${{ github.ref_name }}
@@ -34,10 +37,10 @@ jobs:
         run: npm ci
 
       - name: Check version
-        run: npm run check-version ${{ inputs.expectedVersion }}
+        run: npm run check-version ${{ inputs.expectedVersion }} ${{ inputs.package }}
 
       - name: Build
-        run: npm run build
+        run: cd packages/${{ inputs.package }} && npm run build
 
       - name: Publish to NPM
         run: npx tsx ./bin/npm-publish --tag=${{ inputs.tag }}

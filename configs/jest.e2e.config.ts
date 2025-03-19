@@ -5,7 +5,7 @@ const config: Config = {
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',
-      { useESM: true, tsconfig: './tests/tsconfig.json' },
+      { useESM: true, tsconfig: '<rootDir>/tests/tsconfig.json' },
     ],
   },
   testRegex: ['tests/e2e/.*\\.test\\.ts$'],

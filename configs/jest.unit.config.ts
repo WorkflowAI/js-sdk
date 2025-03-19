@@ -5,7 +5,7 @@ const config: Config = {
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',
-      { useESM: true, tsconfig: './tests/tsconfig.json' },
+      { useESM: true, tsconfig: '<rootDir>/tests/tsconfig.json' },
     ],
   },
   testRegex: ['src/.*\\.test\\.ts$', 'tests/integration/.*\\.test\\.ts$'],
@@ -14,7 +14,8 @@ const config: Config = {
   automock: false,
   setupFiles: ['./configs/setupJest.js'],
   moduleNameMapper: {
-    '@workflowai/workflowai': '<rootDir>/src',
+    '@workflowai/workflowai': '<rootDir>/packages/workflowai/src',
+    '@workflowai/react': '<rootDir>/packages/react/src',
     '(.+)\\.js': '$1',
   },
 };
