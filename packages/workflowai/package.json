@@ -51,9 +51,9 @@
     "-------- BUILD": "",
     "clean": "rm -rf dist/*",
     "prebuild": "tsx ../../configs/prebuild.ts",
-    "build:types": "tsc -p ../../configs/tsconfig.types.json --outDir ./dist/types",
-    "build:cjs": "tsc -p ../../configs/tsconfig.cjs.json --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
-    "build:esm": "tsc -p ../../configs/tsconfig.esm.json --outDir ./dist/esm && tsx ../../configs/postesm.ts",
+    "build:types": "tsc -p ./tsconfig.json --declaration --declarationMap --emitDeclarationOnly --outDir ./dist/types",
+    "build:cjs": "tsc -p ./tsconfig.json --module commonjs --declaration --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
+    "build:esm": "tsc -p ./tsconfig.json --module es2020 --target es2020 --outDir ./dist/esm && tsx ../../configs/postesm.ts",
     "build": "npm run clean && npm run prebuild && npm run build:types && npm run build:cjs && npm run build:esm",
     "dry": "npm run build && npm pub --dry-run",
     "prepublishOnly": "npm run build"

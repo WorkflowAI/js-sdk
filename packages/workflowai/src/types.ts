@@ -1,4 +1,8 @@
-import type { FetchOptions, RunRequest, VersionReference } from 'api/types';
+import type {
+  FetchOptions,
+  RunRequest,
+  VersionReference,
+} from './api/types.js';
 
 export type AgentId = string;
 export type SchemaId = number;

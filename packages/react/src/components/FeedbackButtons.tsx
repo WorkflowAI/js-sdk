@@ -1,28 +1,30 @@
+import { cls } from '../lib/cls.js';
 import styles from './FeedbackButtons.module.css';
 import { openFeedbackModal } from './FeedbackModal.js';
 import { ThumbsDown } from './ThumbsDown.js';
 import { ThumbsUp } from './ThumbsUp.js';
 
 export interface FeedbackButtonsProps {
-  user_id?: string;
-  feedback_token: string;
+  userID?: string;
+  feedbackToken: string;
+  className?: string;
 }
 
 export function FeedbackButtons(props: FeedbackButtonsProps) {
-  const { user_id, feedback_token } = props;
+  const { userID, feedbackToken, className } = props;
 
   return (
-    <div className={styles.WorkflowAIFeedbackButtons}>
+    <div className={cls(styles.WorkflowAIFeedbackButtons, className)}>
       <button
         onClick={() =>
-          openFeedbackModal({ user_id, feedback_token, outcome: 'positive' })
+          openFeedbackModal({ userID, feedbackToken, outcome: 'positive' })
         }
       >
         <ThumbsUp />
       </button>
       <button
         onClick={() =>
-          openFeedbackModal({ user_id, feedback_token, outcome: 'negative' })
+          openFeedbackModal({ userID, feedbackToken, outcome: 'negative' })
         }
       >
         <ThumbsDown />

@@ -46,23 +46,18 @@ export function FeedbackModal(props: FeedbackModalProps) {
             onChange={(e) => setComment(e.target.value)}
           />
         </div>
-
-        <div className={styles.buttons}>
-          <button className={styles.cancel_button} onClick={() => onCancel?.()}>
-            {cancelButtonText}
-          </button>
-          <button
-            className={styles.submit_button}
-            onClick={() => onSubmit?.(comment)}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader className={styles.spinner} />
-            ) : (
-              submitButtonText
-            )}
-          </button>
-        </div>
+      </div>
+      <div className={styles.buttons}>
+        <button className={styles.cancel_button} onClick={() => onCancel?.()}>
+          {cancelButtonText}
+        </button>
+        <button
+          className={styles.submit_button}
+          onClick={() => onSubmit?.(comment)}
+          disabled={isLoading}
+        >
+          {isLoading ? <Loader className={styles.spinner} /> : submitButtonText}
+        </button>
       </div>
     </div>
   );
@@ -70,13 +65,13 @@ export function FeedbackModal(props: FeedbackModalProps) {
 
 export interface FeedbackModalContainerProps
   extends Omit<FeedbackModalProps, 'onSubmit' | 'isLoading'> {
-  feedback_token: string;
-  user_id?: string;
+  feedbackToken: string;
+  userID?: string;
   outcome: 'positive' | 'negative';
 }
 
 export function FeedbackModalContainer(props: FeedbackModalContainerProps) {
-  const { outcome, user_id, feedback_token, onCancel, ...rest } = props;
+  const { outcome, userID, feedbackToken, onCancel, ...rest } = props;
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = useCallback(
@@ -84,8 +79,8 @@ export function FeedbackModalContainer(props: FeedbackModalContainerProps) {
       try {
         setIsLoading(true);
         await sendFeedback({
-          user_id,
-          feedback_token,
+          userID,
+          feedbackToken,
           comment,
           outcome,
         });
@@ -96,18 +91,26 @@ export function FeedbackModalContainer(props: FeedbackModalContainerProps) {
         setIsLoading(false);
       }
     },
-    [user_id, feedback_token, outcome, onCancel]
+    [userID, feedbackToken, outcome, onCancel]
   );
 
-  return <FeedbackModal {...rest} onSubmit={onSubmit} isLoading={isLoading} />;
+  return (
+    <div className={styles.WorkflowAIFeedbackModalContainer}>
+      <FeedbackModal {...rest} onSubmit={onSubmit} isLoading={isLoading} />
+    </div>
+  );
 }
 
 export function openFeedbackModal(args: {
-  user_id?: string;
-  feedback_token: string;
+  userID?: string;
+  feedbackToken: string;
   outcome: 'positive' | 'negative';
 }) {
-  const root = createRoot(document.body);
+  // Create a container for the modal
+  const modalContainer = document.createElement('div');
+  document.body.appendChild(modalContainer);
+
+  const root = createRoot(modalContainer);
 
   // Handler to unmount and remove the modal from the DOM
   const handleClose = () => {

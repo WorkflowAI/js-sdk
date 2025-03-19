@@ -2,9 +2,10 @@
   "name": "@workflowai/react",
   "version": "0.1.0",
   "description": "React components for WorkflowAI",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "homepage": "https://workflowai.com",
   "keywords": [
     "workflowai",
@@ -14,13 +15,7 @@
     "react",
     "components"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
+  "style": "dist/bundle.css",
   "files": [
     "dist"
   ],
@@ -37,8 +32,9 @@
     "@types/react-dom": "^18.2.0"
   },
   "scripts": {
-    "build:types": "tsc -p ../../configs/tsconfig.types.json --outDir ./dist/types",
-    "build:cjs": "tsc -p ../../configs/tsconfig.cjs.json --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
-    "build:esm": "tsc -p ../../configs/tsconfig.esm.json --outDir ./dist/esm && tsx ../../configs/postesm.ts"
+    "prebuild": "tsx ../../configs/prebuild.ts",
+    "clean": "rm -rf dist/*",
+    "build": "npm run clean && rollup -c",
+    "prepublishOnly": "npm run build"
   }
 }

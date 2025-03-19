@@ -1,7 +1,7 @@
-import { AgentId, RunOptions } from 'types.js';
 import type { WorkflowAIApi } from './api/api.js';
 import type { RunResponse } from './api/types.js';
 import type { z } from './schema/zod/zod.js';
+import { AgentId, RunOptions } from './types.js';
 import type { AsyncIteratorValue, DeepPartial } from './utils.js';
 
 export type InputSchema = z.ZodTypeAny;
