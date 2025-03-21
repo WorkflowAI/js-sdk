@@ -1,6 +1,12 @@
-import { TaskInput, TaskOutput, WorkflowAI, WorkflowAIError, z } from '@workflowai/workflowai';
+import {
+  TaskInput,
+  TaskOutput,
+  WorkflowAI,
+  WorkflowAIError,
+  z,
+} from '@workflowai/workflowai';
+import { DeepPartial } from '@workflowai/workflowai/utils';
 import 'dotenv/config';
-import { DeepPartial } from 'utils';
 
 const workflowAI = new WorkflowAI();
 
@@ -196,7 +202,9 @@ describe('analyzeBookCharacter', () => {
         fail(`Expected an error to be thrown ${error}`);
       }
       expect(error.errorCode).toBe('version_not_found');
-      expect(error.detail?.error.message).toContain('No version deployed to dev for agent \'analyze-book-characters\' and schema \'1\'.');
+      expect(error.detail?.error.message).toContain(
+        "No version deployed to dev for agent 'analyze-book-characters' and schema '1'."
+      );
     }
   }, 30000);
 
