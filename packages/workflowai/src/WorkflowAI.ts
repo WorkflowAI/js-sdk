@@ -51,6 +51,7 @@ function optionsToRunRequest(
 
 export class WorkflowAI {
   protected api: WorkflowAIApi;
+  protected api_url: string;
 
   constructor(config?: WorkflowAIConfig | { api: WorkflowAIConfig }) {
     // Old constructors used to be { api: WorkflowAIConfig }
@@ -58,6 +59,8 @@ export class WorkflowAI {
     this.api = initWorkflowAIApi({
       ...(c ?? {}),
     });
+
+    this.api_url = this.api.url.replace('https://run.', 'https://api.');
   }
 
   protected async runTask<IS extends InputSchema, OS extends OutputSchema>(
@@ -102,7 +105,12 @@ export class WorkflowAI {
         data.task_output
       );
 
-      return { data: data as RunResponse, response, output };
+      return {
+        data: data as RunResponse,
+        response,
+        output,
+        feedbackToken: data.feedback_token,
+      };
     }
 
     // Streaming response, we receive partial results
@@ -133,6 +141,7 @@ export class WorkflowAI {
             data,
             output: parsed?.data,
             partialOutput: partialParsed?.data?.partial,
+            feedbackToken: data?.feedback_token as string,
           };
         }
       ),
@@ -229,7 +238,12 @@ export class WorkflowAI {
 
       const output = data.task_output as Output;
 
-      return { data: data as RunResponse, response, output };
+      return {
+        data: data as RunResponse,
+        response,
+        output,
+        feedbackToken: data.feedback_token,
+      };
     }
 
     // Streaming response, we receive partial results
@@ -247,6 +261,7 @@ export class WorkflowAI {
           return {
             data,
             output: data?.task_output as DeepPartial<O>,
+            feedbackToken: data?.feedback_token as string,
           };
         }
       ),
@@ -301,5 +316,32 @@ export class WorkflowAI {
       };
     };
     return run;
+  }
+
+  public async sendFeedback(req: {
+    feedbackToken: string;
+    outcome: 'positive' | 'negative';
+    comment?: string;
+    userID?: string;
+  }) {
+    const { feedbackToken, outcome, comment, userID } = req;
+    const body = {
+      feedback_token: feedbackToken,
+      outcome,
+      comment,
+      user_id: userID,
+    };
+
+    const response = await fetch(`${this.api_url}/v1/feedback`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to send feedback');
+    }
   }
 }
