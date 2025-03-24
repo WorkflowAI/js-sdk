@@ -40,9 +40,9 @@ jobs:
         run: npm run check-version ${{ inputs.expectedVersion }} ${{ inputs.package }}
 
       - name: Build
-        run: cd packages/${{ inputs.package }} && npm run build
+        run: npm run build --workspace=@workflowai/${{ inputs.package }}
 
       - name: Publish to NPM
-        run: npx tsx ./bin/npm-publish --tag=${{ inputs.tag }}
+        run: npm publish --tag=${{ inputs.tag }} --workspace=@workflowai/${{ inputs.package }} --loglevel=error
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
