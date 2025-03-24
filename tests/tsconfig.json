@@ -3,7 +3,8 @@
   "include": ["**/*.test.ts", "**/*.spec.ts"],
   "compilerOptions": {
     "paths": {
-      "@workflowai/workflowai": ["../packages/workflowai/src"]
+      "@workflowai/workflowai": ["../packages/workflowai/src"],
+      "@workflowai/workflowai/*": ["../packages/workflowai/src/*"]
     }
   }
 }

@@ -22,6 +22,7 @@ export type TaskRunResult<OS extends OutputSchema> = {
   data: RunResponse;
   response: Response;
   output: TaskOutput<OS>;
+  feedbackToken: string;
 };
 
 // Raw async iterator that the API client returns for streaming a task run
@@ -36,6 +37,7 @@ export type TaskRunStreamEvent<OS extends OutputSchema> = AsyncIteratorValue<
 > & {
   output: TaskOutput<OS> | undefined;
   partialOutput: DeepPartial<TaskOutput<OS>> | undefined;
+  feedbackToken: string | undefined;
 };
 
 export type TaskRunStreamResult<OS extends OutputSchema> = Pick<

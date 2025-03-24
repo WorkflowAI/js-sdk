@@ -1,6 +1,7 @@
 {
   "name": "@workflowai/workflowai",
-  "version": "1.6.4",
+  "version": "1.6.5-dev.1",
+  "type": "module",
   "description": "WorkflowAI JS SDK",
   "author": "WorkflowAI",
   "homepage": "https://workflowai.com",
@@ -10,14 +11,14 @@
     "llm",
     "agent"
   ],
-  "types": "./dist/types/index.d.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
     }
   },
   "files": [
@@ -43,18 +44,15 @@
     "lint:fix": "eslint --cache --fix --ext .ts ./src",
     "check": "npm run lint:check && npm run prettier:check",
     "fix": "npm run lint:fix && npm run prettier:fix",
-    "test": "jest",
+    "test": "npm run test:unit",
     "test:unit": "jest --projects ../../configs/jest.unit.config.ts",
-    "test:e2e": "jest tests/e2e",
+    "test:e2e": "jest --projects ../../configs/jest.e2e.config.ts",
     "lint-staged": "lint-staged",
     "check-version": "tsx ./bin/check-version.ts",
     "-------- BUILD": "",
     "clean": "rm -rf dist/*",
-    "prebuild": "tsx ../../configs/prebuild.ts",
-    "build:types": "tsc -p ./tsconfig.json --declaration --declarationMap --emitDeclarationOnly --outDir ./dist/types",
-    "build:cjs": "tsc -p ./tsconfig.json --module commonjs --declaration --outDir ./dist/cjs && tsx ../../configs/postcjs.ts",
-    "build:esm": "tsc -p ./tsconfig.json --module es2020 --target es2020 --outDir ./dist/esm && tsx ../../configs/postesm.ts",
-    "build": "npm run clean && npm run prebuild && npm run build:types && npm run build:cjs && npm run build:esm",
+    "prebuild": "npm run clean && tsx ../../configs/prebuild.ts",
+    "build": "rollup -c",
     "dry": "npm run build && npm pub --dry-run",
     "prepublishOnly": "npm run build"
   }

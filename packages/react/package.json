@@ -32,9 +32,10 @@
     "@types/react-dom": "^18.2.0"
   },
   "scripts": {
-    "prebuild": "tsx ../../configs/prebuild.ts",
+    "prebuild": "npm run clean && tsx ../../configs/prebuild.ts",
     "clean": "rm -rf dist/*",
-    "build": "npm run clean && rollup -c",
+    "build": "rollup -c",
+    "dry": "npm run build && npm pub --dry-run",
     "prepublishOnly": "npm run build"
   }
 }

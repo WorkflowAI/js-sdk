@@ -13,7 +13,8 @@ const config: Config = {
   coverageReporters: ['json-summary', 'text', 'lcov'],
   automock: false,
   moduleNameMapper: {
-    '@workflowai/workflowai': '<rootDir>/src',
+    '@workflowai/workflowai': '<rootDir>/packages/workflowai/src',
+    '@workflowai/react': '<rootDir>/packages/react/src',
     '(.+)\\.js': '$1',
   },
 };

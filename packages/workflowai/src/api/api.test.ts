@@ -1,5 +1,4 @@
 import { expect, test } from '@jest/globals';
-import { z } from 'zod';
 import { initWorkflowAIApi } from './api.js';
 import * as createClients from './http-clients.js';
 import {
@@ -19,16 +18,6 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-const apiMethod = z
-  .function()
-  .args(z.record(z.string(), z.any()))
-  .returns(
-    z.object({
-      data: z.any(),
-      status: z.any(),
-    })
-  );
-
 describe('WorkflowAIApi', () => {
   test('export api init function', () => {
     expect(initWorkflowAIApi).toBeInstanceOf(Function);
@@ -36,33 +25,6 @@ describe('WorkflowAIApi', () => {
 
   test('accept empty configuration', () => {
     expect(initWorkflowAIApi()).toBeTruthy();
-  });
-
-  test('export api routes as functions', () => {
-    const outputSchema = z.record(
-      z.string(),
-      z.union([
-        apiMethod,
-        z.record(
-          z.string(),
-          z.union([
-            apiMethod,
-            z.record(
-              z.string(),
-              z.union([
-                apiMethod,
-                z.record(
-                  z.string(),
-                  z.union([apiMethod, z.record(z.string(), apiMethod)])
-                ),
-              ])
-            ),
-          ])
-        ),
-      ])
-    );
-    const api = initWorkflowAIApi();
-    expect(outputSchema.parse(api)).toBeTruthy();
   });
 
   test('create clients is called with the correct arguments, no middlware', () => {

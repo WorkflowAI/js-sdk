@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/v1/{tenant}/tasks/{task_id}/schemas/{task_schema_id}/run': {
+  '/v1/{tenant}/agents/{task_id}/schemas/{task_schema_id}/run': {
     /** Run Task */
     post: operations['run_task_v1__tenant__tasks__task_id__schemas__task_schema_id__run_post'];
   };
@@ -182,6 +182,7 @@ export interface operations {
             version: $defs['Version'];
             /** Duration Seconds */
             duration_seconds: number | null;
+            feedback_token: string;
             /** Cost Usd */
             cost_usd: number | null;
             $defs: {
@@ -304,6 +305,7 @@ export interface operations {
                 duration_seconds: number | null;
                 /** Cost Usd */
                 cost_usd: number | null;
+                feedback_token: string;
               };
               /**
                * RunResponseStreamChunk
@@ -314,6 +316,7 @@ export interface operations {
                 id: string;
                 /** Task Output */
                 task_output: Record<string, never>;
+                feedback_token?: string | null;
               };
               /**
                * TaskGroupProperties
