@@ -1,25 +1,37 @@
+import argv from 'minimist';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// @ts-expect-error import.meta is only supported for certain modes
 const __filename = fileURLToPath(import.meta.url);
-const rootDir = join(dirname(__filename), '..');
+const workspaceDir = join(dirname(__filename), '..');
+
+const { version, package: packageName } = argv(process.argv.slice(2)) as {
+  _: string[];
+  version?: string;
+  package?: string;
+};
+
+if (!packageName || !version) {
+  console.log('Package name and expected version are required');
+  process.exit(1);
+}
+
+const rootDir = join(workspaceDir, 'packages', packageName);
 
 // Read the main package.json to get the list of workspaces
 const mainPackageJsonPath = join(rootDir, 'package.json');
 const mainPackageJson = JSON.parse(readFileSync(mainPackageJsonPath, 'utf-8'));
 
 // Get the expected version from command line arguments or main package.json
-let expectedVersion = process.argv[2];
 
-if (!expectedVersion) {
+if (!version) {
   console.log('Expected version is required');
   process.exit(1);
 }
 
-if (expectedVersion.startsWith('v')) {
-  expectedVersion = expectedVersion.slice(1);
-}
+const expectedVersion = version.startsWith('v') ? version.slice(1) : version;
 
 const versionFileContents = readFileSync(
   join(rootDir, 'src/version.ts'),

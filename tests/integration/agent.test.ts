@@ -2,6 +2,7 @@ import { WorkflowAI, WorkflowAIError } from '@workflowai/workflowai';
 import mockFetch from 'jest-fetch-mock';
 // eslint-disable-next-line no-restricted-imports
 import { readFile } from 'node:fs/promises';
+import { fixturePath } from '../fixtures/fixture.js';
 
 beforeAll(() => {
   mockFetch.enableMocks();
@@ -41,7 +42,7 @@ const run = workflowAI.agent<
 
 describe('run', () => {
   it('runs a task', async () => {
-    const run1Fixture = await readFile('./tests/fixtures/run1.json', 'utf-8');
+    const run1Fixture = await readFile(fixturePath('run1.json'), 'utf-8');
     mockFetch.mockResponseOnce(run1Fixture);
 
     const result = await run({ animal: 'platypus' });
@@ -54,11 +55,14 @@ describe('run', () => {
     expect(result.data.version.properties.model).toEqual('gpt-4o-2024-08-06');
     expect(result.data.cost_usd).toEqual(0.0024200000000000003);
     expect(result.data.duration_seconds).toEqual(1.311426);
+    expect(result.feedbackToken).toEqual(
+      'b650f038-e54e-41cf-9934-f57713fb9402'
+    );
 
     expect(mockFetch.mock.calls.length).toEqual(1);
     const req = mockFetch.mock.calls[0][0] as Request;
     expect(req.url).toEqual(
-      'https://run.workflowai.com/v1/_/tasks/animal-classification/schemas/4/run'
+      'https://run.workflowai.com/v1/_/agents/animal-classification/schemas/4/run'
     );
     expect(req.method).toEqual('POST');
     expect(req.headers.get('Authorization')).toEqual('Bearer hello');

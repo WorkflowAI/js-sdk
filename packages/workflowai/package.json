@@ -1,0 +1,59 @@
+{
+  "name": "@workflowai/workflowai",
+  "version": "1.6.5",
+  "type": "module",
+  "description": "WorkflowAI JS SDK",
+  "author": "WorkflowAI",
+  "homepage": "https://workflowai.com",
+  "keywords": [
+    "workflowai",
+    "ai",
+    "llm",
+    "agent"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.13"
+  },
+  "dependencies": {
+    "fetch-event-stream": "^0.1.5",
+    "fetch-retry": "^6.0.0",
+    "openapi-fetch": "^0.9.8",
+    "zod": "^3.23.8"
+  },
+  "scripts": {
+    "-------- CODEGEN": "",
+    "codegen:openapi": "openapi-typescript ${WORKFLOWAI_API_URL:-https://run.workflowai.dev}/openapi.json -o ./src/api/generated/openapi.ts",
+    "codegen": "npm run codegen:openapi && npm run fix",
+    "-------- LINTING": "",
+    "prettier:check": "prettier --check src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --no-error-on-unmatched-pattern",
+    "prettier:fix": "prettier --write src/**/*.ts src/*.ts src/**/*.js src/*.js *.md --ignore-unknown --no-error-on-unmatched-pattern",
+    "lint:check": "eslint --cache --ext .ts ./src",
+    "lint:fix": "eslint --cache --fix --ext .ts ./src",
+    "check": "npm run lint:check && npm run prettier:check",
+    "fix": "npm run lint:fix && npm run prettier:fix",
+    "test": "npm run test:unit",
+    "test:unit": "jest --projects ../../configs/jest.unit.config.ts",
+    "test:e2e": "jest --projects ../../configs/jest.e2e.config.ts",
+    "lint-staged": "lint-staged",
+    "check-version": "tsx ./bin/check-version.ts",
+    "-------- BUILD": "",
+    "clean": "rm -rf dist/*",
+    "prebuild": "npm run clean && tsx ../../configs/prebuild.ts",
+    "build": "rollup -c",
+    "dry": "npm run build && npm pub --dry-run",
+    "prepublishOnly": "npm run build"
+  }
+}

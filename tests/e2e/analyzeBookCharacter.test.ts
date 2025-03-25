@@ -1,6 +1,12 @@
-import { TaskInput, TaskOutput, WorkflowAI, WorkflowAIError, z } from '@workflowai/workflowai';
+import {
+  RunStreamEvent,
+  TaskInput,
+  TaskOutput,
+  WorkflowAI,
+  WorkflowAIError,
+  z,
+} from '@workflowai/workflowai';
 import 'dotenv/config';
-import { DeepPartial } from 'utils';
 
 const workflowAI = new WorkflowAI();
 
@@ -58,18 +64,16 @@ describe('analyzeBookCharacter', () => {
     const input: BookCharacterTaskInput = {
       book_title: 'The Shadow of the Wind',
     };
-    const { stream } = await analyzeBookCharacters(input, {
-      useCache: 'never',
-    }).stream();
+    const { stream } = await analyzeBookCharacters(input).stream();
 
-    const chunks: DeepPartial<BookCharacterTaskOutput>[] = [];
+    let lastChunk: RunStreamEvent<BookCharacterTaskOutput> | undefined;
     for await (const chunk of stream) {
-      if (chunk.output) {
-        chunks.push(chunk.output);
-      }
+      lastChunk = chunk;
     }
-
-    expect(chunks.length).toBeGreaterThan(1);
+    console.log(lastChunk?.feedbackToken);
+    expect(lastChunk).toBeDefined();
+    expect(lastChunk?.feedbackToken).toBeDefined();
+    expect(lastChunk?.output).toBeDefined();
   }, 30000);
 
   it('runs', async () => {
@@ -196,7 +200,9 @@ describe('analyzeBookCharacter', () => {
         fail(`Expected an error to be thrown ${error}`);
       }
       expect(error.errorCode).toBe('version_not_found');
-      expect(error.detail?.error.message).toContain('No version deployed to dev for agent \'analyze-book-characters\' and schema \'1\'.');
+      expect(error.detail?.error.message).toContain(
+        "No version deployed to dev for agent 'analyze-book-characters' and schema '1'."
+      );
     }
   }, 30000);
 

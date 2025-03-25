@@ -4,7 +4,9 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:require-extensions/recommended',
-    // 'prettier', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
+    'plugin:storybook/recommended',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
   ],
   ignorePatterns: ['**/node_modules/**', '**/dist/**'],
   // parser: '@typescript-eslint/parser', Since configs and plugins are installed in sub folders, this needs to be defined locally in package.json
@@ -18,6 +20,8 @@ module.exports = {
     'import/order': 0, // turn off in favor of eslint-plugin-simple-import-sort
     'import/no-unresolved': 0,
     'import/no-duplicates': 1,
+    'react/react-in-jsx-scope': 'off',
+    'react-hooks/exhaustive-deps': 'error',
 
     'sort-imports': 0, // we use eslint-plugin-import instead
 
@@ -56,4 +60,9 @@ module.exports = {
       },
     },
   ],
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
 };
