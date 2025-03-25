@@ -7,8 +7,7 @@
 
 ## WorkflowAI
 
-[WorkflowAI](https://workflowai.com) is a low-code tool for product managers and software engineers
-that makes it easier to ship features powered by AI.
+[WorkflowAI](https://workflowai.com) is an open-source platform where product and engineering teams collaborate to build and iterate on AI features.
 
 ## Get Started
 
