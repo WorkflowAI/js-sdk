@@ -1,0 +1,212 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.WorkflowAIFeedbackModal {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 440px;
+  background-color: transparent;
+  border: 1px solid rgba(209, 213, 219, 1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  background-image: url('https://workflowai.blob.core.windows.net/workflowai-public/gradient.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  --workflowai-feedback-modal-rounded-sm: 2px;
+
+  & .title {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 14px;
+    border-bottom: 1px dashed rgba(229, 231, 235, 1);
+  }
+
+  & .content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 14px;
+    font-size: 13px;
+    font-weight: 400;
+
+    & .description {
+      margin-bottom: 16px;
+    }
+  }
+
+  & button {
+    padding: 0 16px;
+    height: 36px;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: var(--workflowai-feedback-modal-rounded-sm);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & .description {
+    color: rgba(107, 114, 128, 1);
+  }
+
+  & .caption {
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+
+  & .feedback_input {
+    resize: vertical;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 10px;
+    border-radius: var(--workflowai-feedback-modal-rounded-sm);
+    border: 1px solid rgba(209, 213, 219, 1);
+    outline: none;
+    min-height: 32px;
+
+    &::placeholder {
+      font-size: 13px;
+      color: rgba(107, 114, 128, 1);
+    }
+  }
+
+  & .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+
+    & .button_loading {
+      color: transparent;
+
+      & .spinner {
+        display: block;
+      }
+    }
+  }
+
+  & .cancel_button {
+    background-color: var(--workflowai-feedback-modal-cancel-bg, #f3f4f6);
+    color: var(--workflowai-feedback-modal-cancel-text, #1f2937);
+  }
+
+  & .submit_button {
+    background: linear-gradient(90deg, #8759e3 0%, #4235f8 100%);
+    color: var(--workflowai-feedback-modal-submit-text, #ffffff);
+  }
+
+  & .spinner {
+    animation: spin 2s linear infinite;
+    height: 16px;
+    color: white;
+    position: absolute;
+    left: calc(50% - 8px);
+    top: calc(50% - 8px);
+    display: none;
+  }
+
+  & .watermark {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid rgba(209, 213, 219, 1);
+    height: 52px;
+  }
+
+  & .powered_by {
+    display: flex;
+    flex-direction: row;
+    color: rgba(156, 163, 175, 1);
+    gap: 4px;
+    font-size: 13px;
+
+    & img {
+      height: 16px;
+      color: rgba(75, 85, 99, 1);
+    }
+  }
+
+  & .thank_you {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  & .thank_you_content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+  }
+
+  & .thank_you_check {
+    width: 56px;
+    height: 56px;
+    background-color: rgba(243, 244, 246, 1);
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & svg {
+      width: 24px;
+      height: 24px;
+      color: rgba(55, 65, 81, 1);
+    }
+  }
+
+  & .thank_you_title {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(55, 65, 81, 1);
+    margin-top: 20px;
+  }
+
+  & .thank_you_footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 16px;
+    height: 52px;
+  }
+}
+
+.WorkflowAIFeedbackModalContainer {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

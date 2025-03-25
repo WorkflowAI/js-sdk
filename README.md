@@ -12,6 +12,6 @@
 1. Go to [workflowai.com](https://workflowai.com).
 2. Enter your company URL, and get suggestions of AI-powered features for your product.
 3. Build your first AI features in a few minutes.
-2. Then go to the **Code** section to copy the code generated for Typescript.
+4. Then go to the **Code** section to copy the code generated for Typescript.
 
 [![Code Section](./examples/assets/code-section.png)](https://workflowai.com/docs/agents/get-capital-info/1/code)

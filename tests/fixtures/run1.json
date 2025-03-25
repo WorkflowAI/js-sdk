@@ -23,5 +23,6 @@
   "cost_usd": 0.0024200000000000003,
   "metadata": {
     "workflowai.runBy": "model|openai:gpt-4o-2024-08-06"
-  }
+  },
+  "feedback_token": "b650f038-e54e-41cf-9934-f57713fb9402"
 }

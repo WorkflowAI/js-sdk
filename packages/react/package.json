@@ -1,0 +1,41 @@
+{
+  "name": "@workflowai/react",
+  "version": "0.1.0-beta.0",
+  "description": "React components for WorkflowAI",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "homepage": "https://workflowai.com",
+  "keywords": [
+    "workflowai",
+    "ai",
+    "llm",
+    "agent",
+    "react",
+    "components"
+  ],
+  "style": "dist/bundle.css",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.13"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "devDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "prebuild": "npm run clean && tsx ../../configs/prebuild.ts",
+    "clean": "rm -rf dist/*",
+    "build": "rollup -c",
+    "dry": "npm run build && npm pub --dry-run",
+    "prepublishOnly": "npm run build"
+  }
+}

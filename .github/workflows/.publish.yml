@@ -3,6 +3,9 @@ name: Publish
 on:
   workflow_call:
     inputs:
+      package:
+        type: string
+        required: true
       branch:
         type: string
         default: ${{ github.ref_name }}
@@ -34,12 +37,12 @@ jobs:
         run: npm ci
 
       - name: Check version
-        run: npm run check-version ${{ inputs.expectedVersion }}
+        run: npm run check-version ${{ inputs.expectedVersion }} ${{ inputs.package }}
 
       - name: Build
-        run: npm run build
+        run: npm run build --workspace=@workflowai/${{ inputs.package }}
 
       - name: Publish to NPM
-        run: npx tsx ./bin/npm-publish --tag=${{ inputs.tag }}
+        run: npm publish --tag=${{ inputs.tag }} --workspace=@workflowai/${{ inputs.package }} --loglevel=error
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
