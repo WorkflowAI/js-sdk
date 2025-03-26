@@ -1,14 +1,11 @@
 # Javascript / Typescript SDK for WorkflowAI
 
-[![WorkflowAI](./examples/assets/readme-header.png)](https://workflowai.com)
-
 [![npm version](https://img.shields.io/npm/v/@workflowai/workflowai.svg)](https://www.npmjs.com/package/@workflowai/workflowai)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## WorkflowAI
 
-[WorkflowAI](https://workflowai.com) is a low-code tool for product managers and software engineers
-that makes it easier to ship features powered by AI.
+[WorkflowAI](https://workflowai.com) is an open-source platform where product and engineering teams collaborate to build and iterate on AI features.
 
 ## Get Started
 
