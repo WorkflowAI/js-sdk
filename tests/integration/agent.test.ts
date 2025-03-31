@@ -37,7 +37,7 @@ const run = workflowAI.agent<
 >({
   id: 'animal-classification',
   schemaId: 4,
-  version: 43,
+  version: 'production',
 });
 
 describe('run', () => {
@@ -68,7 +68,35 @@ describe('run', () => {
     expect(req.headers.get('Authorization')).toEqual('Bearer hello');
     const body = await req.json();
     expect(body).toEqual({
-      version: 43,
+      version: 'production',
+      stream: false,
+      task_input: {
+        animal: 'platypus',
+      },
+      use_cache: 'auto',
+    });
+  });
+  it('allows overriding the version by a semver semver', async () => {
+    const run1Fixture = await readFile(fixturePath('run1.json'), 'utf-8');
+    mockFetch.mockResponseOnce(run1Fixture);
+
+    const result = await run({ animal: 'platypus' }, { version: '1.4' });
+    expect(result.output).toEqual({
+      is_cute: true,
+      is_dangerous: true,
+      explanation_of_reasoning: 'Plat plat',
+    });
+
+    expect(mockFetch.mock.calls.length).toEqual(1);
+    const req = mockFetch.mock.calls[0][0] as Request;
+    expect(req.url).toEqual(
+      'https://run.workflowai.com/v1/_/agents/animal-classification/schemas/4/run'
+    );
+    expect(req.method).toEqual('POST');
+    expect(req.headers.get('Authorization')).toEqual('Bearer hello');
+    const body = await req.json();
+    expect(body).toEqual({
+      version: '1.4',
       stream: false,
       task_input: {
         animal: 'platypus',

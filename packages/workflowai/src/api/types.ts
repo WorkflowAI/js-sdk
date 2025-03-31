@@ -9,7 +9,11 @@ export type VersionProperties = Schema['TaskGroupProperties'];
 
 export type VersionEnvironment = 'dev' | 'staging' | 'production';
 
-export type VersionReference = VersionEnvironment | number | VersionProperties;
+export type VersionReference =
+  | VersionEnvironment
+  | number
+  | string
+  | VersionProperties;
 
 export type RunRequest = Schema['RunRequest'];
 

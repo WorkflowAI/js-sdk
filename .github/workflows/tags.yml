@@ -19,16 +19,22 @@ jobs:
 
   splits:
     runs-on: ubuntu-latest
+
     steps:
       - name: Set package and version
+        id: set_package_and_version
         run: |
-          echo "PACKAGE=${TAG_NAME%%@*}" >> $GITHUB_ENV
-          echo "VERSION=${TAG_NAME#*@}" >> $GITHUB_ENV
+          echo "package=${TAG_NAME%%@*}" >> $GITHUB_OUTPUT
+          echo "version=${TAG_NAME#*@}" >> $GITHUB_OUTPUT
+    outputs:
+      package: ${{ steps.set_package_and_version.outputs.package }}
+      version: ${{ steps.set_package_and_version.outputs.version }}
+
   publish:
-    needs: quality
+    needs: split
     uses: ./.github/workflows/.publish.yml
     secrets: inherit
     with:
       tag: latest
-      expectedVersion: ${{ env.VERSION }}
-      package: ${{ env.PACKAGE }}
+      expectedVersion: ${{ needs.split.outputs.version }}
+      package: ${{ needs.split.outputs.package }}
