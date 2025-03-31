@@ -31,10 +31,10 @@ jobs:
       version: ${{ steps.set_package_and_version.outputs.version }}
 
   publish:
-    needs: split
+    needs: splits
     uses: ./.github/workflows/.publish.yml
     secrets: inherit
     with:
       tag: latest
-      expectedVersion: ${{ needs.split.outputs.version }}
-      package: ${{ needs.split.outputs.package }}
+      expectedVersion: ${{ needs.splits.outputs.version }}
+      package: ${{ needs.splits.outputs.package }}
