@@ -15,10 +15,14 @@ on:
       expectedVersion:
         type: string
         required: true
+      env:
+        type: string
+        default: npm
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
 
     steps:
       - uses: actions/checkout@v4
