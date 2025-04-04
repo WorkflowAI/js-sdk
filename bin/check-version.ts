@@ -7,10 +7,10 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const workspaceDir = join(dirname(__filename), '..');
 
-const { version, package: packageName } = argv(process.argv.slice(2)) as {
+const {
+  _: [version, packageName],
+} = argv(process.argv.slice(2)) as {
   _: string[];
-  version?: string;
-  package?: string;
 };
 
 if (!packageName || !version) {

@@ -67,7 +67,8 @@
     "prepare": "husky",
     "test:unit": "npm run test:unit --workspaces --if-present",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "check-version": "tsx ./bin/check-version.ts"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
