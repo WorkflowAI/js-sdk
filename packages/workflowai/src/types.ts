@@ -14,6 +14,7 @@ export type RunOptions<Stream extends true | false = false> = {
   stream?: Stream;
   fetch?: FetchOptions;
   privateFields?: ('task_input' | 'task_output' | string)[];
+  useFallback?: 'never' | 'auto' | string[];
 };
 
 export type FileContentType =

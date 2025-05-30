@@ -202,4 +202,73 @@ describe('run', () => {
       expect(error.errorCode).toBeFalsy();
     }
   });
+
+  it('correctly handles useFallback when passed to the run function', async () => {
+    const run1Fixture = await readFile(fixturePath('run1.json'), 'utf-8');
+    mockFetch.mockResponseOnce(run1Fixture);
+
+    const result = await run({ animal: 'platypus' }, { useFallback: 'never' });
+    expect(result.output).toEqual({
+      is_cute: true,
+      is_dangerous: true,
+      explanation_of_reasoning: 'Plat plat',
+    });
+
+    expect(mockFetch.mock.calls.length).toEqual(1);
+    const req = mockFetch.mock.calls[0][0] as Request;
+    expect(req.url).toEqual(
+      'https://run.workflowai.com/v1/_/agents/animal-classification/schemas/4/run'
+    );
+    expect(req.method).toEqual('POST');
+    expect(req.headers.get('Authorization')).toEqual('Bearer hello');
+    const body = await req.json();
+    expect(body).toEqual({
+      version: 'production',
+      stream: false,
+      task_input: {
+        animal: 'platypus',
+      },
+      use_cache: 'auto',
+      use_fallback: 'never',
+    });
+  });
+
+  it('correctly handles useFallback when passed to the agent', async () => {
+    const run2 = workflowAI.agent<
+      AnimalClassificationInput,
+      AnimalClassificationOutput
+    >({
+      id: 'animal-classification',
+      schemaId: 4,
+      version: 'production',
+      useFallback: ['gpt-4o-mini', 'gpt-4o'],
+    });
+    const run1Fixture = await readFile(fixturePath('run1.json'), 'utf-8');
+    mockFetch.mockResponseOnce(run1Fixture);
+
+    const result = await run2({ animal: 'platypus' });
+    expect(result.output).toEqual({
+      is_cute: true,
+      is_dangerous: true,
+      explanation_of_reasoning: 'Plat plat',
+    });
+
+    expect(mockFetch.mock.calls.length).toEqual(1);
+    const req = mockFetch.mock.calls[0][0] as Request;
+    expect(req.url).toEqual(
+      'https://run.workflowai.com/v1/_/agents/animal-classification/schemas/4/run'
+    );
+    expect(req.method).toEqual('POST');
+    expect(req.headers.get('Authorization')).toEqual('Bearer hello');
+    const body = await req.json();
+    expect(body).toEqual({
+      version: 'production',
+      stream: false,
+      task_input: {
+        animal: 'platypus',
+      },
+      use_cache: 'auto',
+      use_fallback: ['gpt-4o-mini', 'gpt-4o'],
+    });
+  });
 });

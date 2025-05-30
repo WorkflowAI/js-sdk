@@ -37,7 +37,8 @@ function optionsToRunRequest(
   input: Record<string, never>,
   options: Omit<RunOptions<true | false>, 'fetch'>
 ): RunRequest {
-  const { version, stream, metadata, useCache, privateFields } = options;
+  const { version, stream, metadata, useCache, privateFields, useFallback } =
+    options;
 
   return {
     task_input: input,
@@ -46,6 +47,7 @@ function optionsToRunRequest(
     metadata,
     use_cache: useCache || 'auto',
     private_fields: privateFields,
+    use_fallback: useFallback,
   };
 }
 
