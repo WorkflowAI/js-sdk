@@ -83,6 +83,11 @@ export interface components {
        * @description Fields marked as private will not be saved, none by default.
        */
       private_fields?: ('task_input' | string)[] | null;
+      /**
+       * Use Fallback
+       * @description Whether to use fallback models if the primary model fails.
+       */
+      use_fallback?: 'never' | 'auto' | string[] | null;
     };
     /**
      * TaskGroupProperties
