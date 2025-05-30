@@ -60,7 +60,7 @@ const getCapitalInfo = workflowAI.agent<
   // The selected model is in the same price range and depends on the error that was triggered
   // - "never": the fallback is never used
   // - list of model names: models to try in order after the primary model fails
-  useFallback: ['gpt-4o-mini', 'gpt-4o'],
+  useFallback: ['gpt-4o-mini-latest', 'gpt-4o-latest'],
 });
 
 // Run Your AI agent
