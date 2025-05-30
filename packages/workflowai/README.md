@@ -48,13 +48,19 @@ const getCapitalInfo = workflowAI.agent<
   id: 'get-capital-info',
   schemaId: 1,
   version: '1.4',
-  // Cache options:
+  // Cache options (can also be passed to the run function):
   // - "auto" (default): if a previous run exists with the same version and input, and if
   // the temperature is 0, the cached output is returned
   // - "always": the cached output is returned when available, regardless
   // of the temperature value
   // - "never": the cache is never used
   useCache: 'auto',
+  // Customize model fallback,  (can also be passed to the run function):
+  // - defaults to 'auto' meaning that the model to fallback to is picked by WorkflowAI
+  // The selected model is in the same price range and depends on the error that was triggered
+  // - "never": the fallback is never used
+  // - list of model names: models to try in order after the primary model fails
+  useFallback: ['gpt-4o-mini', 'gpt-4o'],
 });
 
 // Run Your AI agent
@@ -68,6 +74,12 @@ async function getCapitalInfoRun() {
       output,
       data: { duration_seconds, cost_usd, version },
     } = await getCapitalInfo(input);
+
+    // Also possible to pass options to the run function:
+    // const { output } = await getCapitalInfo(input, {
+    //   useCache: 'always',
+    //   useFallback: 'never',
+    // });
 
     console.log(output);
     console.log('\nModel: ', version?.properties?.model);
